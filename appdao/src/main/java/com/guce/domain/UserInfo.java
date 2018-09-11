@@ -1,5 +1,8 @@
 package com.guce.domain;
 
+import org.apache.ibatis.type.Alias;
+
+@Alias("userInfo")
 public class UserInfo {
     private Long id;
     private String userId;

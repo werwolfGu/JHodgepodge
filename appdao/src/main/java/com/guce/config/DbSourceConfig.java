@@ -1,10 +1,8 @@
 package com.guce.config;
 
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
@@ -58,12 +56,12 @@ public class DbSourceConfig {
         return factory.getObject();
     }
 
-    @Bean("sqlSession")
+    /*@Bean("sqlSession")
     public SqlSession sqlSession() throws Exception {
 
         SqlSession sqlSession = new SqlSessionTemplate(sqlSessionFactory());
         return sqlSession;
 
-    }
+    }*/
 
 }

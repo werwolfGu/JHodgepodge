@@ -4,6 +4,7 @@ import com.alibaba.fastjson.JSON;
 import com.guce.dao.DemoDao;
 import com.guce.domain.UserInfo;
 import org.apache.ibatis.session.SqlSession;
+import org.apache.ibatis.session.SqlSessionFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,9 +26,8 @@ public class DemoDaoImpl implements DemoDao {
     @Resource(name = "secondJdbcTemplate")
     private JdbcTemplate jdbcTemplate1;
 
-
     @Autowired
-    private SqlSession sqlSession;
+    private SqlSessionFactory sqlSessionFactory;
 
     @Override
     public String getInfo(Map<String,Object> paramMap) {
@@ -37,6 +37,7 @@ public class DemoDaoImpl implements DemoDao {
             logger.info("jdbcTemplate dao list:" + list);
         }
 
+        SqlSession sqlSession = sqlSessionFactory.openSession();
         try{
             paramMap.put("id",1);
             List<UserInfo> userInfos = sqlSession.selectList("sample.mybatis.mapper.UserInfo.selectUserInfoById",paramMap);
@@ -45,6 +46,8 @@ public class DemoDaoImpl implements DemoDao {
             }
         }catch (Exception e){
             logger.error("从数据库中获取数据Exception:{}" ,e.getMessage(),e);
+        }finally {
+            sqlSession.close();
         }
         return null;
     }

@@ -16,7 +16,7 @@ public class ZkConfig {
     @Value("${zk.retry.sleep.time:1000}")
     private int baseSleepTime;
 
-    @Value(("${zk.max.retries:3}"))
+    @Value("${zk.max.retries:3}")
     private int maxRetries;
 
     @Value("${zk.connection.timeout:5000}")
