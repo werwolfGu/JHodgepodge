@@ -1,4 +1,6 @@
-# springboot-demo
+# Jhodgepodge
+    java大杂烩 是基于springboot框架开发的；
+## springboot-demo
     springboot开发架构、日志使用log4j2 可支持异步日志
 ## 加入Filter/Interceptor
 
