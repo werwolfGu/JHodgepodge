@@ -8,6 +8,7 @@
     
 ## 集成mybatis
     springboot集成mybatis
+    
 ## 集成zookeeper(curator)
     通过zookeeper实现服务配置；通知/协调 发布订阅
 
@@ -18,5 +19,6 @@
     
 ## guavaCache 
 -   [guava缓存](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/guava_cache.md)
+
 ## Object对象结构
 - [Java Object结构](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/createObject.md)

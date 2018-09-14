@@ -32,7 +32,17 @@
     - 缓存key被封装在WeakReference引用中；
     - 缓存Value被封装在WeakReference或SoftReference引用中；
 - 如图所示，guava cache结构图
-![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/guava-cache.png)
+![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/guava_cache.png)
+
+如图所示是Guava Cache的大致缓存结构
+- cache为segment数组，每个segment有一个ReferenceEntry数组，ReferenceEntry也是一个链表；
+    - segment包含了一个ReferenceEntry[]、recencyQueue、writeQueue、accessQueue；这3个队列用来到清除淘汰数据；
+    - ReferenceEntry是一给键值对的抽象，结构中包含了：key、hash、ValueReference、next等字段；
+    ReferenceEntry实现类：StrongEntry、StrongWriteEntry、StrongAccessEntry、StrongWriteAccessEntry等；
+    - ValueReference实现类：StrongValueReference、SoftValueReference、WeakValueReference。
+    其中还有LoadingValueReference用于支持在加载同一个key时出现并发请求时，其他请求不必走相同的逻辑等待第一个请求返回而设计的；
+    - writeQueue、accessQueue、recencyQueue为了实现LRU算法，而增加的3个队列 recencyQueue为LinkedBlockingDueue；writeQueue、accessQueue为guava自定义的双向链表；
+>guava cache常用的功能有：refreshAfterWrite、expireAfterWrite、expireAfterAccess、maximumSize等；
 
 
 
