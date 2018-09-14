@@ -115,7 +115,8 @@ private static class LockData{
         return true;
     }
 ```
-- [源代码](https://github.com/werwolfGu/springboot-demo/blob/master/api/src/main/java/com/guce/redis/lock/impl/InterProcessRedisMutexLock.java)
+- [源代码](https://github.com/werwolfGu/JHodgepodge/blob/master/api/src/main/java/com/guce/redis/lock/impl/InterProcessRedisMutexLock.java)
+- [示例](https://github.com/werwolfGu/JHodgepodge/blob/master/api/src/test/java/com/guce/redis/lock/LockTest.java)
 ## 总结
 - 至此redis可重入锁实现已完成，但是依然还有问题存在，比如业务代码还未执行完，但是redis超时时间一到，所以这个超时时间需要业务自己控制；
 

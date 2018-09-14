@@ -12,7 +12,7 @@
     通过zookeeper实现服务配置；通知/协调 发布订阅
 
 ## redis分布式锁
--   [基于redis实现分布式可重入锁](https://github.com/werwolfGu/springboot-demo/blob/master/MD/redis-distribute.md)
+-   [基于redis实现分布式可重入锁](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/redis-distribute.md)
 ## 自定义注解
     基于springAOP(aspect)实现自定义注解 解析
     

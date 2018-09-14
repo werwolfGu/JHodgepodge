@@ -3,6 +3,8 @@ package com.guce.guava;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
+import com.google.common.cache.RemovalListener;
+import com.google.common.cache.RemovalNotification;
 import com.google.common.collect.ImmutableMap;
 import com.google.errorprone.annotations.CompatibleWith;
 import org.slf4j.Logger;
@@ -22,7 +24,16 @@ public abstract class AbstractGuavaCache<K,V>{
 
         delegate = CacheBuilder
                 .newBuilder()
-                .refreshAfterWrite(maxSize, unit)
+                .refreshAfterWrite(refreshTime, unit)
+                .removalListener(new RemovalListener<Object, Object>() {
+                    @Override
+                    public void onRemoval(RemovalNotification<Object, Object> notification) {
+                        if(logger.isInfoEnabled()){
+                            logger.info("删除 cause：{} -> key:{} -> value{}"
+                                    ,notification.getCause(),notification.getKey(),notification.getValue());
+                        }
+                    }
+                })
 //                .expireAfterWrite(maxSize,unit)
                 .maximumSize(maxSize)
                 .build(cacheLoader);

@@ -1,6 +1,6 @@
 package com.guce.redis.lock;
 
-import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.Jedis;
 
 import java.util.concurrent.TimeUnit;
 
@@ -12,9 +12,9 @@ public interface InterProcessLock {
      * @param key
      * @return
      */
-    public boolean lock(JedisCommands jedisCommands, String key) throws InterruptedException;
+    public boolean lock(Jedis jedisCommands, String key) throws InterruptedException;
 
-    public boolean tryLock(JedisCommands jedisCommands , String key, long time, TimeUnit timeUnit) throws InterruptedException;
+    public boolean tryLock(Jedis jedisCommands , String key, long time, TimeUnit timeUnit) throws InterruptedException;
 
     /**
      * redis 解锁
@@ -22,5 +22,5 @@ public interface InterProcessLock {
      * @param key
      * @return
      */
-    public boolean unlock(JedisCommands jedisCommands, String key);
+    public boolean unlock(Jedis jedisCommands, String key);
 }
