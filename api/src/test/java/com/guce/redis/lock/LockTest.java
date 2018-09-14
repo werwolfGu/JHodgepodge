@@ -13,7 +13,7 @@ public class LockTest {
 
         for(int i = 0 ; i < 10 ;i++ ){
 
-            Jedis jedis = new Jedis("192.168.144.122",6379);
+            Jedis jedis = new Jedis("redis.local",6379);
             Thread th = new Thread(new Runnable() {
                 @Override
                 public void run() {
