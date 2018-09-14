@@ -18,3 +18,5 @@
     
 ## guavaCache 
 -   [guava缓存](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/guava_cache.md)
+## Object对象结构
+- [Java Object结构](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/createObject.md)
