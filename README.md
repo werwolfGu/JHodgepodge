@@ -22,3 +22,5 @@
 
 ## Object对象结构
 - [Java Object结构](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/createObject.md)
+
+- [一致性hash算法](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/consistent_hash.md)

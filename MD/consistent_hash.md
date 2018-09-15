@@ -15,16 +15,20 @@
 
 一致性hash是对2^32是模，所以起点是0，终点是2^32-1;并且[0,2^23-1]形成一个环；    
 如图所示
+
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_3.png)
     
 将对象放入到hash环中
 如图所示
+
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_4.png)    
 >m1=hash(o3);
 m2=hash(o1);
 m3=hash(o2);    
 
 将节点放入到hash环中
+如图所示
+
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_5.png)
 >n1=hash(c3);
 n2=hash(c1);
@@ -36,10 +40,12 @@ n3=hash(c2);
 
 增减节点的情况
 增加节点如图所示
+
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_6.png)
 >从图中可以看出当增加节点后受影响的数据只有一小部分节点 n2~n4位置的数据会访问到n4 ；其他数据还是正常访问的；
 
 减少节点如图所示
+
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_7.png)
 >减少节点后如图所示o2会访问到n2上，即原先n1~n3节点的数据都会去访问n2节点了；    
 
