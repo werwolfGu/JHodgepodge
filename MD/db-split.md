@@ -48,5 +48,8 @@
 
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/db_5.png) 
 
->在之前有4个数据库，现在扩展成8个数据库 db5 存有db1 的冗余`5 == hash(key)%8`的数据 db6有db2的冗余`5 == hash(key)%8`的数据... 按之前hash(key) mod 4 ；现在mod 8 ；
-比如现在 key为5 ；之前是落到db1 ；但现在落到db5不过是有db1的数据，这样就可以平滑实现数据库扩张； 以此类推；水平分表同理
+>在之前有4个数据库，现在扩展成8个数据库`db5`存有`db1` 的冗余`5 == hash(key)%8`的数据`db6`有`db2`的冗余`5 == hash(key)%8`的数据...按之前hash(key) mod 4 ；现在mod 8 ；
+比如现在 key为5 ；之前是落到db1 ；但现在落到db5不过是有db1的数据，这样就可以平滑实现数据库扩张；以此类推；水平分表同理
+
+- 如果使用[一致性hash算法](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/consistent_hash.md)实现分表分库可以随便增加几个数据库节点；亦无需按倍数来增加数据库
+参考 [大众点评订单系统分库分表实践](https://tech.meituan.com/dianping_order_db_sharding.html)

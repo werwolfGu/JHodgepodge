@@ -23,9 +23,9 @@
 ## Object对象结构
 - [Java Object结构](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/createObject.md)
 
-##数据结构与算法
+## 数据结构与算法
 - [一致性hash算法](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/consistent_hash.md)
 
 ## MySQL
 
-- [数据库分库分表](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/db_split.md)
+- [数据库分库分表](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/db-split.md)
