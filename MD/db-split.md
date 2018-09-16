@@ -52,4 +52,5 @@
 比如现在 key为5 ；之前是落到db1 ；但现在落到db5不过是有db1的数据，这样就可以平滑实现数据库扩张；以此类推；水平分表同理
 
 - 如果使用[一致性hash算法](https://github.com/werwolfGu/JHodgepodge/blob/master/MD/consistent_hash.md)实现分表分库可以随便增加几个数据库节点；亦无需按倍数来增加数据库
+
 参考 [大众点评订单系统分库分表实践](https://tech.meituan.com/dianping_order_db_sharding.html)
