@@ -25,12 +25,20 @@
 将ID和库的mapping关系存在一个单独的库中；
         
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/db_1.png)
+
+**优点**：ID和库的Mapping算法可以随意更改。
+
+**缺点**：引入额外的单点。
     
 - 范围拆分
     
 比如按时间范围或按ID范围拆分；
         
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/db_2.png)
+
+**优点**：单表大小可控，天然水平扩展。
+
+**缺点**：无法解决集中写入瓶颈的问题。
         
 - hash拆分       
      

@@ -49,3 +49,19 @@ n3=hash(c2);
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_7.png)
 >减少节点后如图所示o2会访问到n2上，即原先n1~n3节点的数据都会去访问n2节点了；    
 
+- 虚拟节点
+
+>上面已基本上介绍完了一致性hash的基本原理了，但是还有一个问题，比如环上的节点分布不均衡；比如增加一个节点但是影响的
+只是增加节点的后面的那个节点其他节点不受影响；为此引入了虚拟节点来解决分布不均衡的问题；
+将每台物理机虚拟成一组虚拟机，将虚拟机放置到hash环上，如果需要确定对象的机器，先确定对象的虚拟机器，再由虚拟机器确定物理机器。
+
+如图所示
+
+![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_2.png)
+
+>如图,c1 c2  c3分别分出了一组虚拟节点出来
+c1->c_11、c_12、c_13;
+c2->c_21、c_22、c_23;
+c3->c_31、c_32、c_33;
+
+
