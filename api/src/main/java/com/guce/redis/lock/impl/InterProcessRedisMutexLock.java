@@ -4,6 +4,7 @@ import com.guce.redis.lock.InterProcessLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
+import redis.clients.jedis.JedisCommands;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -33,13 +34,12 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
     private final ConcurrentMap<Thread,LockData> lockDataMap = new ConcurrentHashMap<>();
 
     @Override
-    public boolean lock(Jedis jedis, String key) throws InterruptedException {
+    public boolean lock(JedisCommands jedis, String key) throws InterruptedException {
 
         return tryLock(jedis,key,overtime ,null);
     }
 
     /**
-     * 暂未实现
      * @param jedisCommands
      * @param key
      * @param time
@@ -48,7 +48,7 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
      * @throws InterruptedException
      */
     @Override
-    public boolean tryLock(Jedis jedisCommands, String key, long time, TimeUnit unit) throws InterruptedException {
+    public boolean tryLock(JedisCommands jedisCommands, String key, long time, TimeUnit unit) throws InterruptedException {
 
         Thread currentThread = Thread.currentThread();
         Long currTime ;
@@ -94,7 +94,7 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
     }
 
     @Override
-    public boolean unlock(Jedis jedisCommands, String key) {
+    public boolean unlock(JedisCommands jedisCommands, String key) {
 
         Thread currentThread = Thread.currentThread();
         LockData lockData = lockDataMap.get(currentThread);
