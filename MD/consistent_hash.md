@@ -64,4 +64,6 @@ c1->c_11、c_12、c_13;
 c2->c_21、c_22、c_23;
 c3->c_31、c_32、c_33;
 
+- [一致性hash示例](https://github.com/werwolfGu/JHodgepodge/blob/master/app-leetcode/src/main/java/com/guce/ConsistentHashWithoutVN.java)
+
 
