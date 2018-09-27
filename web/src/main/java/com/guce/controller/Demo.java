@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.annotation.Resource;
+import java.util.concurrent.ExecutionException;
 
 @RestController
 @RequestMapping("/sync")
@@ -15,7 +16,7 @@ public class Demo {
     private DemoService demoService ;
 
     @RequestMapping(value = "/hello" ,method = {RequestMethod.GET,RequestMethod.POST})
-    public String helloWorld(){
+    public String helloWorld() throws ExecutionException {
 
         return demoService.helloService("name","age");
     }

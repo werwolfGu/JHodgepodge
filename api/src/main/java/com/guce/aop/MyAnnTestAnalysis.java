@@ -37,6 +37,7 @@ public class MyAnnTestAnalysis {
         if(joinPoint instanceof MethodInvocationProceedingJoinPoint){
 
             MethodInvocationProceedingJoinPoint methodInvocationProceedingJoinPoint = (MethodInvocationProceedingJoinPoint) joinPoint;
+
             Field proxy = methodInvocationProceedingJoinPoint.getClass().getDeclaredField("methodInvocation");
             proxy.setAccessible(true);
             ReflectiveMethodInvocation methodInvocation = (ReflectiveMethodInvocation) proxy.get(joinPoint);

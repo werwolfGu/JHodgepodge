@@ -1,4 +1,4 @@
-package com.guce;
+package com.guce.module;
 
 /**
  * Created by chengen.gu on 2018/9/20.

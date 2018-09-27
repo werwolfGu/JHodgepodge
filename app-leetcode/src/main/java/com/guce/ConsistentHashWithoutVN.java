@@ -3,6 +3,7 @@ package com.guce;
 import com.google.common.hash.HashCode;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
+import com.guce.module.ServerNode;
 
 import java.util.ArrayList;
 import java.util.Collections;

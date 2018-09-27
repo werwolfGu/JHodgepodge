@@ -1,1 +1,2 @@
-org.springframework.boot.autoconfigure.EnableAutoConfiguration=com.guce.config.ApiConfig
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+  com.guce.config.ApiBeanCfgCenter

@@ -21,9 +21,11 @@ public class AsynDemoController {
     private DemoService demoService ;
 
     @RequestMapping(value = "/hello")
-    public CompletableFuture<String> asynHelloworld(HttpServletRequest request, HttpServletResponse response) throws InterruptedException {
+    public CompletableFuture<String> asynHelloworld(HttpServletRequest request, HttpServletResponse response) throws Exception {
         Thread.sleep(3000);
+
         return CompletableFuture.completedFuture(demoService.helloService("name2",null));
+
     }
 
     @RequestMapping(value = "/helloV1")
