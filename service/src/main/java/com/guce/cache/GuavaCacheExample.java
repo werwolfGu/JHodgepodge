@@ -1,8 +1,8 @@
 package com.guce.cache;
 
 import com.guce.cache.loader.SampleCacheLoader;
-import com.guce.cache.thread.AsyncCacheThreadFactory;
 import com.guce.guava.AbstractGuavaCache;
+import com.guce.thread.AsyncCacheThreadFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 

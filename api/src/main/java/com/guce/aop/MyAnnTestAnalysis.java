@@ -27,6 +27,7 @@ public class MyAnnTestAnalysis {
     private static Logger logger = LoggerFactory.getLogger(MyAnnTestAnalysis.class);
 
     @Around("@annotation(com.guce.aop.MyAnnTest)")
+//    @Pointcut("execution( * com.guce.*.*(..))")
     public Object methodAround(ProceedingJoinPoint joinPoint) throws Throwable {
 //        logger.warn(" methodAround :{}" ,joinPoint);
         return this.invoker(joinPoint);
