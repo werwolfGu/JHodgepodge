@@ -43,5 +43,6 @@ public class IntegerReverse {
 
     public static void main(String[] args) {
         System.out.println(solution(1534236469));
+        System.out.println(-8 % 10);
     }
 }
