@@ -81,6 +81,7 @@ public class threeSum {
         set.add(list1);
         set.add(list2);
         System.out.println(list1.hashCode() == list2.hashCode());
+        System.out.println(list1 == list2);
         System.out.println(set);
     }
 
