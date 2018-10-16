@@ -68,7 +68,7 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
             try{
                 result = jedisCommands.set(key,currTime.toString(),SET_IF_NOT_EXIST,SET_WITH_EXPIRE_TIME,overtime);
             }catch (Exception e){
-                e.printStackTrace();
+                logger.error("redis lock Exception key:{}  -> message:{}" ,key,e.getMessage(),e);
             }
             //加锁  判断是否成功
             if(LOCK_SUCCESS.equals(result)){
@@ -98,18 +98,15 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
 
         Thread currentThread = Thread.currentThread();
         LockData lockData = lockDataMap.get(currentThread);
-        if ( lockData == null )
-        {
+        if ( lockData == null ) {
             throw new IllegalMonitorStateException("You do not own the lock: " + key + " currThread:" + currentThread );
         }
         int newLockCount = lockData.lockCount.decrementAndGet();
-        if ( newLockCount > 0 )
-        {
+        if ( newLockCount > 0 ) {
             return true;
         }
 
-        if ( newLockCount < 0 )
-        {
+        if ( newLockCount < 0 ){
             throw new IllegalMonitorStateException("Lock count has gone negative for lock: " + key);
         }
 

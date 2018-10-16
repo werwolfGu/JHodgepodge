@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.Scope;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -95,6 +96,7 @@ public class DbSourceConfig {
     }
 
     @Bean("druidDataSource")
+    @Scope("prototype")
     public DataSource druidDataSource(){
         DruidDataSource druidDataSource = new DruidDataSource();
         druidDataSource.setAsyncInit(true);
