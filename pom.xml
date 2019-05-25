@@ -15,6 +15,7 @@
     <module>appdao</module>
     <module>app-zk</module>
     <module>app-leetcode</module>
+      <module>spi</module>
   </modules>
   <packaging>pom</packaging>
 
