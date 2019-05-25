@@ -9,7 +9,6 @@ import java.util.ServiceLoader;
 /**
  * @Auther:chengen.gce
  * @Date:2019/5/25 13:31
- * @E-mail: chengen.gce@alibaba-inc.com
  * @Description:
  */
 public class SpiServiceMain {
