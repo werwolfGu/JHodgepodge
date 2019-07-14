@@ -18,15 +18,15 @@ import java.util.concurrent.ExecutionException;
 public class DemoService {
 
     private static Logger logger = LoggerFactory.getLogger(DemoService.class);
-    
+
     @Autowired
     private DemoDao demoDao;
 
     /*@Resource(name = "appDemo")
     private AppDemo AppDemo;*/
 
-    @Autowired
-    private CacheZkServiceDemo cacheZkServiceDemo;
+//    @Autowired
+//    private CacheZkServiceDemo cacheZkServiceDemo;
 
     @Autowired
     private AppDemo appDemo;
@@ -41,7 +41,7 @@ public class DemoService {
     public String helloService(@MyAnnTest(name = "name")  String name,@MyAnnTest(name = "age") String age) throws ExecutionException {
         demoDao.getInfo(new HashMap<>());
         String value = guavaCacheExample.get("key");
-        cacheZkServiceDemo.getZkNodePath();
+//        cacheZkServiceDemo.getZkNodePath();
         appDemo.doSomething();
         demo.doSomething();
         logger.info("guava cache value:{}",value );

@@ -1,12 +1,6 @@
 package com.guce.zk;
 
-import com.guce.manager.cache.NodeCacheZkClientWatcher;
-import org.apache.curator.framework.recipes.cache.NodeCache;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.stereotype.Service;
-
+/*
 @Service("zkDemoService")
 public class ZkDemoService extends NodeCacheZkClientWatcher {
 
@@ -27,4 +21,4 @@ public class ZkDemoService extends NodeCacheZkClientWatcher {
         return zkPath;
     }
 
-}
+}*/

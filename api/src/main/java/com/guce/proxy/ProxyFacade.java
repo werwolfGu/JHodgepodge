@@ -5,5 +5,7 @@ package com.guce.proxy;
  */
 public class ProxyFacade {
 
+    public static void main(String[] args) {
 
+    }
 }

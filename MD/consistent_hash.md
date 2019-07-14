@@ -4,8 +4,8 @@
     遇到比如对数据库进行**分表分库** 、分布式缓存节点**增加/删除/宕机**的情况；但是在普通的hash 
     
 - 如图所示
-![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_1.png)    
-    
+![](../web/src/main/webapp/picture/hash_1.png)    
+  
 对于分布式缓存不同机器上存着不同的数据；为了实现这些缓存节点的负载均衡，使用hash定位服务器是很常见的一种方式
 >m=hash(o)%n  o：需要缓存的对象；n：缓存节点的数量；m：定位到一台缓存节点的编号；比如m=2定位到database-B;
 这个算法在平时大部分时间下是没问题；但是比如当需要缓存的数据量增大了，需要增加服务器节点；或某个节点宕机了；比如此时n=4那么hash出来的只就完全不一致了；影响到的数据就很多了；
