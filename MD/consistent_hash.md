@@ -13,7 +13,7 @@
 
 - 一致性hash
 
-一致性hash是对2^32是模，所以起点是0，终点是2^32-1;并且[0,2^23-1]形成一个环；    
+一致性hash是对2^32是模，所以起点是0，终点是2^32-1;并且[0,2^32-1]形成一个环；    
 如图所示
 
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_3.png)
@@ -59,9 +59,9 @@ n3=hash(c2);
 
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/hash_2.png)
 
->如图,c1 c2  c3分别分出了一组虚拟节点出来
-c1->c_11、c_12、c_13;
-c2->c_21、c_22、c_23;
+>如图,c1 c2  c3分别分出了一组虚拟节点出来   
+c1->c_11、c_12、c_13;   
+c2->c_21、c_22、c_23;   
 c3->c_31、c_32、c_33;
 
 - [一致性hash示例](https://github.com/werwolfGu/JHodgepodge/blob/master/app-leetcode/src/main/java/com/guce/ConsistentHashWithoutVN.java)
