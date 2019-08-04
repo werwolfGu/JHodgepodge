@@ -34,11 +34,14 @@ in Object.wait()：线程获取锁之后又执行obj.wait()放弃锁；
     - 获取进程的堆栈信息： jstack -l pid  >> jvmstack.txt   或 kill -3 pid;
     - 如果我们要查看进程中的哪个线程占用CPU高 可通过  top -c -Hp pid ;
 
-top -Hp ${pid} 如下图所示
+- top -Hp ${pid} 如下图所示
 
 ![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/top-Hp.png)
 
 >这个time+ 表示该线程耗费的CPU时间
+
+- ps H -eo user,pid,ppid,tid,time,%cpu,cmd --sort=%cpu | more
+>查看cpu消耗最高线程
 
 通过 `jstack -l pid  >> jvmstack.txt`   或 `kill -3 pid` 获取到的堆栈信息和上面获取到的线程号( `printf "%x\n" pid`)转成16进制找到对应的线程；找到对应的线程；再具体分析该线程；
 

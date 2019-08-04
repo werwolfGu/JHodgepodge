@@ -15,7 +15,8 @@
     <module>appdao</module>
     <module>app-zk</module>
     <module>app-leetcode</module>
-      <module>core</module>
+    <module>core</module>
+    <module>spi</module>
   </modules>
   <packaging>pom</packaging>
 
@@ -245,7 +246,7 @@
     <dependency>
       <groupId>commons-fileupload</groupId>
       <artifactId>commons-fileupload</artifactId>
-      <version>1.2.2</version>
+      <version>1.3.3</version>
     </dependency>
     <dependency>
       <groupId>org.aspectj</groupId>

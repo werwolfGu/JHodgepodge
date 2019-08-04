@@ -74,6 +74,7 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
             if(LOCK_SUCCESS.equals(result)){
 
                 LockData newLockData = new LockData(currentThread);
+                newLockData.setOverTime(overtime);
                 lockDataMap.put(currentThread, newLockData);
 
                 return true;
@@ -110,6 +111,14 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
             throw new IllegalMonitorStateException("Lock count has gone negative for lock: " + key);
         }
 
+        //已经超时
+        long overTime = lockData.getOverTime();
+        if (overTime > 0){
+            long currTime = System.currentTimeMillis();
+            if (overTime >  (currTime -lockData.getCurrTime())){
+                return true;
+            }
+        }
         try{
 
             jedisCommands.del(key);
@@ -132,11 +141,23 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
     private static class LockData{
 
         final Thread owningThread;
+        private Long currTime = System.currentTimeMillis();
+        private Long overTime = 0L;
         final AtomicInteger lockCount = new AtomicInteger(1);
 
-        private LockData(Thread owningThread)
-        {
+        private LockData(Thread owningThread) {
             this.owningThread = owningThread;
+        }
+
+        public void setOverTime(Long overTime){
+            this.overTime = overTime;
+        }
+        public long getOverTime(){
+            return overTime;
+        }
+
+        public long getCurrTime(){
+            return currTime;
         }
     }
 
