@@ -17,7 +17,7 @@ public class CgLibInvocationHandler implements MethodInterceptor {
 
     private Object target;
 
-    public Object getInstance(Object target){
+    public <T> T getInstance(T target){
 
         this.target = target;
 
@@ -25,7 +25,7 @@ public class CgLibInvocationHandler implements MethodInterceptor {
         enhancer.setSuperclass(this.target.getClass());
         enhancer.setCallback(this);
 
-        return enhancer.create();
+        return (T) enhancer.create();
     }
 
 
@@ -37,5 +37,12 @@ public class CgLibInvocationHandler implements MethodInterceptor {
         methodProxy.invoke(target,args);
         System.out.println("cglib dynamic proxy end...");
         return null;
+    }
+
+    public static void main(String[] args) {
+        CgLibInvocationHandler handler = new CgLibInvocationHandler();
+        Hello hello = new Hello();
+        Hello hello1= handler.getInstance(hello);
+        hello1.say();
     }
 }

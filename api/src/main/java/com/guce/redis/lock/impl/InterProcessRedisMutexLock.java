@@ -110,17 +110,17 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
         if ( newLockCount < 0 ){
             throw new IllegalMonitorStateException("Lock count has gone negative for lock: " + key);
         }
-
-        //已经超时
-        long overTime = lockData.getOverTime();
-        if (overTime > 0){
-            long currTime = System.currentTimeMillis();
-            if (overTime >  (currTime -lockData.getCurrTime())){
-                return true;
-            }
-        }
         try{
 
+            //如果已经超时了还去删除的话，可能会把其他线程的锁给删了
+            long overTime = lockData.getOverTime();
+            if (overTime > 0){
+                long currTime = System.currentTimeMillis();
+                if (overTime >  (currTime -lockData.getCurrTime())){
+                    lockDataMap.remove(currentThread);
+                    return true;
+                }
+            }
             jedisCommands.del(key);
         }finally {
             lockDataMap.remove(currentThread);

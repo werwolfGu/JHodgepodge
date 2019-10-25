@@ -34,7 +34,7 @@ public class FilterDemo implements Filter {
     public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
 
         HttpServletRequest request = (HttpServletRequest) servletRequest;
-Å
+
         String uri = request.getRequestURI();
         if(StringUtils.isBlank(uri) || filterURISet.contains(uri)){
             return;

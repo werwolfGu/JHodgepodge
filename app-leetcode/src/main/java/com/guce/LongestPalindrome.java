@@ -1,8 +1,5 @@
 package com.guce;
 
-import java.util.HashMap;
-import java.util.Map;
-
 /**
  * Created by chengen.gu on 2018/9/18.
  *
@@ -20,35 +17,61 @@ import java.util.Map;
  */
 public class LongestPalindrome {
 
+    /**
+     * 中心扩展法
+     * @param s
+     * @return
+     */
     public static String solution(String s){
         int max = 0 ;
         int idx = 0 ;
 
+        for (int i = 0 ; i < s.length() ; i++ ){
+            int tmp = expend(s,i,i);
+            int tmp1 = expend(s,i , i +1 );
 
-        Map<Character,Integer> map = new HashMap<>();
-
-        for(int i = 0 ; i < s.length() ; i++ ){
-            Character ch = s.charAt(i);
-            if(map.containsKey(ch)){
-                int value = map.get(ch);
-                int v1 = i - value;
-                if(max < v1 && value >= idx){
-
-                    idx = value;
-                    max = v1;
-                }
-
+            if (Math.max(tmp,tmp1) > max){
+                max = Math.max(tmp,tmp1);
+                idx =  i - (max -1) / 2;
             }
-            map.put(ch,i);
+
         }
-        if(max > 0 ){
-            return s.substring(idx,idx + max + 1 );
-        }
-        return null;
+        return s.substring(idx,max + idx );
     }
 
+    public static int expend(String str , int l ,int r){
+        while ( l >= 0 && r < str.length() && str.charAt(l) == str.charAt(r)){
+            l-- ;
+            r++ ;
+        }
+        return r - l - 1;
+    }
+
+    public static String dpSolution(String s){
+        int size = s.length();
+        if (size < 2 ){
+            return s;
+        }
+        boolean dp[][] = new boolean[size][size];
+        int maxLen =1 ,start = 0 ;
+        for (int i = 0 ; i < size ; i++ ){
+            dp[i][i] = true;
+            for ( int j = 0 ; j < i ; j++ ){
+                if ( s.charAt(i) == s.charAt(j) && (i - j == 1 || dp[j+1][i-1]) ){
+                    dp[i][j] = true;
+                    if (i - j +1 > maxLen){
+                        maxLen = i - j +1 ;
+                        start = j;
+                    }
+                }
+            }
+        }
+        return s.substring(start,start + maxLen);
+    }
+
+
     public static void main(String[] args) {
-        System.out.println(solution("cbbd"));
+        System.out.println(solution("dhabdddddd"));
         char i = '1';
         char a = 'a';
         if(i > 48 && i < 57)

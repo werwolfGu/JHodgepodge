@@ -32,7 +32,7 @@ public class LengthOfLongestSubstring {
      * @param s
      * @return
      */
-    public int lengthOfLongestSubstring(String s){
+    public static int lengthOfLongestSubstring(String s){
 
         if(s == null || "".equals(s)){
             return 0;
@@ -55,5 +55,9 @@ public class LengthOfLongestSubstring {
             }
         }
         return maxLen ;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(lengthOfLongestSubstring("sdaddpwen"));
     }
 }

@@ -17,7 +17,7 @@ public class JavassistHandler {
         CtClass cc = cp.get("com.guce.proxy.Hello");
         CtMethod m = cc.getDeclaredMethod("say");
         m.insertBefore("{ System.out.println(\"Hello.say():\"); }");
-
+        m.insertAfter("{ System.out.println(\"Hello.say():\"); }");
         Class c = cc.toClass();
         Hello h = (Hello)c.newInstance();
         h.say();

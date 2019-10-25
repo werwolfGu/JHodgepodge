@@ -4,6 +4,7 @@ package com.guce;
  * Created by chengen.gu on 2018/9/18.
  * https://leetcode-cn.com/problems/integer-to-roman/description/
  * 将整形转换成罗马数
+ * 思路：将罗马数与对应的整数映射好，从最大的数减去int整数
  */
 public class IntToRoman {
 
@@ -13,15 +14,15 @@ public class IntToRoman {
 
         String roman[] = new String[]{"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
 
-        String result = "";
+        StringBuilder result = new StringBuilder();
         for(int i = 0 ; i < numbers.length ; i++ ){
             while (num >= numbers[i]){
                 num -= numbers[i];
-                result += roman[i];
+                result.append(roman[i]);
             }
         }
 
-        return result;
+        return result.toString();
 
     }
 
