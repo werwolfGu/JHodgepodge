@@ -38,9 +38,12 @@ public class LCS {
         return dp[str1.length()][str2.length()];
     }
 
-    public static void main(String[] args) {
-
-        String[] strs = new String[1];
+    /**
+     * 最长前缀匹配
+     * @param strs
+     * @return
+     */
+    public String longestPrefixMatch(String[] strs){
         String prefix = strs[0];
         for (int i = 1 ; i < strs.length ; i++ ){
             StringBuilder tmp = new StringBuilder();
@@ -53,5 +56,10 @@ public class LCS {
             }
             prefix = tmp.toString();
         }
+        return prefix;
+    }
+    public static void main(String[] args) {
+
+
     }
 }
