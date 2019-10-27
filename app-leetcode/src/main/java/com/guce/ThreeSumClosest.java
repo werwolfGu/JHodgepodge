@@ -11,14 +11,14 @@ import java.util.Vector;
  */
 public class ThreeSumClosest {
 
-    public static int solution(int[] nums,int target){
+    public static int solution(int[] nums, int target) {
 
         int minClosest = Integer.MAX_VALUE;
 
-        for(int i = 0 ; i < nums.length - 1;i++){
+        for (int i = 0; i < nums.length - 1; i++) {
 
             int target1 = target - nums[i];
-            for(int j = i + 1; j < nums.length ; j++ ){
+            for (int j = i + 1; j < nums.length; j++) {
 
             }
         }
@@ -33,7 +33,7 @@ public class ThreeSumClosest {
         list.add(2);
         list1.add(2);
         list1.add(1);
-        System.out.println(list.equals(list1) );
+        System.out.println(list.equals(list1));
 
         Vector<Integer> vector = new Vector<>();
         Vector<Integer> vector1 = new Vector<>();

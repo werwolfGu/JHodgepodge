@@ -9,29 +9,29 @@ import java.util.Stack;
  */
 public class ValidBrackets {
 
-    public static boolean solution(String s){
+    public static boolean solution(String s) {
         Stack<Character> stack = new Stack<>();
 
-        for(int i = 0 ; i < s.length() ; i++ ){
+        for (int i = 0; i < s.length(); i++) {
             Character ch = s.charAt(i);
-            if(ch == '(' || ch == '{' || ch == '['){
+            if (ch == '(' || ch == '{' || ch == '[') {
                 stack.push(ch);
                 continue;
             }
 
-            if(ch == ')' || ch == ']' || ch == '}'){
+            if (ch == ')' || ch == ']' || ch == '}') {
 
-                if(stack.size() <= 0){
+                if (stack.size() <= 0) {
                     return false;
                 }
                 Character tmp = stack.pop();
-                if(ch == ')' && tmp == '('){
+                if (ch == ')' && tmp == '(') {
                     continue;
                 }
-                if(ch == ']' && tmp == '['){
+                if (ch == ']' && tmp == '[') {
                     continue;
                 }
-                if(ch == '}' && tmp == '{'){
+                if (ch == '}' && tmp == '{') {
                     continue;
                 }
 
@@ -40,7 +40,7 @@ public class ValidBrackets {
 
         }
 
-        if(stack.size() > 0){
+        if (stack.size() > 0) {
             return false;
         }
         return true;

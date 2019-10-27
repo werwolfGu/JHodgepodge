@@ -5,11 +5,11 @@ import java.util.Map;
 
 /**
  * Created by chengen.gu on 2018/9/18.
- *
+ * <p>
  * 给定一个整数数组和一个目标值，找出数组中和为目标值的两个数。
-
+ * <p>
  * 你可以假设每个输入只对应一种答案，且同样的元素不能被重复利用。
-
+ * <p>
  * 示例:
  * 给定 nums = [2, 7, 11, 15], target = 9
  * 因为 nums[0] + nums[1] = 2 + 7 = 9
@@ -17,19 +17,19 @@ import java.util.Map;
  */
 public class TwoSum {
 
-    public int[] solution(int[] nums,int target){
+    public int[] solution(int[] nums, int target) {
         int result[] = new int[2];
 
-        Map<Integer,Integer> map = new HashMap<>();
-        for(int i = 0 ; i< nums.length ; i++ ){
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < nums.length; i++) {
 
             int currNum = target - nums[i];
-            if(map.containsKey(currNum)){
+            if (map.containsKey(currNum)) {
                 result[0] = map.get(currNum);
                 result[1] = i;
                 break;
             }
-            map.put(nums[i],i);
+            map.put(nums[i], i);
         }
         return result;
     }
@@ -38,7 +38,7 @@ public class TwoSum {
         TwoSum sum = new TwoSum();
         int[] nums = new int[]{2, 7, 11, 15};
         int target = 9;
-        int result[] = sum.solution(nums,target);
+        int result[] = sum.solution(nums, target);
         System.out.println("" + result[0] + "    " + result[1]);
     }
 }
