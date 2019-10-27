@@ -7,15 +7,15 @@ package com.guce;
  */
 public class RomanToInteger {
 
-    public static int solution(String s){
+    public static int solution(String s) {
 
-        String roman[] = new String[]{"M","CM","D","CD","C","XC","L","XL","X","IX","V","IV","I"};
-        int numbers[] = new int[]{1000,900,500,400,100,90,50,40,10,9,5,4,1};
+        String roman[] = new String[]{"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
+        int numbers[] = new int[]{1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
         int result = 0;
-        for(int i = 0 ; i < roman.length ; i++ ){
-            while (s.startsWith(roman[i])){
+        for (int i = 0; i < roman.length; i++) {
+            while (s.startsWith(roman[i])) {
                 result += numbers[i];
-                s =s.substring(roman[i].length());
+                s = s.substring(roman[i].length());
             }
         }
         return result;

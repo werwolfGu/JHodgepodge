@@ -27,7 +27,7 @@ public class RemoveDuplicates {
             }
         }
         System.out.println("repeat :" + repeatNum);
-        return repeatNum - 1 ;
+        return repeatNum - 1;
     }
 
     public void moveNums(int[] nums, int begin, int len) {
@@ -41,7 +41,7 @@ public class RemoveDuplicates {
 
     public static void main(String[] args) {
         RemoveDuplicates duplicates = new RemoveDuplicates();
-        int[] nums = {0,0,1,1,1,2,2,3,3,4};
+        int[] nums = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4};
         int x = duplicates.soution(nums);
         System.out.println(x);
         for (int i = 0; i < nums.length; i++) {
