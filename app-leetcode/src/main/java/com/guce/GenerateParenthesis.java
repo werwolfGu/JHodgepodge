@@ -13,27 +13,26 @@ import java.util.List;
 public class GenerateParenthesis {
 
 
-    public List<String> solution(int n ){
+    public List<String> solution(int n) {
 
-        List<String> list = new ArrayList(2*n);
+        List<String> list = new ArrayList(2 * n);
 
-        backtrace("",list,2*n ,0);
-         return list;
+        backtrace("", list, 2 * n, 0);
+        return list;
     }
 
     /**
-     *
-     * @param s  回溯每一次的字符串
+     * @param s    回溯每一次的字符串
      * @param list 结果集
-     * @param n     最终字符串的长度
-     * @param num   期望括号的数目
+     * @param n    最终字符串的长度
+     * @param num  期望括号的数目
      */
-    public void backtrace(String s, List<String> list, int n, int num ){
-        if(s.length() == n && num ==0){
+    public void backtrace(String s, List<String> list, int n, int num) {
+        if (s.length() == n && num == 0) {
             list.add(s);
             return;
         }
-        if(num < 0 || (s.length() == n && num !=0) ){
+        if (num < 0 || (s.length() == n && num != 0)) {
             return;
         }
         int v1 = num + 1;

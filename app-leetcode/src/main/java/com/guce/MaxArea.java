@@ -6,30 +6,27 @@ package com.guce;
  */
 public class MaxArea {
 
-    public static int solution(int[] height){
+    public static int solution(int[] height) {
 
-        int maxArea = 0 ;
-        /*for(int i = 0 ; i < height.length - 1 ; i++ ){
+        int maxArea = 0;
 
-            for(int j = i + 1 ; j < height.length ; j++ ){
-
-                int  x = j - i;
-                int y = Math.min(height[i],height[j]);
-                maxArea = Math.max(maxArea,x * y);
-            }
-        }*/
-
-        int i = 0 ,j = height.length - 1;
-        while (i < j){
+        int i = 0, j = height.length - 1;
+        while (i < j) {
             int x = j - i;
-            int y = Math.min(height[i],height[j]);
-            maxArea = Math.max(maxArea , x * y);
-            if(height[i] > height[j]){
+            int y = Math.min(height[i], height[j]);
+            maxArea = Math.max(maxArea, x * y);
+            if (height[i] > height[j]) {
                 j--;
-            }else{
+            } else {
                 i++;
             }
         }
         return maxArea;
+    }
+
+    public static void main(String[] args) {
+        int[] len = {1, 8, 6, 2, 5, 4, 8, 3, 7};
+        int area = solution(len);
+        System.out.println(area);
     }
 }
