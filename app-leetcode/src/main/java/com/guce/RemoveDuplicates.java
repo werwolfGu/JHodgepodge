@@ -54,5 +54,10 @@ public class RemoveDuplicates {
         for (int i = 0; i < nums.length; i++) {
             System.out.print(nums[i] + " ");
         }
+
+
+        boolean a[][] = new boolean[1][1];
+        System.out.println(a[0][0]);
+
     }
 }

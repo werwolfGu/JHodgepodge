@@ -47,6 +47,23 @@ public class LongestPalindrome {
         return r - l - 1;
     }
 
+    /**
+     * abcdedcba
+     * l   r
+     * 如果 dp[l, r] = true 那么 dp[l + 1, r - 1] 也一定为 true
+     * 关键在这里：[l + 1, r - 1] 一定至少有 2 个元素才有判断的必要
+     * 因为如果 [l + 1, r - 1] 只有一个元素，不用判断，一定是回文串
+     * 如果 [l + 1, r - 1] 表示的区间为空，不用判断，也一定是回文串
+     * [l + 1, r - 1] 一定至少有 2 个元素 等价于 l + 1 < r - 1，即 r - l >  2
+     * <p>
+     * 写代码的时候这样写：如果 [l + 1, r - 1]  的元素小于等于 1 个，即 r - l <=  2 ，就不用做判断了
+     * <p>
+     * 因为只有 1 个字符的情况在最开始做了判断
+     * 左边界一定要比右边界小，因此右边界从 1 开始
+     *
+     * @param s
+     * @return
+     */
     public static String dpSolution(String s) {
         int size = s.length();
         if (size < 2) {
@@ -74,7 +91,8 @@ public class LongestPalindrome {
         System.out.println(solution("dhabdddddd"));
         char i = '1';
         char a = 'a';
-        if (i > 48 && i < 57)
+        if (i > 48 && i < 57) {
             System.out.println("a " + (int) a + "  1:" + (int) '9' + "i" + " 0 :" + (int) '0');
+        }
     }
 }
