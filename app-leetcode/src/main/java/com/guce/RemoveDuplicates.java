@@ -7,27 +7,19 @@ package com.guce;
 public class RemoveDuplicates {
 
     public int soution(int nums[]) {
-        if (nums == null) {
-            return 0;
-        }
-        if (nums.length < 2) {
+        if ( nums == null || nums.length < 2 ){
             return 1;
         }
-        int len = nums.length, i = 0, j = 1;
-
-        int repeatNum = 0;
         int idx = 0;
-        while (idx++ < nums.length) {
-            if (nums[i] == nums[j]) {
-                repeatNum++;
-                moveNums(nums, j, len - repeatNum + 1);
-            } else {
-                j++;
-                i++;
+        for (int i = 1 ; i < nums.length ; i++ ){
+            if (nums[i] != nums[idx]){
+                if (i -idx > 1){
+                    nums[idx+1] = nums[i];
+                }
+                idx++;
             }
         }
-        System.out.println("repeat :" + repeatNum);
-        return repeatNum - 1;
+        return idx + 1;
     }
 
     public void moveNums(int[] nums, int begin, int len) {
@@ -56,7 +48,7 @@ public class RemoveDuplicates {
 
     public static void main(String[] args) {
         RemoveDuplicates duplicates = new RemoveDuplicates();
-        int[] nums = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4};
+        int[] nums = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4,5};
         int x = duplicates.soution(nums);
         System.out.println(x);
         for (int i = 0; i < nums.length; i++) {
