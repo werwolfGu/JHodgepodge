@@ -11,5 +11,6 @@ public class PingAnTest {
         BigDecimal bigDecimal = new BigDecimal(1);
 //        bigDecimal.add(BigDecimal.ONE);
         System.out.println(bigDecimal.intValue());
+        
     }
 }
