@@ -22,15 +22,6 @@ public class RemoveDuplicates {
         return idx + 1;
     }
 
-    public void moveNums(int[] nums, int begin, int len) {
-
-        for (int i = begin; i < len - 1; i++) {
-
-            nums[i] = nums[i + 1];
-        }
-
-    }
-
     public int removeDuplicate(int[] nums) {
         if (nums == null || nums.length == 0) {
             return 0;
@@ -38,8 +29,11 @@ public class RemoveDuplicates {
         int i = 0;
         for (int j = 1; j < nums.length; j++) {
             if (nums[j] != nums[i]) {
+                if ( i != j){
+                    nums[i + 1] = nums[j];
+                }
+
                 i++;
-                nums[i] = nums[j];
             }
         }
         return i + 1;
@@ -54,10 +48,6 @@ public class RemoveDuplicates {
         for (int i = 0; i < nums.length; i++) {
             System.out.print(nums[i] + " ");
         }
-
-
-        boolean a[][] = new boolean[1][1];
-        System.out.println(a[0][0]);
 
     }
 }
