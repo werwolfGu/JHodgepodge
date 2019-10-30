@@ -49,7 +49,7 @@
     <cglib.version>3.2.8</cglib.version>
     <caffeine.version>2.6.2</caffeine.version>
     <hystrix.version>1.5.12</hystrix.version>
-    <httpcomponents.version>4.3.5</httpcomponents.version>
+    <httpcomponents.version>4.5.10</httpcomponents.version>
     <okhttp.version>4.2.0</okhttp.version>
   </properties>
 
