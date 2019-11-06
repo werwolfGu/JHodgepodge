@@ -13,6 +13,7 @@ public class InterceptorAsyncHandler implements AsyncHandlerInterceptor{
 
     private final Logger logger = LoggerFactory.getLogger(InterceptorAsyncHandler.class);
 
+    @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
 
         //异步请求分2步
