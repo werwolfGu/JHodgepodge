@@ -16,12 +16,11 @@ public class JdkInvocationHandler implements InvocationHandler {
 
     private Object target;
 
-    public <T> T getInstance(T target){
+    public <T> T getInstance(T target) {
 
         this.target = target;
-        return (T)Proxy.newProxyInstance(target.getClass().getClassLoader(),target.getClass().getInterfaces(),this);
+        return (T) Proxy.newProxyInstance(target.getClass().getClassLoader(), target.getClass().getInterfaces(), this);
     }
-
 
 
     @Override
@@ -31,7 +30,7 @@ public class JdkInvocationHandler implements InvocationHandler {
         logger.info("代理前。。。。。");
         System.out.println("jdk dynamic proxy start...");
         //调用业务方法
-        result = method.invoke(target,args);
+        result = method.invoke(target, args);
         System.out.println("jdk dynamic proxy end...");
         logger.info("代理后。。。。。");
         return result;
@@ -39,7 +38,7 @@ public class JdkInvocationHandler implements InvocationHandler {
 
     public static void main(String[] args) {
         JdkInvocationHandler invocationHandler = new JdkInvocationHandler();
-        Hello hello = new Hello();
+        HelloDemo hello = new Hello();
         HelloDemo helloProxy = invocationHandler.getInstance(hello);
         helloProxy.say();
 
