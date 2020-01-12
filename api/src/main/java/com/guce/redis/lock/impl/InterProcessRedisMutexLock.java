@@ -14,10 +14,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 /**
  * redis 实现分布式可重入锁
  * 利用 redis set (key,value,NX,PX,timeout)  实现redis原子性操作
- *     NX 表示 key不存在时才设置key的值
- *     XX 表示 key存在才设置 key value 值
- *     PX 超时间单位是 ms
- *
+ * NX 表示 key不存在时才设置key的值
+ * XX 表示 key存在才设置 key value 值
+ * PX 超时间单位是 ms
  */
 public class InterProcessRedisMutexLock implements InterProcessLock {
 
@@ -31,12 +30,12 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
     private final static String SET_WITH_EXPIRE_TIME = "PX";  //设置过期时间单位  ms
 
 
-    private final ConcurrentMap<Thread,LockData> lockDataMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<Thread, LockData> lockDataMap = new ConcurrentHashMap<>();
 
     @Override
     public boolean lock(JedisCommands jedis, String key) throws InterruptedException {
 
-        return tryLock(jedis,key,overtime ,null);
+        return tryLock(jedis, key, overtime, null);
     }
 
     /**
@@ -51,27 +50,27 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
     public boolean tryLock(JedisCommands jedisCommands, String key, long time, TimeUnit unit) throws InterruptedException {
 
         Thread currentThread = Thread.currentThread();
-        Long currTime ;
+        Long currTime;
 
         LockData lockData = lockDataMap.get(currentThread);
-        if(lockData != null){
+        if (lockData != null) {
             lockData.lockCount.incrementAndGet();
             return true;
         }
 
-        final long      startMillis = System.currentTimeMillis();
-        final Long      millisToWait = (unit != null) ? unit.toMillis(time) : null;
+        final long startMillis = System.currentTimeMillis();
+        final Long millisToWait = (unit != null) ? unit.toMillis(time) : null;
 
-        while (true){
+        while (true) {
             currTime = System.currentTimeMillis();
             String result = null;
-            try{
-                result = jedisCommands.set(key,currTime.toString(),SET_IF_NOT_EXIST,SET_WITH_EXPIRE_TIME,overtime);
-            }catch (Exception e){
-                logger.error("redis lock Exception key:{}  -> message:{}" ,key,e.getMessage(),e);
+            try {
+                result = jedisCommands.set(key, currTime.toString(), SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, overtime);
+            } catch (Exception e) {
+                logger.error("redis lock Exception key:{}  -> message:{}", key, e.getMessage(), e);
             }
             //加锁  判断是否成功
-            if(LOCK_SUCCESS.equals(result)){
+            if (LOCK_SUCCESS.equals(result)) {
 
                 LockData newLockData = new LockData(currentThread);
                 newLockData.setOverTime(overtime);
@@ -80,13 +79,13 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
                 return true;
             }
 
-            if(millisToWait != null){
+            if (millisToWait != null) {
 
                 long currSysTime = System.currentTimeMillis();
-                if(currSysTime - startMillis > millisToWait){
+                if (currSysTime - startMillis > millisToWait) {
                     return false;
                 }
-            }else{
+            } else {
                 //防止cpu空转
                 sleep();
             }
@@ -99,46 +98,46 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
 
         Thread currentThread = Thread.currentThread();
         LockData lockData = lockDataMap.get(currentThread);
-        if ( lockData == null ) {
-            throw new IllegalMonitorStateException("You do not own the lock: " + key + " currThread:" + currentThread );
+        if (lockData == null) {
+            throw new IllegalMonitorStateException("You do not own the lock: " + key + " currThread:" + currentThread);
         }
         int newLockCount = lockData.lockCount.decrementAndGet();
-        if ( newLockCount > 0 ) {
+        if (newLockCount > 0) {
             return true;
         }
 
-        if ( newLockCount < 0 ){
+        if (newLockCount < 0) {
             throw new IllegalMonitorStateException("Lock count has gone negative for lock: " + key);
         }
-        try{
+        try {
 
             //如果已经超时了还去删除的话，可能会把其他线程的锁给删了
             long overTime = lockData.getOverTime();
-            if (overTime > 0){
+            if (overTime > 0) {
                 long currTime = System.currentTimeMillis();
-                if (overTime >  (currTime -lockData.getCurrTime())){
+                if (overTime > (currTime - lockData.getCurrTime())) {
                     lockDataMap.remove(currentThread);
                     return true;
                 }
             }
             jedisCommands.del(key);
-        }finally {
+        } finally {
             lockDataMap.remove(currentThread);
         }
 
         return true;
     }
 
-    private void sleep(){
+    private void sleep() {
 
         try {
             Thread.sleep(sleeptime);
         } catch (InterruptedException e) {
-            logger.error("redis lock Thread sleep InterruptException :{}",e.getMessage(),e);
+            logger.error("redis lock Thread sleep InterruptException :{}", e.getMessage(), e);
         }
     }
 
-    private static class LockData{
+    private static class LockData {
 
         final Thread owningThread;
         private Long currTime = System.currentTimeMillis();
@@ -149,20 +148,21 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
             this.owningThread = owningThread;
         }
 
-        public void setOverTime(Long overTime){
+        public void setOverTime(Long overTime) {
             this.overTime = overTime;
         }
-        public long getOverTime(){
+
+        public long getOverTime() {
             return overTime;
         }
 
-        public long getCurrTime(){
+        public long getCurrTime() {
             return currTime;
         }
     }
 
     public static void main(String[] args) {
-        Jedis jedis = new Jedis("192.168.144.122",6379);
+        Jedis jedis = new Jedis("192.168.144.122", 6379);
 //        String result = jedis.set("ab","1234",SET_IF_NOT_EXIST,SET_WITH_EXPIRE_TIME,overtime);
 //        System.out.println(result);
         System.out.println(jedis.get("lock"));

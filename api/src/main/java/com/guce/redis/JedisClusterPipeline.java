@@ -27,6 +27,14 @@ import java.util.Map;
 import java.util.Queue;
 
 /**
+ * 在集群模式下提供批量操作的功能。 <br/>
+ * 由于集群模式存在节点的动态添加删除，且client不能实时感知（只有在执行命令时才可能知道集群发生变更），
+ * 因此，该实现不保证一定成功，建议在批量操作之前调用 refreshCluster() 方法重新获取集群信息。<br />
+ * 应用需要保证不论成功还是失败都会调用close() 方法，否则可能会造成泄露。<br/>
+ * 如果失败需要应用自己去重试，因此每个批次执行的命令数量需要控制。防止失败后重试的数量过多。<br />
+ * 基于以上说明，建议在集群环境较稳定（增减节点不会过于频繁）的情况下使用，且允许失败或有对应的重试策略。<br />
+ * <p>
+ * 该类非线程安全
  * Created by chengen.gu on 2018/10/11.
  * jedis 管道  批量操作
  */
@@ -38,6 +46,7 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
     // 你也可以去继承JedisCluster和JedisSlotBasedConnectionHandler来提供访问接口
     private static final Field FIELD_CONNECTION_HANDLER;
     private static final Field FIELD_CACHE;
+
     static {
         FIELD_CONNECTION_HANDLER = getField(BinaryJedisCluster.class, "connectionHandler");
         FIELD_CACHE = getField(JedisClusterConnectionHandler.class, "cache");
@@ -45,12 +54,13 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
     private JedisSlotBasedConnectionHandler connectionHandler;
     private JedisClusterInfoCache clusterInfoCache;
-    private Queue<Client> clients = new LinkedList();	// 根据顺序存储每个命令对应的Client
-    private Map<JedisPool, Jedis> jedisMap = new HashMap<>();	// 用于缓存连接
-    private boolean hasDataInBuf = false;	// 是否有数据在缓存区
+    private Queue<Client> clients = new LinkedList();    // 根据顺序存储每个命令对应的Client
+    private Map<JedisPool, Jedis> jedisMap = new HashMap<>();    // 用于缓存连接
+    private boolean hasDataInBuf = false;    // 是否有数据在缓存区
 
     /**
      * 根据jedisCluster实例生成对应的JedisClusterPipeline
+     *
      * @param
      * @return
      */
@@ -70,6 +80,7 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
     /**
      * 刷新集群信息，当集群信息发生变更时调用
+     *
      * @param
      * @return
      */
@@ -208,10 +219,10 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
         }
     }
 
-    @SuppressWarnings({"unchecked" })
+    @SuppressWarnings({"unchecked"})
     private static <T> T getValue(Object obj, Field field) {
         try {
-            return (T)field.get(obj);
+            return (T) field.get(obj);
         } catch (IllegalArgumentException | IllegalAccessException e) {
             logger.error("get value fail", e);
 

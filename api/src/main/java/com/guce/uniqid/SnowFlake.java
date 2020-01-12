@@ -105,6 +105,7 @@ public class SnowFlake {
             System.out.println(snowFlake.nextId());
         }
         System.out.println(Long.MAX_VALUE);
+        System.out.println(1<<12);
 
     }
 }
