@@ -2,4 +2,4 @@
 
 thread原理图
 
-![](../picture/threadLocal.png threadlocal)
+![](../picture/threadLocal.png)
