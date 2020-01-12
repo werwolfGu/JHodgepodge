@@ -34,7 +34,7 @@
     
 比如按时间范围或按ID范围拆分；
         
-![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/db_2.png)
+![](../web/src/main/webapp/picture/db_2.png)
 
 **优点**：单表大小可控，天然水平扩展。
 
@@ -44,18 +44,18 @@
      
 一般采用mod来拆分;
 
-![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/db_3.png)
+![](../web/src/main/webapp/picture/db_3.png)
         
 ## 下面重点介绍下mod策略
 
 如图所示
 
-![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/db_4.png)    
+![](../web/src/main/webapp/picture/db_4.png)    
 
 对比数据库拆分我们希望是一劳永逸，可以很方便的进行水平扩展的，这里我们使用`mod 2^n` 
 数据库达到瓶颈原有的规则不变 将数据库数量增加一倍如图
 
-![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/db_5.png) 
+![](../web/src/main/webapp/picture/db_5.png) 
 
 >在上面使用了4个数据库节点，现在扩展成8个数据库`db5`存有`db1` 的冗余 `5 == hash(key)%8` 的数据 `db6` 有 `db2` 的冗余`5 == hash(key)%8`的数据...按之前hash(key) mod 4 ；现在mod 8 ；
 比如现在 key为5 ；之前是落到db1 ；但现在落到db5不过是有db1的数据，这样就可以平滑实现数据库扩张；以此类推；水平分表同理

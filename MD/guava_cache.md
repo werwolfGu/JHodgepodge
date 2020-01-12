@@ -32,7 +32,7 @@
     - 缓存key被封装在WeakReference引用中；
     - 缓存Value被封装在WeakReference或SoftReference引用中；
 - 如图所示，guava cache结构图
-![](https://github.com/werwolfGu/JHodgepodge/blob/master/web/src/main/webapp/picture/guava_cache.png)
+![](../web/src/main/webapp/picture/guava_cache.png)
 
 如图所示是Guava Cache的大致缓存结构
 - cache为segment数组，每个segment有一个ReferenceEntry数组，ReferenceEntry也是一个链表；
