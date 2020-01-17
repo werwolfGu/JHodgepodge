@@ -2,7 +2,6 @@ package com.guce.startup;
 
 
 import com.guce.config.AppWebMvcConfigurer;
-import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.builder.SpringApplicationBuilder;
 import org.springframework.boot.web.servlet.support.SpringBootServletInitializer;
@@ -17,7 +16,6 @@ import javax.servlet.ServletRegistration;
 @SpringBootApplication
 @EnableAsync
 @Import({AppWebMvcConfigurer.class})
-@EnableAutoConfiguration
 public class SpringApplicationContainerBootstrap extends SpringBootServletInitializer {
 
     @Override

@@ -7,9 +7,11 @@ import com.guce.thread.AsyncCacheThreadFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
+@ComponentScan(basePackages = "com.guce")
 public class ApiBeanCfgCenter {
 
     @Value("${guava.core.thread.num:4}")
