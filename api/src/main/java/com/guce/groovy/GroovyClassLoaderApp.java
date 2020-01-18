@@ -1,6 +1,8 @@
 package com.guce.groovy;
 
 import com.google.common.collect.Maps;
+import com.guce.groovy.model.RequestEntry;
+import com.guce.groovy.model.ResponseEntry;
 import groovy.lang.GroovyClassLoader;
 import groovy.lang.GroovyObject;
 import org.apache.commons.io.IOUtils;
@@ -24,7 +26,7 @@ public class GroovyClassLoaderApp {
     }
 
     public static void main(String[] args) throws InterruptedException, IOException {
-        initGroovyClassLoader();
+
         loadClass();
 
         System.out.println("======================");
@@ -61,6 +63,15 @@ public class GroovyClassLoaderApp {
         Object[] objects = new Object[]{"abc", "def", "ghi"};
         List<String> ls=(List<String>) groovyObject.invokeMethod("printArgs", objects);
         ls.stream().forEach(System.out::println);
+
+        RequestEntry req = new RequestEntry();
+        req.setUserId("1234");
+        req.setUserName("gce");
+        ResponseEntry resp = new ResponseEntry();
+
+        Object[] args = new Object[]{req,resp};
+        groovyObject.invokeMethod("printEntryArgs",args);
+        System.out.println("resp:" + resp);
     }
 
 
