@@ -53,6 +53,7 @@
     <hystrix.version>1.5.12</hystrix.version>
     <httpcomponents.version>4.3.5</httpcomponents.version>
     <okhttp.version>4.2.0</okhttp.version>
+    <groovy-all.version>3.0.0-rc-3</groovy-all.version>
   </properties>
 
   <parent>
@@ -190,6 +191,13 @@
         <groupId>org.codehaus.janino</groupId>
         <artifactId>janino</artifactId>
         <version>3.1.0</version>
+      </dependency>
+
+      <dependency>
+        <groupId>org.codehaus.groovy</groupId>
+        <artifactId>groovy-all</artifactId>
+        <version>${groovy-all.version}</version>
+        <type>pom</type>
       </dependency>
 
     </dependencies>
