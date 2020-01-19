@@ -12,7 +12,7 @@ import javax.script.*;
  */
 public class GrvyScriptEngine {
 
-    private static ScriptEngineManager factory = new ScriptEngineManager();
+    private final static ScriptEngineManager factory = new ScriptEngineManager();
 
     private static volatile GrvyScriptEngine  grvyScriptEngine;
 
@@ -21,7 +21,7 @@ public class GrvyScriptEngine {
 
 
     /**
-     * ThreadSafe
+     * script engine binding 为线程不安全；
      */
     private static ThreadLocal<ScriptEngine> scriptEngineHolder = new ThreadLocal<ScriptEngine>(){
 
@@ -67,7 +67,7 @@ public class GrvyScriptEngine {
      * @param orgField
      * @return
      */
-    public GrvyScriptEngine addGlobalFieldMapper(String key,Object orgField){
+    public GrvyScriptEngine bingingGlobalScopeMapper(String key,Object orgField){
         Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
         if (bindings == null){
             synchronized (scriptEngine){
@@ -83,7 +83,7 @@ public class GrvyScriptEngine {
         return this;
     }
 
-    public ScriptEngine getThreadLocalGrvyScriptEngine(){
+    public ScriptEngine getCurrentGrvyScriptEngine(){
         return scriptEngineHolder.get();
     }
 
@@ -93,7 +93,7 @@ public class GrvyScriptEngine {
      * @param orgField
      * @return
      */
-    public GrvyScriptEngine addThreadlocalEngineFieldMapper(String key,Object orgField){
+    public GrvyScriptEngine bindingEngineScopeMapper(String key,Object orgField){
         scriptEngineHolder.get().put(key,orgField);
         return this;
     }
