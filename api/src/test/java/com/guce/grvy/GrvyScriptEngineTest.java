@@ -78,6 +78,7 @@ public class GrvyScriptEngineTest {
 
         GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("卡","4");
         GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("渠道","NET");
+        GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("amt",7);
         //GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("卡集合",card);
 
         String script = " def list = [\"12\",\"34\",\"56\",\"78\",\"90\"]\n" +
@@ -90,6 +91,7 @@ public class GrvyScriptEngineTest {
                 "    if (list.contains(\"34\") && 卡集合.contains(卡) && channelList.contains(渠道)){\n" +
                 "        return 1;\n" +
                 "    }";
+        String script3 = " 4 * amt ";
         Object obj = null;
         long totalTime = 0;
         for (int i = 0 ; i < 100 ;i++) {
@@ -97,6 +99,7 @@ public class GrvyScriptEngineTest {
             try {
                 obj = GrvyScriptEngine.getInstance().eval(script);
                 obj = GrvyScriptEngine.getInstance().eval(script1);
+                obj = GrvyScriptEngine.getInstance().eval(script3);
                 long costTime = System.currentTimeMillis() - start;
                 totalTime += costTime;
                 System.out.println("OBJ :" + obj + " cost time:" + costTime);
