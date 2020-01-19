@@ -12,35 +12,6 @@
     <artifactId>api</artifactId>
 
     <dependencies>
-        <!--        <dependency>
-                   <groupId>org.springframework.boot</groupId>
-                   <artifactId>spring-boot-starter-web</artifactId>
-                   <exclusions>
-                       <exclusion>
-                           <groupId>com.h2database</groupId>
-                           <artifactId>h2</artifactId>
-                       </exclusion>
-              </exclusions>
-               </dependency>
-
-              <dependency>
-                   <groupId>com.h2database</groupId>
-                   <artifactId>h2</artifactId>
-                   <version>1.4.196</version>
-               </dependency>
-
-               <dependency>
-                   <groupId>org.apache.ignite</groupId>
-                   <artifactId>ignite-core</artifactId>
-               </dependency>
-               <dependency>
-                   <groupId>org.apache.ignite</groupId>
-                   <artifactId>ignite-spring</artifactId>
-               </dependency>
-               <dependency>
-               <groupId>org.apache.ignite</groupId>
-               <artifactId>ignite-indexing</artifactId>
-               </dependency>-->
         <dependency>
             <groupId>org.springframework.data</groupId>
             <artifactId>spring-data-redis</artifactId>
@@ -97,6 +68,7 @@
             <artifactId>janino</artifactId>
         </dependency>
 
+        <!-- https://mvnrepository.com/artifact/org.codehaus.groovy/groovy-all -->
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy-all</artifactId>
