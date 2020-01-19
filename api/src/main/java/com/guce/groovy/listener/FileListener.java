@@ -5,7 +5,6 @@ import org.apache.commons.io.monitor.FileAlterationMonitor;
 import org.apache.commons.io.monitor.FileAlterationObserver;
 
 import java.io.File;
-import java.io.FileFilter;
 
 public class FileListener extends FileAlterationListenerAdaptor {
 
@@ -45,15 +44,11 @@ public class FileListener extends FileAlterationListenerAdaptor {
         FileListener myFileLister = new FileListener();
         String path = "/Users/guchengen495/workspace/github/JHodgepodge/api/src/main/java/com/guce/groovy";
         File file = new File(path);
-        System.out.println(file.exists());
-        FileAlterationObserver observer1 = new FileAlterationObserver(file, new FileFilter() {
-            @Override
-            public boolean accept(File pathname) {
-                if ("GroovyDemo.groovy".equals(pathname.getName())){
-                    return true;
-                }
-                return false;
+        FileAlterationObserver observer1 = new FileAlterationObserver(file, files -> {
+            if ("GroovyDemo.groovy".equals(files.getName())){
+                return true;
             }
+            return false;
         });
         observer1.addListener(myFileLister);
 

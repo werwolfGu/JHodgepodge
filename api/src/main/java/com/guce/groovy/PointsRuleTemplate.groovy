@@ -1,25 +1,25 @@
 package com.guce.groovy
 
-import com.gce.model.PointsRequest
-import com.gce.model.PointsResponse
+import com.guce.groovy.model.RequestEntry
+import com.guce.groovy.model.ResponseEntry
 import groovy.text.StreamingTemplateEngine
 
 class PointsRuleTemplate {
 
-    PointsRequest request
-    PointsResponse response
+    RequestEntry request
+    ResponseEntry response
 
     def 规则集 = [
             '卡类型':[
                     '白金卡':[
                             '普通': {
-                                '$amt'
+                                1
                             }()
                     ]
             ]
     ]
 
-    def ruleTemplate(PointsRequest request, PointsResponse response, String eval){
+    def ruleTemplate(RequestEntry request, ResponseEntry response, String eval){
 
         this.request = request
         def engine = new StreamingTemplateEngine()
@@ -38,8 +38,8 @@ class PointsRuleTemplate {
 
     public static void main(String[] args) {
         def ruleTemplate = new PointsRuleTemplate()
-        PointsRequest request = new PointsRequest();
-        PointsResponse response = new PointsResponse();
+        RequestEntry request = new RequestEntry();
+        ResponseEntry response = new ResponseEntry();
         ruleTemplate.request = request;
         ruleTemplate.response = response
         request.setAmt(1000L)

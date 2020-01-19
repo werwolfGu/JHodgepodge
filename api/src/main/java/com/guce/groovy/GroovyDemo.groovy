@@ -9,7 +9,7 @@ import com.guce.groovy.model.ResponseEntry
 class GroovyDemo implements IFoo{
 
     void print() {
-        System.out.println("abello word!!dddddsssdddd");
+        System.out.println("hello groovy!!");
     }
 
     List<String> printArgs(String str1, String str2, String str3) {
