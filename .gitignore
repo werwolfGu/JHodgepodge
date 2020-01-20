@@ -1,3 +1,4 @@
 *.iml
 .idea/
 */target/
+mq/rocketmq-demo/target/
