@@ -10,25 +10,25 @@ import java.io.IOException;
 
 public class GrvyClassLoader {
 
-    private static String CHATSET = "UTF-8";
+    private static String CHARSET = "UTF-8";
 
     private static GroovyClassLoader groovyClassLoader ;
 
     static{
         CompilerConfiguration config = new CompilerConfiguration();
-        config.setSourceEncoding(CHATSET);
+        config.setSourceEncoding(CHARSET);
         // 设置该GroovyClassLoader的父ClassLoader为当前线程的加载器(默认)
         groovyClassLoader = new GroovyClassLoader(Thread.currentThread().getContextClassLoader(), config);
     }
 
 
-    public static Class  loadClass(String filePath) throws IllegalAccessException, IOException, InstantiationException {
+    public static Class  loadClass(String filePath) throws  IOException {
         File file = new File(filePath);
         return loadClass(file);
     }
-    public static Class loadClass(File file) throws IOException, IllegalAccessException, InstantiationException {
+    public static Class loadClass(File file) throws IOException {
 
-        String grvyContent = IOUtils.toString(new FileInputStream(file),CHATSET);
+        String grvyContent = IOUtils.toString(new FileInputStream(file), CHARSET);
         Class groovyClass = groovyClassLoader.parseClass(grvyContent);
 
         return groovyClass;

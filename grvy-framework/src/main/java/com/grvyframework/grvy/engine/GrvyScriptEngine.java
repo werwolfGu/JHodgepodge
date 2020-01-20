@@ -17,16 +17,10 @@ public class GrvyScriptEngine {
     private final static ScriptEngineManager factory = new ScriptEngineManager();
 
     @Getter
-    private ScriptEngine scriptEngine;
+    private final ScriptEngine scriptEngine;
 
-    private static ThreadLocal<ScriptEngine> scriptEngineHolder = new ThreadLocal<ScriptEngine>(){
-
-        @Override
-        public ScriptEngine initialValue(){
-            ScriptEngine scriptEngine = factory.getEngineByName("groovy");
-            return scriptEngine;
-        }
-    };
+    private static ThreadLocal<ScriptEngine> scriptEngineHolder =
+            ThreadLocal.withInitial(() -> factory.getEngineByName("groovy"));
 
     private GrvyScriptEngine(){
         this.scriptEngine = factory.getEngineByName("groovy");
@@ -54,6 +48,7 @@ public class GrvyScriptEngine {
     public GrvyScriptEngine bingingGlobalScopeMapper(String key,Object orgField){
         Bindings bindings = scriptEngine.getBindings(ScriptContext.GLOBAL_SCOPE);
         if (bindings == null){
+
             synchronized (scriptEngine){
                 if (bindings == null){
                     bindings = scriptEngine.createBindings();

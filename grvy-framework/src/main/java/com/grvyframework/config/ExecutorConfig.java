@@ -12,11 +12,13 @@ import java.util.concurrent.TimeUnit;
 @Data
 public class ExecutorConfig {
 
-    private int corePoolSize = 10;
-    private int maximumPoolSize = 20;
-    private long keepAliveTime = 3;
+    private int corePoolSize = 0;
+    private int maximumPoolSize = 0;
+    private long keepAliveTime = 0L;
 
     private TimeUnit unit;
 
-    private int queueSize = Integer.MAX_VALUE;
+    private int queueSize = 0;
+
+    private String threadName;
 }

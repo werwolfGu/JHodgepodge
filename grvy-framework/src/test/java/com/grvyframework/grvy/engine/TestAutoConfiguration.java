@@ -1,6 +1,6 @@
 package com.grvyframework.grvy.engine;
 
-import com.grvyframework.handle.GrvyScriptEngineExecutor;
+import com.grvyframework.grvy.GrvyScriptEngineExecutor;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.model.GrvyRequest;
 import com.grvyframework.model.GrvyResponse;
@@ -61,7 +61,7 @@ public class TestAutoConfiguration {
     public void testGrvyScriptEngineExecutor() throws Exception {
 
         List<String> mccList = new ArrayList<>();
-        int seed = 1000;
+        int seed = 10;
         for (int i = 0 ; i < seed ; i++ ){
             mccList.add(String.valueOf(i));
         }
