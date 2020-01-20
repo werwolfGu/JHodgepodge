@@ -1,6 +1,7 @@
 package com.grvyframework.config;
 
 import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.stereotype.Component;
 
 /**
  * @author guchengen495
@@ -8,5 +9,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
  * @description
  */
 @ConfigurationProperties(prefix = "grvy.executor")
+@Component("grvyExecutorConfig")
+//@PropertySource(value = "classpath:application.properties",encoding = "UTF-8")
 public class GrvyExecutorConfig extends ExecutorConfig {
 }

@@ -6,6 +6,7 @@ import com.grvyframework.executor.ThreadPoolFactory;
 import com.grvyframework.grvy.engine.GrvyScriptEngine;
 import com.grvyframework.model.GrvyRequest;
 import com.grvyframework.model.GrvyResponse;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -27,10 +28,14 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
     private static Logger logger = LoggerFactory.getLogger(GrvyScriptEngineExecutor.class);
 
+    @Getter
     private ThreadPoolExecutor executor ;
 
     @Autowired
     private GrvyScriptEngine grvyScriptEngine;
+
+    @Autowired
+    private GrvyExecutorConfig config ;
 
     public Object executor(GrvyRequest request , GrvyResponse response) throws Exception {
 
@@ -68,13 +73,15 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
         }finally {
             grvyScriptEngine.clearCurrEngineBinding();
-            watch.stop();
+            if (watch != null){
+                watch.stop();
+            }
+            watch = null;
         }
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-        GrvyExecutorConfig config = new GrvyExecutorConfig();
         executor = ThreadPoolFactory.getThreadPoolExecutor(config);
     }
 }
