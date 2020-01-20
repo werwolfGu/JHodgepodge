@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ThreadLocalRandom;
 
 /**
  * @Author chengen.gu
@@ -42,44 +44,76 @@ public class TestAutoConfiguration {
     }
 
     @Test
-    public void testGrvyScriptEngine() throws ScriptException {
+    public void testGrvyScriptEngine() throws ScriptException, ExecutionException, InterruptedException {
 
         List<String> card = Arrays.asList("1","2","3");
         GrvyScriptEngine grvyScriptEngine = this.context.getBean(GrvyScriptEngine.class);
         grvyScriptEngine.bingingGlobalScopeMapper("卡集合",card);
         grvyScriptEngine.bindingEngineScopeMapper("卡","2");
-
+        System.out.println(grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(100));
         String script = " if (卡集合.contains(卡) ) return 卡 ";
         Object obj = grvyScriptEngine.eval(script);
+
         assert "2".equals(obj);
     }
 
     @Test
     public void testGrvyScriptEngineExecutor() throws Exception {
 
+        List<String> mccList = new ArrayList<>();
+        int seed = 1000;
+        for (int i = 0 ; i < seed ; i++ ){
+            mccList.add(String.valueOf(i));
+        }
+        GrvyRequest request = new GrvyRequest();
+        GrvyResponse response = new GrvyResponse();
+        String script = " if (卡集合.contains(卡) ) return 卡 ";
+        request.setEvalScript(script);
+        Bindings bindings = new SimpleBindings();
+        bindings.put("卡集合",mccList);
+        Integer idx = ThreadLocalRandom.current().nextInt(seed);
+        bindings.put("卡","2");
+        request.setBindings(bindings);
+        Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
+        GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
+        IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
+        request.setGrvyScriptResultHandler(handle);
+        CompletableFuture future = grvyScriptEngineExecutor.executor(request,response);
+
+        assert "2".equals(future.get());
+    }
+
+    @Test
+    public void testAsynGrvyScriptEngineExecutor() throws Exception {
+
         List<CompletableFuture> list = new ArrayList<>();
-        for (int i = 0 ; i < 1000 ; i++ ){
-            CompletableFuture future = CompletableFuture.runAsync(() -> {GrvyRequest request = new GrvyRequest();
-                GrvyResponse response = new GrvyResponse();
-                String script = " if (卡集合.contains(卡) ) return 卡 ";
-                request.setEvalScript(script);
-                Bindings bindings = new SimpleBindings();
-                List<String> card = Arrays.asList("1","2","3");
-                bindings.put("卡集合",card);
-                bindings.put("卡","2");
-                request.setBindings(bindings);
-                GrvyScriptEngineExecutor grvyScriptEngineExecutor = null;
-                try {
-                    Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
-                    grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
-                    IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
-                    request.setGrvyScriptResultHandler(handle);
-                    grvyScriptEngineExecutor.executor(request,response);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-            list.add(future);
+        List<String> mccList = new ArrayList<>();
+        int seed = 1000;
+        for (int i = 0 ; i < seed ; i++ ){
+            mccList.add(String.valueOf(i));
+        }
+        for (int i = 0 ; i < seed ; i++ ){
+
+            GrvyRequest request = new GrvyRequest();
+            GrvyResponse response = new GrvyResponse();
+            String script = " if (卡集合.contains(卡) ) return 卡 ";
+            request.setEvalScript(script);
+            Bindings bindings = new SimpleBindings();
+            bindings.put("卡集合",mccList);
+            Integer idx = ThreadLocalRandom.current().nextInt(seed);
+            bindings.put("卡",idx.toString());
+            request.setBindings(bindings);
+            try {
+                Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
+                GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
+                IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
+                request.setGrvyScriptResultHandler(handle);
+                CompletableFuture future = grvyScriptEngineExecutor.executor(request,response);
+                list.add(future);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
         }
         CompletableFuture[] arr = list.toArray(new CompletableFuture[list.size()]);
         CompletableFuture future = CompletableFuture.allOf(arr);

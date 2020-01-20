@@ -4,7 +4,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 /**
- * @author guchengen495
+ * @author chengen.gu
  * @date 2020-01-20 15:01
  * @description
  */

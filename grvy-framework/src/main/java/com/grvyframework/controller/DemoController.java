@@ -6,7 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 import javax.servlet.http.HttpServletRequest;
 
 /**
- * @author guchengen495
+ * @author chengen.gu
  * @date 2020-01-20 15:19
  * @description
  */

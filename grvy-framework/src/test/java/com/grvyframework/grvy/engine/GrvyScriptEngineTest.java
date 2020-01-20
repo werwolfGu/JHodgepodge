@@ -12,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import javax.naming.Binding;
 import javax.script.Bindings;
 import javax.script.ScriptException;
 import javax.script.SimpleBindings;
@@ -20,7 +19,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * @author guchengen495
+ * @author chengen.gu
  * @date 2020-01-20 15:55
  * @description
  */

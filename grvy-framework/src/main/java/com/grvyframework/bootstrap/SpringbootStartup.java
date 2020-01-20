@@ -6,7 +6,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Import;
 
 /**
- * @author guchengen495
+ * @author chengen.gu
  * @date 2020-01-20 15:16
  * @description
  */

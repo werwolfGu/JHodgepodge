@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
 /**
- * @author guchengen495
+ * @author chengen.gu
  * @date 2020-01-20 15:07
  * @description
  */

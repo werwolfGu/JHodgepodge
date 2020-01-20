@@ -2,6 +2,8 @@ package com.grvyframework.handle;
 
 import com.google.common.base.Stopwatch;
 import com.grvyframework.config.GrvyExecutorConfig;
+import com.grvyframework.exception.GrvyExceptionEnum;
+import com.grvyframework.exception.GrvyExecutorException;
 import com.grvyframework.executor.ThreadPoolFactory;
 import com.grvyframework.grvy.engine.GrvyScriptEngine;
 import com.grvyframework.model.GrvyRequest;
@@ -13,13 +15,16 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.script.ScriptContext;
+import javax.script.ScriptException;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author guchengen495
+ * @author chengen.gu
  * @date 2020-01-20 16:13
  * @description
  */
@@ -37,15 +42,18 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     @Autowired
     private GrvyExecutorConfig config ;
 
-    public Object executor(GrvyRequest request , GrvyResponse response) throws Exception {
+    public CompletableFuture executor(GrvyRequest request , GrvyResponse response) throws Exception {
 
-        Stopwatch watch = Stopwatch.createStarted();
+
         String script = request.getEvalScript();
         if (script == null){
-            return null;
+
+            throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_SCRIPT_EMPTY);
         }
-        Object result = null;
-        try{
+
+        CompletableFuture future = CompletableFuture.supplyAsync( () -> {
+
+            Stopwatch watch = Stopwatch.createStarted();
             Optional.ofNullable(request)
                     .map(req -> req.getBindings())
                     .map( bindings -> {
@@ -59,29 +67,43 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                         }
                         return true;
                     });
+            try{
+                Object scriptResult = grvyScriptEngine.eval(script);
+                IGrvyScriptResultHandler grvyScriptResultHandler = request.getGrvyScriptResultHandler();
+                Object result = grvyScriptResultHandler.dealResult(scriptResult);
+                long time = watch.elapsed(TimeUnit.MILLISECONDS);
 
-            Object scriptResult = grvyScriptEngine.eval(script);
-            IGrvyScriptResultHandler grvyScriptResultHandler = request.getGrvyScriptResultHandler();
-            result = grvyScriptResultHandler.dealResult(scriptResult);
-            long time = watch.elapsed(TimeUnit.MILLISECONDS);
-            logger.info("executor script :{} ; result:{} ;  cost time:{} ms.",script,result,time);
-            return result;
-        }catch (Throwable ex){
+                logger.info("executor script :{} ; result:{} ;  cost time:{} ms.",script,result,time);
+                return result;
+            } catch (ScriptException e) {
 
-            logger.error("grvy executor error script-> :{}" ,script,ex);
-            throw ex;
+                logger.error("script exception: script:{} ; param:{} ; "
+                        ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
+                throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_ERROR);
 
-        }finally {
-            grvyScriptEngine.clearCurrEngineBinding();
-            if (watch != null){
-                watch.stop();
+            }catch (Exception e){
+
+                logger.error("script exception: script:{} ; param:{} ; "
+                        ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
+                throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_UNKNOWN_ERROR);
+
+            }finally {
+
+                grvyScriptEngine.clearCurrEngineBinding();
+                if (watch != null){
+                    watch.stop();
+                }
+                watch = null;
             }
-            watch = null;
-        }
+            } ,executor);
+
+        return future;
+
     }
 
     @Override
     public void afterPropertiesSet() throws Exception {
+
         executor = ThreadPoolFactory.getThreadPoolExecutor(config);
     }
 }
