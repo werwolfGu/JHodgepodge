@@ -1,7 +1,7 @@
 package com.guce.grvy;
 
 import com.guce.groovy.manager.GroovyDynamicsScriptManager;
-import com.guce.groovy.pool.GrvyEngineThreadPool;
+import com.guce.groovy.pool.GrvyEngineThreadPoolExecutor;
 import com.guce.grvy.service.IGrvy;
 import org.junit.Test;
 
@@ -23,8 +23,8 @@ public class testGroovyDynamicsScriptManager {
         try {
             long totalTime = System.currentTimeMillis() ;
             GroovyDynamicsScriptManager.getInstance().getGrvyScriptMapper().put("grvy",clazzpath);
-            List<CompletableFuture> list = new ArrayList<>(10000);
-            for (int i = 0 ; i < 1000 ; i++ ){
+            List<CompletableFuture> list = new ArrayList<>(50000);
+            for (int i = 0 ; i < 50000 ; i++ ){
                 CompletableFuture future = CompletableFuture.runAsync( ()->{
                     long start = System.currentTimeMillis();
 
@@ -37,13 +37,12 @@ public class testGroovyDynamicsScriptManager {
                     }
                     String name = iGrvy.printGrvy(" grvy classloader");
                     long time = System.currentTimeMillis() - start;
-                    System.out.println("name :" + name + " cost time:{}" + time);
-                }, GrvyEngineThreadPool.getPoolExecutor());
+                    System.out.println("thread name : " + Thread.currentThread().getName() + " ; name :" + name + " cost time:" + time);
+                }, GrvyEngineThreadPoolExecutor.getPoolExecutor());
                 list.add(future);
             }
             CompletableFuture[] futureArr = list.toArray(new CompletableFuture[list.size()]);
             CompletableFuture future = CompletableFuture.allOf(futureArr);
-            System.out.println("total time: " + (System.currentTimeMillis() - totalTime));
             future.get();
             System.out.println("total time: " + (System.currentTimeMillis() - totalTime));
             //IGrvy iGrvy = GrvyClassLoader.loaderInstance(clazzpath);

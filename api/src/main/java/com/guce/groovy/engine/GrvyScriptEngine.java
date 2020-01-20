@@ -3,6 +3,8 @@ package com.guce.groovy.engine;
 import lombok.Getter;
 
 import javax.script.*;
+import java.util.Optional;
+
 /**
  *  http://docs.groovy-lang.org/latest/html/documentation/guide-integrating.html#_groovyscriptengine
  *  https://www.w3cschool.cn/groovy/groovy_strings.html
@@ -96,5 +98,24 @@ public class GrvyScriptEngine {
     public GrvyScriptEngine bindingEngineScopeMapper(String key,Object orgField){
         scriptEngineHolder.get().put(key,orgField);
         return this;
+    }
+    /**
+     * 写入Engine  scope Binding
+     * @param bindings
+     * @return
+     */
+    public GrvyScriptEngine bindingEngineScopeMapper(Bindings bindings){
+        scriptEngineHolder.get().setBindings(bindings,ScriptContext.ENGINE_SCOPE);
+        return this;
+    }
+
+    public  void clearCurrEngineBinding(){
+
+        Bindings bindings = Optional.ofNullable(scriptEngineHolder.get().getContext())
+                .map( context -> context.getBindings(ScriptContext.ENGINE_SCOPE))
+                .orElse(null);
+        if (bindings != null){
+            bindings.clear();
+        }
     }
 }

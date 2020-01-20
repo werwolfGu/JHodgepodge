@@ -1,7 +1,7 @@
 package com.guce.grvy;
 
 import com.guce.groovy.engine.GrvyScriptEngine;
-import com.guce.groovy.pool.GrvyEngineThreadPool;
+import com.guce.groovy.pool.GrvyEngineThreadPoolExecutor;
 import org.junit.Test;
 
 import javax.script.ScriptContext;
@@ -54,7 +54,7 @@ public class GrvyScriptEngineTest {
                 e.printStackTrace();
             }
             assert "4".equals(obj);
-        }, GrvyEngineThreadPool.getPoolExecutor());
+        }, GrvyEngineThreadPoolExecutor.getPoolExecutor());
         CompletableFuture<Object> future1 = CompletableFuture.supplyAsync( () -> {
             GrvyScriptEngine.getInstance().bingingGlobalScopeMapper("卡集合",card);
             GrvyScriptEngine.getInstance().bindingEngineScopeMapper("卡","2");
@@ -70,7 +70,7 @@ public class GrvyScriptEngineTest {
             }
             assert "2".equals(obj);
             return obj;
-        },GrvyEngineThreadPool.getPoolExecutor());
+        }, GrvyEngineThreadPoolExecutor.getPoolExecutor());
         future.get();
         System.out.println("future1 : " + future1.get());
     }
@@ -160,7 +160,7 @@ public class GrvyScriptEngineTest {
                 long time = System.currentTimeMillis() - start;
 
                 System.out.println("script : " + script + "   obj: "+obj+" cost time:" +time);
-            },GrvyEngineThreadPool.getPoolExecutor());
+            }, GrvyEngineThreadPoolExecutor.getPoolExecutor());
             futures.add(future);
         }
         CompletableFuture[] arr = futures.toArray(new CompletableFuture[futures.size()]);
@@ -180,9 +180,8 @@ public class GrvyScriptEngineTest {
         }
         for (int i = 0 ; i < idx ; i++ ){
             Thread th = new MultiThread();
-            GrvyEngineThreadPool.getPoolExecutor().execute(th);
+            GrvyEngineThreadPoolExecutor.getPoolExecutor().execute(th);
         }
-        System.in.read();
     }
     public static class MultiThread extends Thread{
 
@@ -207,10 +206,7 @@ public class GrvyScriptEngineTest {
                 e.printStackTrace();
             }
             finally {
-                GrvyScriptEngine.getInstance().getCurrentGrvyScriptEngine().getContext()
-                        .setBindings(GrvyScriptEngine.getInstance()
-                                .getCurrentGrvyScriptEngine()
-                                .createBindings(), ScriptContext.ENGINE_SCOPE);
+                GrvyScriptEngine.getInstance().clearCurrEngineBinding();
             }
 
         }
@@ -239,10 +235,7 @@ public class GrvyScriptEngineTest {
                     e.printStackTrace();
                 }
                 finally {
-                    GrvyScriptEngine.getInstance().getCurrentGrvyScriptEngine().getContext()
-                            .setBindings(GrvyScriptEngine.getInstance()
-                                    .getCurrentGrvyScriptEngine()
-                                    .createBindings(), ScriptContext.ENGINE_SCOPE);
+                    GrvyScriptEngine.getInstance().clearCurrEngineBinding();
                 }
 
             }
@@ -265,9 +258,9 @@ public class GrvyScriptEngineTest {
 
         MultiThread1 multiThread1 = new MultiThread1();
         MultiModifyValueClazz multiModifyValueClazz = new MultiModifyValueClazz();
-        GrvyEngineThreadPool.getPoolExecutor().execute(multiThread);
-        GrvyEngineThreadPool.getPoolExecutor().execute(multiThread1);
-        GrvyEngineThreadPool.getPoolExecutor().execute(multiModifyValueClazz);
+        GrvyEngineThreadPoolExecutor.getPoolExecutor().execute(multiThread);
+        GrvyEngineThreadPoolExecutor.getPoolExecutor().execute(multiThread1);
+        GrvyEngineThreadPoolExecutor.getPoolExecutor().execute(multiModifyValueClazz);
 
         GrvyScriptEngineTest test = new GrvyScriptEngineTest();
         test.scriptEngineMultiThreadTest();

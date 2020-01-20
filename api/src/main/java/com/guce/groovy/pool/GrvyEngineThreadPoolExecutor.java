@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @date 2020-01-20 09:47
  * @description
  */
-public class GrvyEngineThreadPool {
+public class GrvyEngineThreadPoolExecutor {
 
     @Getter
     private static ThreadPoolExecutor poolExecutor ;
@@ -24,10 +24,10 @@ public class GrvyEngineThreadPool {
     static {
 
         int cupCore = Runtime.getRuntime().availableProcessors() + 4;
-        LinkedBlockingQueue workQueue = new LinkedBlockingQueue(10000);
+        LinkedBlockingQueue workQueue = new LinkedBlockingQueue(100000);
         poolExecutor = new ThreadPoolExecutor(cupCore, cupCore * 2, 3, TimeUnit.MINUTES, workQueue
                 , r -> {
-                    Thread t = new Thread();
+                    Thread t = new Thread(r);
                     t.setName("grvy->" + threadNumber.getAndIncrement());
                     if (t.isDaemon()){
                         t.setDaemon(false);
