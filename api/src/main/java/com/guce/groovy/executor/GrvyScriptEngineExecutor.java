@@ -25,6 +25,7 @@ public abstract class GrvyScriptEngineExecutor {
         try{
 
             GrvyScriptEngine.getInstance().bindingEngineScopeMapper(bindings());
+
             result = GrvyScriptEngine.getInstance().eval(script);
             long time = watch.elapsed(TimeUnit.MILLISECONDS);
             logger.info("executor script :{} ; cost time:{} ms.",script,time);
