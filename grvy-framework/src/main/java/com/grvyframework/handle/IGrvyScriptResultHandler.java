@@ -6,5 +6,10 @@ package com.grvyframework.handle;
  */
 public interface IGrvyScriptResultHandler {
 
+    /**
+     * 对表达式计算结果进行wrapper
+     * @param result 表达式计算结果参数
+     * @return  返回处理结果
+     */
     public Object dealResult(Object result);
 }
