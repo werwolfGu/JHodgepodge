@@ -1,7 +1,7 @@
 package com.guce.grvy;
 
-import com.guce.groovy.GrvyEngineThreadPool;
 import com.guce.groovy.engine.GrvyScriptEngine;
+import com.guce.groovy.pool.GrvyEngineThreadPool;
 import org.junit.Test;
 
 import javax.script.ScriptContext;
@@ -54,7 +54,7 @@ public class GrvyScriptEngineTest {
                 e.printStackTrace();
             }
             assert "4".equals(obj);
-        },GrvyEngineThreadPool.getPoolExecutor());
+        }, GrvyEngineThreadPool.getPoolExecutor());
         CompletableFuture<Object> future1 = CompletableFuture.supplyAsync( () -> {
             GrvyScriptEngine.getInstance().bingingGlobalScopeMapper("卡集合",card);
             GrvyScriptEngine.getInstance().bindingEngineScopeMapper("卡","2");
@@ -260,7 +260,7 @@ public class GrvyScriptEngineTest {
         }
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         MultiThread multiThread = new MultiThread();
 
         MultiThread1 multiThread1 = new MultiThread1();
@@ -268,5 +268,8 @@ public class GrvyScriptEngineTest {
         GrvyEngineThreadPool.getPoolExecutor().execute(multiThread);
         GrvyEngineThreadPool.getPoolExecutor().execute(multiThread1);
         GrvyEngineThreadPool.getPoolExecutor().execute(multiModifyValueClazz);
+
+        GrvyScriptEngineTest test = new GrvyScriptEngineTest();
+        test.scriptEngineMultiThreadTest();
     }
 }

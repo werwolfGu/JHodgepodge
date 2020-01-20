@@ -1,11 +1,11 @@
 package com.guce.grvy;
 
 import com.guce.groovy.engine.GrvyClassLoader;
+import com.guce.groovy.manager.GroovyDynamicsScriptManager;
+import com.guce.grvy.service.IGrvy;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
 
 /**
  * @Author chengen.gu
@@ -19,7 +19,7 @@ public class GrvyClassLoaderTest {
     public void testClassLoaderGrvyClass() throws ClassNotFoundException {
         IGrvy grvy = null;
         try {
-            grvy = (IGrvy) GrvyClassLoaderTest.class.getClassLoader().loadClass("com.guce.grvy.GrvyImpl").newInstance();
+            grvy = (IGrvy) GrvyClassLoaderTest.class.getClassLoader().loadClass("com.guce.grvy.service.impl.GrvyImpl").newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
@@ -30,15 +30,14 @@ public class GrvyClassLoaderTest {
 
     @Test
     public void testGrvyClassLoader(){
-        String clazzPaht = "/Users/chengen.gu/apps/github/springboot-demo/api/src/test/java/com/guce/grvy/GrvyImpl.groovy";
+        String clazzpath = "/Users/guchengen495/workspace/github/JHodgepodge/api/src/test/java/com/guce/grvy/service/impl/GrvyImpl.groovy";
         try {
-            IGrvy iGrvy = GrvyClassLoader.loadClass(clazzPaht);
-            System.out.println(iGrvy.printGrvy(" grvy load file"));
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InstantiationException e) {
+
+            IGrvy iGrvy = GrvyClassLoader.loaderInstance(clazzpath);;
+            String name = iGrvy.printGrvy(" grvy classloader");
+            System.out.println(name);
+            //IGrvy iGrvy = GrvyClassLoader.loaderInstance(clazzpath);
+           } catch (Exception e) {
             e.printStackTrace();
         }
     }

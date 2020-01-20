@@ -3,17 +3,17 @@ package com.guce.groovy.manager;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
-import com.guce.groovy.GrvyScriptMapper;
-import com.guce.groovy.IFoo;
 import com.guce.groovy.engine.GrvyClassLoader;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.concurrent.ExecutionException;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class GroovyDynamicsScriptManager {
+
+public class GroovyDynamicsScriptManager<V> {
 
 
     private final static Logger logger = LoggerFactory.getLogger(GroovyDynamicsScriptManager.class);
@@ -21,7 +21,10 @@ public class GroovyDynamicsScriptManager {
     private static volatile GroovyDynamicsScriptManager grvy ;
 
     @Getter
-    private LoadingCache<String, IFoo> grvyClassCache;
+    private LoadingCache<String, V> grvyClassCache;
+
+    @Getter
+    private Map<String,String> grvyScriptMapper = new ConcurrentHashMap<>();
 
     public static GroovyDynamicsScriptManager getInstance(){
         if (grvy == null){
@@ -36,31 +39,24 @@ public class GroovyDynamicsScriptManager {
 
     private GroovyDynamicsScriptManager(){
 
-        grvyClassCache = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, IFoo>() {
+        grvyClassCache = CacheBuilder.newBuilder().maximumSize(1000).build(new CacheLoader<String, V>() {
 
             @Override
-            public IFoo load(String s) throws Exception {
+            public V load(String s) throws Exception {
+
                 return loadGrvyClassInstance(s);
             }
         });
     }
 
-    public IFoo loadGrvyClassInstance(String key){
+    private V loadGrvyClassInstance(String key) throws IllegalAccessException, IOException, InstantiationException {
 
-        IFoo iFoo = null;
-        try {
-            String scriptPath =GrvyScriptMapper.grvyScriptMap.get(key);
-            iFoo = GrvyClassLoader.loadClass(scriptPath);
-        } catch (IllegalAccessException | IOException | InstantiationException e) {
-            logger.error("guava cache grovy dynamics class loader error!" ,e);
-        }
-        return iFoo;
+        String grvyScriptPaht = grvyScriptMapper.get(key);
+        logger.warn("load class key:{} ; classpath:{}" ,key,grvyScriptPaht);
+        System.out.println("load class key:"+key + "; classpath:"  + grvyScriptPaht);
+        V instance = GrvyClassLoader.loaderInstance(grvyScriptPaht);
+        return instance;
     }
 
-    public static void main(String[] args) throws ExecutionException {
-
-        IFoo iFoo = GroovyDynamicsScriptManager.getInstance().getGrvyClassCache().get("普卡");
-        iFoo.print();
-    }
 
 }

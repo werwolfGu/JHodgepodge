@@ -1,8 +1,6 @@
 package com.guce.groovy.engine;
 
-import com.guce.groovy.IFoo;
 import groovy.lang.GroovyClassLoader;
-import groovy.lang.GroovyObject;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 
@@ -13,6 +11,7 @@ import java.io.IOException;
 public class GrvyClassLoader {
 
     private static String CHATSET = "UTF-8";
+
     private static GroovyClassLoader groovyClassLoader ;
 
     static{
@@ -23,36 +22,25 @@ public class GrvyClassLoader {
     }
 
 
-    public static <T> T  loadClass(String filePath) throws IllegalAccessException, IOException, InstantiationException {
+    public static Class  loadClass(String filePath) throws IllegalAccessException, IOException, InstantiationException {
         File file = new File(filePath);
         return loadClass(file);
     }
-    public static <T> T loadClass(File file) throws IOException, IllegalAccessException, InstantiationException {
+    public static Class loadClass(File file) throws IOException, IllegalAccessException, InstantiationException {
 
         String grvyContent = IOUtils.toString(new FileInputStream(file),CHATSET);
         Class groovyClass = groovyClassLoader.parseClass(grvyContent);
 
-        return (T) groovyClass.newInstance();
+        return groovyClass;
     }
 
-    public static void main(String[] args) throws IllegalAccessException, IOException, InstantiationException, InterruptedException {
+    public static <T> T loaderInstance(String filepath) throws IllegalAccessException, IOException, InstantiationException {
 
-        String path = "/Users/guchengen495/workspace/github/JHodgepodge/api/src/main/java/com/guce/groovy/GroovyDemo.groovy";
-        File file = new File(path);
-        IFoo demo = GrvyClassLoader.loadClass(path);
-        long last = file.lastModified();
-        for (int i = 0 ; i < 10 ; i++ ){
+        Class clazz = loadClass(filepath);
+        return (T) clazz.newInstance();
+    }
 
-            long curr = file.lastModified();
-            if ( curr != last){
-                demo = GrvyClassLoader.loadClass(path);
-                last = curr;
-            }
-            demo.print();
-
-            Thread.sleep(5000L);
-        }
-
+    public static void main(String[] args) {
 
     }
 

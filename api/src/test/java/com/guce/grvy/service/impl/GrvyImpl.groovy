@@ -1,4 +1,6 @@
-package com.guce.grvy
+package com.guce.grvy.service.impl
+
+import com.guce.grvy.service.IGrvy
 
 /**
  * @Author chengen.gu* @DATE 2020/1/19 11:43 下午
