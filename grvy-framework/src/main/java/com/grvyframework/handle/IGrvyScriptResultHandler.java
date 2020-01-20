@@ -1,6 +1,10 @@
 package com.grvyframework.handle;
 
-public interface IGrvyScriptResultHandler<P,R> {
+/**
+ * @author chengen.gu
+ * @date 2020/1/21 8:11 下午
+ */
+public interface IGrvyScriptResultHandler {
 
-    public R dealResult(P result);
+    public Object dealResult(Object result);
 }

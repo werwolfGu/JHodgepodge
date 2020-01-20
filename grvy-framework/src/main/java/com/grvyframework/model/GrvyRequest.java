@@ -18,6 +18,7 @@ public class GrvyRequest {
 
     private String evalScript;
     private Map<String,Object> proMap;
+
     private IGrvyScriptResultHandler grvyScriptResultHandler;
 
 }
