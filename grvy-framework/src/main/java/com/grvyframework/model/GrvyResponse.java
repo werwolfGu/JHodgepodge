@@ -9,4 +9,6 @@ import lombok.Data;
  */
 @Data
 public class GrvyResponse {
+
+    private BaseScriptEvalResult scriptEvalResult;
 }

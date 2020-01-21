@@ -2,6 +2,9 @@ package com.grvyframework.grvy.engine;
 
 import com.grvyframework.grvy.GrvyScriptEngineExecutor;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
+import com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler;
+import com.grvyframework.model.BaseScriptEvalResult;
+import com.grvyframework.model.BaseScriptEvalResultCalculateParam;
 import com.grvyframework.model.GrvyRequest;
 import com.grvyframework.model.GrvyResponse;
 import com.grvyframework.spring.autoconfigure.GrvyAutoConfiguration;
@@ -48,13 +51,16 @@ public class TestAutoConfiguration {
 
         List<String> card = Arrays.asList("1","2","3");
         GrvyScriptEngine grvyScriptEngine = this.context.getBean(GrvyScriptEngine.class);
-        grvyScriptEngine.bingingGlobalScopeMapper("卡集合",card);
-        grvyScriptEngine.bindingEngineScopeMapper("卡","2");
+        grvyScriptEngine.bingingGlobalScopeMapper("交易码","1101");
+        grvyScriptEngine.bindingEngineScopeMapper("渠道","NET");
         System.out.println(grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(100));
-        String script = " if (卡集合.contains(卡) ) return 卡 ";
+        String script = " def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
+                "    def channels = [\"NET\",\"NCUP\"]\n" +
+                "    if (list.contains(交易码) && channels.contains(渠道))\n" +
+                "        return true ";
         Object obj = grvyScriptEngine.eval(script);
+        System.out.println("obj:" + obj);
 
-        assert "2".equals(obj);
     }
 
     @Test
@@ -67,20 +73,27 @@ public class TestAutoConfiguration {
         }
         GrvyRequest request = new GrvyRequest();
         GrvyResponse response = new GrvyResponse();
-        String script = " if (卡集合.contains(卡) ) return 卡 ";
+        String script = " def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
+                "    def channels = [\"NET\",\"NCUP\"]\n" +
+                "    if (list.contains(交易码) && channels.contains(渠道))\n" +
+                "        return true ";
+
         request.setEvalScript(script);
         Bindings bindings = new SimpleBindings();
-        bindings.put("卡集合",mccList);
-        Integer idx = ThreadLocalRandom.current().nextInt(seed);
-        bindings.put("卡","2");
+        bindings.put("交易码","1101");
+        bindings.put("渠道","NET");
         request.setBindings(bindings);
-        Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
+        /*Class clazz = Thread.currentThread().getContextClassLoader()
+                .loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");*/
         GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
-        IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
+        IGrvyScriptResultHandler handle = SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class);
         request.setGrvyScriptResultHandler(handle);
-        CompletableFuture future = grvyScriptEngineExecutor.executor(request,response);
-
-        assert "2".equals(future.get());
+        BaseScriptEvalResultCalculateParam calculateParam = new BaseScriptEvalResultCalculateParam();
+        calculateParam.setAmt(2L);
+        request.setCalculateParam(calculateParam);
+        CompletableFuture<BaseScriptEvalResult> future = grvyScriptEngineExecutor.executor(request,response);
+        BaseScriptEvalResult result = future.get();
+        assert "2".equals(result.getAmt().toString());
     }
 
     @Test
@@ -96,18 +109,29 @@ public class TestAutoConfiguration {
 
             GrvyRequest request = new GrvyRequest();
             GrvyResponse response = new GrvyResponse();
-            String script = " if (卡集合.contains(卡) ) return 卡 ";
+            String script = " def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
+                    "    def channels = [\"NET\",\"NCUP\"]\n" +
+                    "    if (list.contains(交易码) && channels.contains(渠道))\n" +
+                    "        return true ";
             request.setEvalScript(script);
             Bindings bindings = new SimpleBindings();
-            bindings.put("卡集合",mccList);
+            bindings.put("交易码","1101");
+            bindings.put("渠道","NET");
             Integer idx = ThreadLocalRandom.current().nextInt(seed);
             bindings.put("卡",idx.toString());
             request.setBindings(bindings);
             try {
-                Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
+
                 GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
-                IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
+
+                IGrvyScriptResultHandler handle = SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class);
                 request.setGrvyScriptResultHandler(handle);
+
+                BaseScriptEvalResultCalculateParam calculateParam = new BaseScriptEvalResultCalculateParam();
+
+                Long amt = ThreadLocalRandom.current().nextLong(seed);
+                calculateParam.setAmt(amt);
+                request.setCalculateParam(calculateParam);
                 CompletableFuture future = grvyScriptEngineExecutor.executor(request,response);
                 list.add(future);
             } catch (Exception e) {

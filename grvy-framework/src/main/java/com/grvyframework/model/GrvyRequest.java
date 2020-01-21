@@ -14,11 +14,29 @@ import java.util.Map;
 @Data
 public class GrvyRequest {
 
+    /**
+     * engine 规则表达式计算参数集
+     */
     private Bindings bindings;
 
-    private String evalScript;
+    /**
+     * 规则表达式计算参数
+     */
     private Map<String,Object> proMap;
 
+    /**
+     *规则表达式
+     */
+    private String evalScript;
+
+    /**
+     * 输出结果计算参数
+     */
+    private BaseScriptEvalResultCalculateParam calculateParam;
+
+    /**
+     * 输出结果计算处理
+     */
     private IGrvyScriptResultHandler grvyScriptResultHandler;
 
 }

@@ -1,4 +1,4 @@
-package com.grvyframework.grvy.engine.handle;
+package com.grvyframework.handle.impl;
 
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.model.BaseScriptEvalResult;
@@ -8,12 +8,12 @@ import org.springframework.stereotype.Component;
 import java.util.Optional;
 
 /**
- * @author chengen.gu
- * @date 2020-01-20 17:23
+ * @author chengen.gce
+ * @date 2020-01-21 09:20
  * @description
  */
-@Component
-public class DefaultGrvyScriptResulthandler implements IGrvyScriptResultHandler {
+@Component("defaultGrvyScriptResultHandler")
+public class DefaultGrvyScriptResultHandler implements IGrvyScriptResultHandler {
 
     @Override
     public BaseScriptEvalResult dealResult(Object result, BaseScriptEvalResultCalculateParam calculateParam) {
@@ -23,10 +23,6 @@ public class DefaultGrvyScriptResulthandler implements IGrvyScriptResultHandler 
                 .map(Boolean::parseBoolean)
                 .orElse(Boolean.FALSE);
 
-        if ( flag ){
-
-            throw new IllegalArgumentException("BaseScriptEvalResultCalculateParam 不能为空!");
-        }
         BaseScriptEvalResult evalResult = new BaseScriptEvalResult();
         if (flag && calculateParam != null){
 

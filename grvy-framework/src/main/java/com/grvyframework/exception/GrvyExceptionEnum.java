@@ -17,6 +17,10 @@ public enum GrvyExceptionEnum {
      */
     GRVY_EXECUTOR_ERROR("40000002","grvy_executor_error","groovy 执行异常"),
     /**
+     * grvy参数异常
+     */
+    Grvy_ILLEGAL_ARGUMMENT_ERROR("40000004","grvy_illegalment_argument_error","请求参数异常"),
+    /**
      * groovy 未知异常
      */
     GRVY_EXECUTOR_UNKNOWN_ERROR("40000003","grvy_executor_unknown_error","groovy 未知异常");

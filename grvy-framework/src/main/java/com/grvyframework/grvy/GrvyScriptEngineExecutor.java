@@ -7,8 +7,11 @@ import com.grvyframework.exception.GrvyExecutorException;
 import com.grvyframework.executor.ThreadPoolFactory;
 import com.grvyframework.grvy.engine.GrvyScriptEngine;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
+import com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler;
+import com.grvyframework.model.BaseScriptEvalResult;
 import com.grvyframework.model.GrvyRequest;
 import com.grvyframework.model.GrvyResponse;
+import com.grvyframework.spring.container.SpringApplicationBean;
 import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -35,7 +38,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     private static Logger logger = LoggerFactory.getLogger(GrvyScriptEngineExecutor.class);
 
     @Getter
-    private ThreadPoolExecutor executor ;
+    private ThreadPoolExecutor tpe ;
 
     @Autowired
     private GrvyScriptEngine grvyScriptEngine;
@@ -43,7 +46,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     @Autowired
     private GrvyExecutorConfig config ;
 
-    public CompletableFuture executor(GrvyRequest request , GrvyResponse response) throws Exception {
+    public CompletableFuture<BaseScriptEvalResult> executor(GrvyRequest request , GrvyResponse response) throws Exception {
 
 
         String script = request.getEvalScript();
@@ -69,22 +72,35 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                         return true;
                     });
             try{
-                Object scriptResult = grvyScriptEngine.eval(script);
-                IGrvyScriptResultHandler grvyScriptResultHandler = request.getGrvyScriptResultHandler();
-                Object result = grvyScriptResultHandler.dealResult(scriptResult);
-                long time = watch.elapsed(TimeUnit.MILLISECONDS);
+                IGrvyScriptResultHandler grvyScriptResultHandler = Optional.ofNullable(request.getGrvyScriptResultHandler())
+                        .orElseGet( () -> SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class));
 
-                logger.info("executor script :{} ; result:{} ;  cost time:{} ms.",script,result,time);
-                return result;
+                Object scriptResult = grvyScriptEngine.eval(script);
+
+                BaseScriptEvalResult evalResult = grvyScriptResultHandler.dealResult(scriptResult,request.getCalculateParam());
+
+                response.setScriptEvalResult(evalResult);
+
+                if (logger.isInfoEnabled()){
+                    logger.info("executor script :{{}} ; evalResult:{} ;  cost time:{} ms."
+                            ,script,evalResult,watch.elapsed(TimeUnit.MILLISECONDS));
+
+                }
+                return evalResult;
             } catch (ScriptException e) {
 
-                logger.error("script exception: script:{} ; param:{} ; "
+                logger.error("script exception: script:{{}} ; param:{} ; "
                         ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
                 throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_ERROR);
 
-            }catch (Exception e){
+            } catch (IllegalArgumentException e){
 
-                logger.error("script exception: script:{} ; param:{} ; "
+                logger.error("script exception: script:{{}} ; param:{} ; "
+                        ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
+                throw new GrvyExecutorException(GrvyExceptionEnum.Grvy_ILLEGAL_ARGUMMENT_ERROR);
+            } catch (Exception e){
+
+                logger.error("script exception: script:{{}} ; param:{} ; "
                         ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
                 throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_UNKNOWN_ERROR);
 
@@ -96,7 +112,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                 }
                 watch = null;
             }
-            } ,executor);
+            } ,tpe);
 
         return future;
 
@@ -105,6 +121,6 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws Exception {
 
-        executor = ThreadPoolFactory.getThreadPoolExecutor(config);
+        tpe = ThreadPoolFactory.getThreadPoolExecutor(config);
     }
 }
