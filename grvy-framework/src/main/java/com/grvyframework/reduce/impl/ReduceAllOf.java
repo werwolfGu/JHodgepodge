@@ -5,7 +5,7 @@ import com.grvyframework.reduce.Reduce;
 import java.util.function.Predicate;
 
 /**
- * @author guchengen495
+ * @author chengen.gce
  * @date 2020-01-21 13:38
  * @description
  */
