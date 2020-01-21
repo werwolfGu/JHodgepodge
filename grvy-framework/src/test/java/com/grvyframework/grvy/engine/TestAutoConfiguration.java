@@ -91,7 +91,7 @@ public class TestAutoConfiguration {
         BaseScriptEvalResultCalculateParam calculateParam = new BaseScriptEvalResultCalculateParam();
         calculateParam.setAmt(2L);
         request.setCalculateParam(calculateParam);
-        CompletableFuture<BaseScriptEvalResult> future = grvyScriptEngineExecutor.executor(request,response);
+        CompletableFuture<BaseScriptEvalResult> future = grvyScriptEngineExecutor.asynExecutor(request,response);
         BaseScriptEvalResult result = future.get();
         assert "2".equals(result.getAmt().toString());
     }
@@ -132,7 +132,7 @@ public class TestAutoConfiguration {
                 Long amt = ThreadLocalRandom.current().nextLong(seed);
                 calculateParam.setAmt(amt);
                 request.setCalculateParam(calculateParam);
-                CompletableFuture future = grvyScriptEngineExecutor.executor(request,response);
+                CompletableFuture future = grvyScriptEngineExecutor.asynExecutor(request,response);
                 list.add(future);
             } catch (Exception e) {
                 e.printStackTrace();

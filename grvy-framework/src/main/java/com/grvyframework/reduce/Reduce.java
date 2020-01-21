@@ -1,5 +1,6 @@
 package com.grvyframework.reduce;
 
+import com.grvyframework.model.BaseScriptEvalResult;
 import com.grvyframework.reduce.impl.ReduceAllOf;
 import com.grvyframework.reduce.impl.ReduceAnyOf;
 import com.grvyframework.reduce.impl.ReduceFirstOf;

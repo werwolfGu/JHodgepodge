@@ -80,7 +80,7 @@ public class GrvyScriptEngineTest {
                      Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
                      IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
                      request.setGrvyScriptResultHandler(handle);
-                     grvyScriptEngineExecutor.executor(request,response);
+                     grvyScriptEngineExecutor.asynExecutor(request,response);
                  } catch (ClassNotFoundException e) {
                      e.printStackTrace();
                  } catch (Exception e) {

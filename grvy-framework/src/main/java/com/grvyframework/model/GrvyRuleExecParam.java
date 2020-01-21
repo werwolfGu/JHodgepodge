@@ -1,20 +1,27 @@
 package com.grvyframework.model;
 
 import com.grvyframework.handle.IGrvyScriptResultHandler;
-import com.grvyframework.reduce.Reduce;
 import lombok.Data;
 
 import javax.script.Bindings;
-import java.util.List;
 import java.util.Map;
 
 /**
- * @author chengen.gu
- * @date 2020-01-20 17:02
+ * @author guchengen495
+ * @date 2020-01-21 15:38
  * @description
  */
 @Data
-public class GrvyRequest {
+public class GrvyRuleExecParam {
+
+    /**
+     * 规则表达式
+     */
+    private String script;
+    /**
+     * 输出结果计算处理
+     */
+    private IGrvyScriptResultHandler grvyScriptResultHandler;
 
     /**
      * engine 规则表达式计算参数集
@@ -27,20 +34,7 @@ public class GrvyRequest {
     private Map<String,Object> proMap;
 
     /**
-     *规则配置信息
-     */
-    private List<GrvyRuleConfigEntry> grvyRuleInfoList;
-
-    /**
      * 输出结果计算参数
      */
     private BaseScriptEvalResultCalculateParam calculateParam;
-
-    /**
-     * 结果集处理条件
-     */
-    private Reduce reduce;
-
-
-
 }
