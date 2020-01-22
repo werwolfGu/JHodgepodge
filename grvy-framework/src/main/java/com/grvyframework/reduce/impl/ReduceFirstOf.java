@@ -1,5 +1,6 @@
 package com.grvyframework.reduce.impl;
 
+import com.grvyframework.model.BaseScriptEvalResult;
 import com.grvyframework.reduce.Reduce;
 
 import java.util.function.Predicate;
@@ -9,10 +10,10 @@ import java.util.function.Predicate;
  * @date 2020-01-21 13:38
  * @description
  */
-public class ReduceFirstOf<T> extends Reduce<T> {
+public class ReduceFirstOf<T extends BaseScriptEvalResult> extends Reduce<T> {
 
 
-    public ReduceFirstOf(Predicate predicate) {
+    public ReduceFirstOf(Predicate<T> predicate) {
         super(predicate);
     }
 

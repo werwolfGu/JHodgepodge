@@ -3,7 +3,12 @@ package com.grvyframework.grvy.engine;
 import lombok.Getter;
 import org.springframework.stereotype.Component;
 
-import javax.script.*;
+import javax.script.Bindings;
+import javax.script.ScriptContext;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 import java.util.Optional;
 
 /**
@@ -88,11 +93,15 @@ public class GrvyScriptEngine {
 
     public  void clearCurrEngineBinding(){
 
-        Bindings bindings = Optional.ofNullable(scriptEngineHolder.get().getContext())
-                .map( context -> context.getBindings(ScriptContext.ENGINE_SCOPE))
-                .orElse(null);
-        if (bindings != null){
-            bindings.clear();
-        }
+        /*Optional.ofNullable(scriptEngineHolder.get().getContext())
+                .map(context -> context.getBindings(ScriptContext.ENGINE_SCOPE)).ifPresent(Map::clear);*/
+        /**
+         * 前面传的是应用 如果clear的话 会导致执行第二个规则时 拿不到binding值 原因 binding值已经被clear了
+         */
+        Optional.ofNullable(scriptEngineHolder.get().getContext())
+                .map(context -> {
+                    context.setBindings(new SimpleBindings(),ScriptContext.ENGINE_SCOPE);
+                    return true;
+                });
     }
 }

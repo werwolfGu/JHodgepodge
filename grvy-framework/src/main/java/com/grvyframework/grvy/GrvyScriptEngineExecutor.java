@@ -8,10 +8,15 @@ import com.grvyframework.executor.ThreadPoolFactory;
 import com.grvyframework.grvy.engine.GrvyScriptEngine;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler;
-import com.grvyframework.model.*;
+import com.grvyframework.model.BaseScriptEvalResult;
+import com.grvyframework.model.GrvyRequest;
+import com.grvyframework.model.GrvyResponse;
+import com.grvyframework.model.GrvyRuleConfigEntry;
+import com.grvyframework.model.GrvyRuleExecParam;
 import com.grvyframework.reduce.Reduce;
 import com.grvyframework.spring.container.SpringApplicationBean;
 import lombok.Getter;
+import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
@@ -20,8 +25,12 @@ import org.springframework.stereotype.Component;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
@@ -44,7 +53,16 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     @Autowired
     private GrvyExecutorConfig config ;
 
-    public List<BaseScriptEvalResult> syncExecutor(GrvyRequest request , GrvyResponse response ,Reduce reduce) throws ScriptException {
+    /**
+     * 串行执行规则
+     * @param request
+     * @param response
+     * @param reduce
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+    public List<BaseScriptEvalResult> serialExecutor(GrvyRequest request , GrvyResponse response ,Reduce<BaseScriptEvalResult> reduce) throws InterruptedException, ExecutionException {
 
         List<BaseScriptEvalResult> resultList = new ArrayList<>();
 
@@ -52,57 +70,63 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                 .map(GrvyRequest::getGrvyRuleInfoList)
                 .orElse(null);
 
-        CompletableFuture.supplyAsync( () -> {
-            List<BaseScriptEvalResult> results = new ArrayList<>();
+        if (CollectionUtils.isEmpty(ruleList)){
+            logger.error(" List<GrvyRuleConfigEntry> ruleList 规则参数不能为空！");
+            throw new GrvyExecutorException(GrvyExceptionEnum.Grvy_ILLEGAL_ARGUMMENT_ERROR);
+        }
+
+        CompletableFuture future = CompletableFuture.runAsync( () -> {
+
             for (GrvyRuleConfigEntry ruleInfo : ruleList ){
 
-                GrvyRuleExecParam param = new GrvyRuleExecParam();
-                param.setProMap(request.getProMap());
-                param.setBindings(request.getBindings());
-                param.setCalculateParam(request.getCalculateParam());
-                param.setScript(ruleInfo.getScript());
-                param.setGrvyScriptResultHandler(ruleInfo.getGrvyScriptResultHandler());
-                BaseScriptEvalResult result = executor(param);
+                GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
+                BaseScriptEvalResult result = this.executor(param);
 
                 if (reduce.execute(result)){
                     break;
                 }
             }
-            return results;
         },tpe);
 
+        future.get();
         resultList.addAll(reduce.getResult());
         return resultList;
     }
 
-    public List<BaseScriptEvalResult> asynExecutor(GrvyRequest request , GrvyResponse response,Reduce reduce) throws Exception {
+    /**
+     * 并行执行规则
+     * @param request
+     * @param response
+     * @param reduce
+     * @return
+     * @throws Exception
+     */
+    public List<BaseScriptEvalResult> parallelExecutor(GrvyRequest request , GrvyResponse response , Reduce<BaseScriptEvalResult> reduce) throws Exception {
 
         List<BaseScriptEvalResult> resultList = new ArrayList<>();
 
         List<GrvyRuleConfigEntry> ruleList = Optional.ofNullable(request)
                 .map(GrvyRequest::getGrvyRuleInfoList)
                 .orElse(null);
+
         List<CompletableFuture<BaseScriptEvalResult>> futureList = new ArrayList<>();
 
-        ruleList.forEach( ruleInfo -> {
+        assert ruleList != null;
+
+        ruleList.forEach(ruleInfo -> {
 
             CompletableFuture<BaseScriptEvalResult> future = CompletableFuture.supplyAsync( () -> {
-                GrvyRuleExecParam param = new GrvyRuleExecParam();
-                param.setProMap(request.getProMap());
-                param.setBindings(request.getBindings());
-                param.setCalculateParam(request.getCalculateParam());
-                param.setScript(ruleInfo.getScript());
-                param.setGrvyScriptResultHandler(ruleInfo.getGrvyScriptResultHandler());
-                BaseScriptEvalResult result = executor(param);
-                BaseScriptEvalResult evalResult = executor(param);
-                return evalResult;
+
+                GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
+                return this.executor(param);
 
             } ,tpe);
             futureList.add(future);
         });
-        CompletableFuture[] arr = futureList.toArray(new CompletableFuture[futureList.size()]);
+        CompletableFuture[] arr = futureList.toArray(new CompletableFuture[0]);
         CompletableFuture future = CompletableFuture.allOf(arr);
         future.get();
+
         for (CompletableFuture<BaseScriptEvalResult> resultFuture : futureList){
             BaseScriptEvalResult value = resultFuture.get();
             if (reduce.execute(value)){
@@ -116,13 +140,25 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
     }
 
+    private GrvyRuleExecParam wrapperGrvyRuleParam(GrvyRequest request,GrvyRuleConfigEntry ruleEntitry){
+        GrvyRuleExecParam param = new GrvyRuleExecParam();
+        param.setProMap(request.getProMap());
+        param.setBindings(request.getBindings());
+        param.setCalculateParam(request.getCalculateParam());
+        param.setScript(ruleEntitry.getScript());
+        param.setGrvyScriptResultHandler(ruleEntitry.getGrvyScriptResultHandler());
+        return param;
+    }
+
     private BaseScriptEvalResult executor(GrvyRuleExecParam ruleExecParam) {
 
 
         Stopwatch watch = Stopwatch.createStarted();
-        BaseScriptEvalResult evalResult = null;
+        BaseScriptEvalResult evalResult ;
 
-        String script = ruleExecParam.getScript();
+        String script = Optional.ofNullable(ruleExecParam)
+                .map(GrvyRuleExecParam::getScript)
+                .orElse(null);
         if (script == null){
 
             throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_SCRIPT_EMPTY);
@@ -130,13 +166,14 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
         try{
 
-            Optional.ofNullable(ruleExecParam)
-                    .map(req -> req.getBindings())
-                    .map( bindings -> {
+            Optional.of(ruleExecParam)
+                    .map(GrvyRuleExecParam::getBindings)
+                    .map(bindings -> {
                         grvyScriptEngine.bindingEngineScopeMapper(bindings);
                         return true;
                     });
-            Optional.of(ruleExecParam).map(req -> req.getProMap())
+
+            Optional.of(ruleExecParam).map(GrvyRuleExecParam::getProMap)
                     .map( map -> {
                         for (Map.Entry<String,Object> entry : map.entrySet()){
                             grvyScriptEngine.bindingEngineScopeMapper(entry.getKey(),entry.getValue());
@@ -144,7 +181,8 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                         return true;
                     });
 
-            IGrvyScriptResultHandler grvyScriptResultHandler = Optional.ofNullable(ruleExecParam.getGrvyScriptResultHandler())
+            IGrvyScriptResultHandler grvyScriptResultHandler = Optional.of(ruleExecParam)
+                    .map(GrvyRuleExecParam::getGrvyScriptResultHandler)
                     .orElseGet(() -> SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class));
 
             Object scriptResult = grvyScriptEngine.eval(script);
@@ -153,39 +191,39 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
 
             if (logger.isInfoEnabled()) {
-                logger.info("executor script :{{}} ; evalResult:{} ; cost time:{}."
+
+                logger.info("executor script :\n{{}} ; evalResult:{} ; cost time:{}."
                         , script, evalResult,watch.elapsed(TimeUnit.MILLISECONDS));
 
             }
             return evalResult;
         }catch (ScriptException e) {
 
-            logger.error("script exception: script:{{}} ; param:{} ; "
-                    ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
-            throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_ERROR);
+            logger.error("script exception: script:\n {{}} ; param:{} ; "
+                    ,script,Optional.
+                            ofNullable(grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE))
+                            .map(Map::entrySet).orElse(null),e);
+            throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_ERROR,e);
 
         } catch (IllegalArgumentException e){
 
             logger.error("script exception: script:{{}} ; param:{} ; "
                     ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
-            throw new GrvyExecutorException(GrvyExceptionEnum.Grvy_ILLEGAL_ARGUMMENT_ERROR);
+            throw new GrvyExecutorException(GrvyExceptionEnum.Grvy_ILLEGAL_ARGUMMENT_ERROR,e);
         } catch (Exception e){
 
             logger.error("script exception: script:{{}} ; param:{} ; "
                     ,script,grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(ScriptContext.ENGINE_SCOPE),e);
-            throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_UNKNOWN_ERROR);
+            throw new GrvyExecutorException(GrvyExceptionEnum.GRVY_EXECUTOR_UNKNOWN_ERROR,e);
 
         }finally {
             grvyScriptEngine.clearCurrEngineBinding();
-            if (watch != null){
-                watch.stop();
-            }
-            watch = null;
+            watch.stop();
         }
     }
 
     @Override
-    public void afterPropertiesSet() throws Exception {
+    public void afterPropertiesSet() {
 
         tpe = ThreadPoolFactory.getThreadPoolExecutor(config);
     }

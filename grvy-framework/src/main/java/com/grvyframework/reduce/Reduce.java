@@ -15,7 +15,7 @@ import java.util.function.Predicate;
  * @date 2020-01-21 13:36
  * @description
  */
-public abstract class Reduce<T> {
+public abstract class Reduce<T extends BaseScriptEvalResult> {
 
     protected Predicate predicate;
 
@@ -37,36 +37,39 @@ public abstract class Reduce<T> {
         return result;
     }
 
-    public static <V> Reduce<V> firstOf(Predicate<V> predicate){
+    public static <V extends BaseScriptEvalResult> Reduce<V> firstOf(Predicate<V> predicate){
 
         return new ReduceFirstOf(predicate);
     }
 
-    public static <V> Reduce<V> anyof(Predicate<V> predicate){
+    public static <V extends BaseScriptEvalResult> Reduce<V> anyof(Predicate<V> predicate){
         return new ReduceAnyOf(predicate);
     }
 
-    public static Reduce allof(Predicate predicate){
+    public static  <V extends BaseScriptEvalResult> Reduce<V> allof(Predicate<V> predicate){
         return new ReduceAllOf(predicate);
     }
 
     public static void main(String[] args) {
 
-        Reduce<String> first = Reduce.firstOf(Objects::nonNull);
-        first.execute("a");
+        Reduce<BaseScriptEvalResult> first = Reduce.firstOf(Objects::nonNull);
+        BaseScriptEvalResult result = new BaseScriptEvalResult();
+        first.execute(result);
         System.out.println(first.getResult());
 
-        Reduce<String> allof = Reduce.allof(Objects::nonNull);
+        Reduce<BaseScriptEvalResult> allof = Reduce.allof(Objects::nonNull);
         for (int i = 0 ; i < 10 ; i++ ){
-            if ( allof.execute(String.valueOf(i))){
+            BaseScriptEvalResult r = new BaseScriptEvalResult();
+            if ( allof.execute(r)){
                 break;
             }
         }
         System.out.println(allof.getResult());
 
-        Reduce<String> anyof = Reduce.anyof(Objects::nonNull);
+        Reduce<BaseScriptEvalResult> anyof = Reduce.anyof(Objects::nonNull);
         for (int i = 0 ; i < 10 ; i++ ){
-            if (anyof.execute(String.valueOf(i))){
+            BaseScriptEvalResult r = new BaseScriptEvalResult();
+            if (anyof.execute(r)){
                 break;
             }
         }

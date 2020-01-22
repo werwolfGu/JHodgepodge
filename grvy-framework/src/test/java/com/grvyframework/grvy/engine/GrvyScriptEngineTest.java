@@ -5,6 +5,8 @@ import com.grvyframework.grvy.GrvyScriptEngineExecutor;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.model.GrvyRequest;
 import com.grvyframework.model.GrvyResponse;
+import com.grvyframework.model.GrvyRuleConfigEntry;
+import com.grvyframework.reduce.Reduce;
 import com.grvyframework.spring.container.SpringApplicationBean;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -18,7 +20,12 @@ import javax.script.SimpleBindings;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.*;
+import java.util.Objects;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.ThreadLocalRandom;
+import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author chengen.gu
@@ -70,17 +77,23 @@ public class GrvyScriptEngineTest {
                  GrvyRequest request = new GrvyRequest();
                  GrvyResponse response = new GrvyResponse();
                  String script = " if (卡集合.contains(卡) ) return 卡 ";
-                 request.setEvalScript(script);
+                 List<GrvyRuleConfigEntry> grvyRuleInfoList = new ArrayList<>();
+
+
+
                  Bindings bindings = new SimpleBindings();
                  bindings.put("卡集合",cardList);
                  Integer idx = ThreadLocalRandom.current().nextInt(1000);
                  bindings.put("卡",idx.toString());
                  request.setBindings(bindings);
                  try {
+                     request.setGrvyRuleInfoList(grvyRuleInfoList);
+                     GrvyRuleConfigEntry ruleInfo = new GrvyRuleConfigEntry();
+                     grvyRuleInfoList.add(ruleInfo);
                      Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
-                     IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
-                     request.setGrvyScriptResultHandler(handle);
-                     grvyScriptEngineExecutor.asynExecutor(request,response);
+                     IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);                 ruleInfo.setGrvyScriptResultHandler(handle);
+                     ruleInfo.setScript(script);
+                     grvyScriptEngineExecutor.parallelExecutor(request,response, Reduce.firstOf(Objects::nonNull));
                  } catch (ClassNotFoundException e) {
                      e.printStackTrace();
                  } catch (Exception e) {
