@@ -20,6 +20,8 @@
     <module>wechat</module>
     <module>mq</module>
     <module>grvy-framework</module>
+      <module>sentinel-demo</module>
+    <module>jmh-sample</module>
   </modules>
   <packaging>pom</packaging>
 
@@ -55,6 +57,7 @@
     <httpcomponents.version>4.3.5</httpcomponents.version>
     <okhttp.version>4.2.0</okhttp.version>
     <groovy-all.version>3.0.0-rc-3</groovy-all.version>
+    <jmh.version>1.23</jmh.version>
   </properties>
 
   <parent>
@@ -338,6 +341,17 @@
       <version>4.2.7</version>
     </dependency>
 
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-core</artifactId>
+      <version>${jmh.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.openjdk.jmh</groupId>
+      <artifactId>jmh-generator-annprocess</artifactId>
+      <version>${jmh.version}</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>

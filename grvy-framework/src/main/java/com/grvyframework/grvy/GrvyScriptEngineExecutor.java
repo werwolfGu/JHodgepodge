@@ -6,6 +6,7 @@ import com.grvyframework.exception.GrvyExceptionEnum;
 import com.grvyframework.exception.GrvyExecutorException;
 import com.grvyframework.executor.ThreadPoolFactory;
 import com.grvyframework.grvy.engine.GrvyScriptEngine;
+import com.grvyframework.grvy.engine.GrvyScriptEngineClient;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler;
 import com.grvyframework.model.BaseScriptEvalResult;
@@ -25,6 +26,7 @@ import org.springframework.stereotype.Component;
 
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
+import javax.script.SimpleScriptContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +35,7 @@ import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * @author chengen.gu
@@ -52,6 +55,9 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
     @Autowired
     private GrvyExecutorConfig config ;
+
+    @Autowired
+    private GrvyScriptEngineClient grvyScriptEngineClient;
 
     /**
      * 串行执行规则
@@ -88,7 +94,12 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
             }
         },tpe);
 
-        future.get();
+        try {
+            future.get(3,TimeUnit.SECONDS);
+        } catch (TimeoutException e) {
+            logger.error("GrvyScript executor time out",e);
+            return null;
+        }
         resultList.addAll(reduce.getResult());
         return resultList;
     }
@@ -125,7 +136,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         });
         CompletableFuture[] arr = futureList.toArray(new CompletableFuture[0]);
         CompletableFuture future = CompletableFuture.allOf(arr);
-        future.get();
+        future.get(3,TimeUnit.SECONDS);
 
         for (CompletableFuture<BaseScriptEvalResult> resultFuture : futureList){
             BaseScriptEvalResult value = resultFuture.get();
@@ -150,7 +161,11 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         return param;
     }
 
-    private BaseScriptEvalResult executor(GrvyRuleExecParam ruleExecParam) {
+    private BaseScriptEvalResult executor(GrvyRuleExecParam ruleExecParam){
+        return executor(ruleExecParam,GrvyScriptEngineExeEnum.SCRIPT_COMPILER);
+    }
+
+    private BaseScriptEvalResult executor(GrvyRuleExecParam ruleExecParam, GrvyScriptEngineExeEnum executorEnum) {
 
 
         Stopwatch watch = Stopwatch.createStarted();
@@ -166,10 +181,13 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
         try{
 
+            ScriptContext context = new SimpleScriptContext();
+
             Optional.of(ruleExecParam)
                     .map(GrvyRuleExecParam::getBindings)
                     .map(bindings -> {
                         grvyScriptEngine.bindingEngineScopeMapper(bindings);
+                        context.setBindings(bindings,ScriptContext.ENGINE_SCOPE);
                         return true;
                     });
 
@@ -177,6 +195,8 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                     .map( map -> {
                         for (Map.Entry<String,Object> entry : map.entrySet()){
                             grvyScriptEngine.bindingEngineScopeMapper(entry.getKey(),entry.getValue());
+
+                            context.setAttribute(entry.getKey(),entry.getValue(),ScriptContext.ENGINE_SCOPE);
                         }
                         return true;
                     });
@@ -185,7 +205,14 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                     .map(GrvyRuleExecParam::getGrvyScriptResultHandler)
                     .orElseGet(() -> SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class));
 
-            Object scriptResult = grvyScriptEngine.eval(script);
+            Object scriptResult;
+            if (GrvyScriptEngineExeEnum.SCRIPT_COMPILER == executorEnum){
+                scriptResult = grvyScriptEngineClient.eval(script,context);
+            }else {
+                scriptResult = grvyScriptEngine.eval(script);
+
+            }
+
 
             evalResult = grvyScriptResultHandler.dealResult(scriptResult, ruleExecParam.getCalculateParam());
 

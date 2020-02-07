@@ -33,6 +33,8 @@ public class GrvyScriptEngine {
 
     /**
      * 执行脚本
+     * 从源码看 engine 可以只有一个的 ，不过scriptContext需要每个请求的线程都不一样 因为不然的话  会出现多线程共享 scriptContext的问题
+     *
      * @param script
      * @param <T>
      * @return
@@ -40,8 +42,7 @@ public class GrvyScriptEngine {
      */
     public <T> T eval(String script) throws ScriptException {
 
-        Object result = scriptEngineHolder.get().eval(script);
-        return (T)result;
+        return (T) scriptEngineHolder.get().eval(script);
     }
 
     /**

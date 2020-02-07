@@ -10,6 +10,8 @@ zookeeper集群是由一组Server节点组成，这组Server中
 所有Server节点都可以返回结果，当请求更新时，Follower节点会将请求转发给Leader节点，Leader节点接收到数据变更请求后，首先会将数据写入本地磁盘，以作恢复，当持久化
 完后更新内存，并就变更后的结果同步到各个节点；
 
+![](./picture/zookeeper.png)
+
 Zookeeper有以下角色
 
 - ***Leader*** ：  负责投票的发起和决议，更新状态和数据
@@ -30,7 +32,21 @@ Leader选举完毕后,Leader需要与Follower进行数据同步：
 4. 完成同步后通知Follower已经成为update状态；
 5. Follower接收到update消息后，就可以重新接受client的请求进行服务了；
 
-## 典型应用场景
+### Watch监听机制
+
+
+    客户端能在znodes上设置watch，监听znode的变化，包括增删改查，通过stat path ，ls2 path get path皆可查看
+    触发watch事件的条件有4种，create，delete，change，child（子节点事件）
+
+- watch的重要特性
+
+
+    1.仅一次性：watch触发后会立即删除，要持续监听变化的话就要持续提供设置watch，这也是watch的注意事项
+    
+    2.有序性：客户端先得到watch通知才可查看变化结果
+    
+    
+## 典型应用场景(CAP 实现了cp)
 ### 数据的发布/订阅
 
 ### 命名服务

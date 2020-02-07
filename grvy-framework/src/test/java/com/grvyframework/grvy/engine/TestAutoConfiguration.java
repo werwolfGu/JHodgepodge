@@ -101,6 +101,7 @@ public class TestAutoConfiguration {
         request.setCalculateParam(calculateParam);
         List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.serialExecutor(request,response,Reduce.firstOf(Objects::nonNull));
         System.out.println(evalResults);
+
         evalResults = grvyScriptEngineExecutor.serialExecutor(request,response,Reduce.firstOf(Objects::nonNull));
         System.out.println(evalResults);
         assert "2".equals(evalResults.get(0).getAmt().toString());
@@ -148,6 +149,7 @@ public class TestAutoConfiguration {
                 calculateParam.setAmt(amt);
                 request.setCalculateParam(calculateParam);
                 List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.parallelExecutor(request,response, Reduce.firstOf(Objects::nonNull));
+                System.out.println(evalResults);
             } catch (Exception e) {
                 e.printStackTrace();
             }

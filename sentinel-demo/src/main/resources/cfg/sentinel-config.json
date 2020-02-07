@@ -1,0 +1,21 @@
+{
+  "degradeRules":[
+    {
+      "resource": "hello",
+      "count": 0.1,
+      "grade": 1,
+      "minRequestAmount": 3,
+      "timeWindow": 10
+    }
+  ],
+  "flowRules":[
+    {
+      "resource": "test",
+      "controlBehavior": 0,
+      "count": 5.0,
+      "grade": 1,
+      "limitApp": "default",
+      "strategy": 0
+    }
+  ]
+}
