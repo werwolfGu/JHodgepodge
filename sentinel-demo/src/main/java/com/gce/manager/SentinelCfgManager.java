@@ -35,6 +35,11 @@ public class SentinelCfgManager implements InitializingBean {
     @Override
     public void afterPropertiesSet() throws IOException {
 
+        long start = System.currentTimeMillis();
+        if (logger.isWarnEnabled()){
+            logger.warn("========sentinel 配置加载。");
+        }
+
         InputStream in = SentinelCfgManager.class.getClassLoader().getResourceAsStream(DEFAULT_SENTINEL_CFG);
         String source = null;
 
@@ -59,17 +64,23 @@ public class SentinelCfgManager implements InitializingBean {
             initSentinelRule(model);
 
         }
+        if (model != null && logger.isWarnEnabled()){
+            logger.warn("========sentinel 配加载完成:{}  ; cost time:{}",model,(System.currentTimeMillis() - start));
+        }
     }
 
     private void initSentinelRule(SentinelCfgModel sentinelCfg) {
         List<FlowRule> flowRules = sentinelCfg.getFlowRules();
         if (CollectionUtils.isNotEmpty(flowRules)){
             FlowRuleManager.loadRules(flowRules);
+            logger.warn("========sentinel限流配置 end ； config info：{}",flowRules);
+
         }
 
         List<DegradeRule> degradeRules = sentinelCfg.getDegradeRules();
         if (CollectionUtils.isNotEmpty(degradeRules)){
             DegradeRuleManager.loadRules(degradeRules);
+            logger.warn("========sentinel熔断降级配置 end ； config info：{}",flowRules);
         }
     }
 }

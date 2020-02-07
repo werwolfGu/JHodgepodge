@@ -1,6 +1,16 @@
 # Sentinel
 
 ## 限流降级
+
+熔断降级规则包含下面几个重要的属性：
+
+- resource  资源名，即限流规则的作用对象  
+- count 阈值  
+- grade 熔断策略，支持秒级 RT/秒级异常比例/分钟级异常数  秒级平均 RT
+- timeWindow  降级的时间，单位为 s 
+- rtSlowRequestAmount RT 模式下 1 秒内连续多少个请求的平均 RT 超出阈值方可触发熔断（1.7.0 引入） 5
+- minRequestAmount  异常熔断的触发最小请求数，请求数小于该值时即使异常比率超出阈值也不会熔断（1.7.0 引入）  5
+
 我们通常以以下3种方式衡量资源的是否处于稳定状态：
 
 - 平均响应时间
@@ -20,16 +30,16 @@
 
 当 QPS 超过某个阈值的时候，则采取措施进行流量控制。流量控制的效果包括以下几种：直接拒绝、Warm Up、匀速排队。
 
-一条限流规则主要由下面几个因素组成，我们可以组合这些元素来实现不同的限流效果：
+重要属性：
 
-- resource：资源名，即限流规则的作用对象
-- count: 限流阈值
-- grade: 限流阈值类型（QPS 或并发线程数）
+- resource： 资源名，即限流规则的作用对象
+- count:  限流阈值
+- grade:  限流阈值类型（QPS 或并发线程数）
 - limitApp: 流控针对的调用来源，若为 default 则不区分调用来源
 - strategy: 调用关系限流策略
-- controlBehavior: 流量控制效果（直接拒绝、Warm Up、匀速排队）
+- controlBehavior: 流量控制效果（直接拒绝、Warm Up、匀速排队） 默认直接拒绝
 
-
+限流策略
 - QPS限流直接拒绝
 
 
@@ -37,3 +47,8 @@
     比如通过压测确定了系统的准确水位时。
     
 - Warm Up
+
+
+参考
+
+[sentinel官方文档](https://github.com/alibaba/Sentinel/wiki)

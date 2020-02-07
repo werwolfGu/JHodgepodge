@@ -7,6 +7,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.concurrent.atomic.AtomicInteger;
+
 /**
  * @Author chengen.gu
  * @DATE 2020/2/4 3:22 下午
@@ -16,6 +18,7 @@ public class DemoController {
 
     public static Logger logger = LoggerFactory.getLogger(DemoController.class);
 
+    private static AtomicInteger count = new AtomicInteger(0);
     @Autowired
     private ITestService testService;
     @RequestMapping(value = "/test")
@@ -23,6 +26,9 @@ public class DemoController {
 
         long t = System.currentTimeMillis();
 
+        if (count.getAndIncrement() %   6 == 1 ){
+            t = -1;
+        }
         testService.test();
 
         return testService.hello(t);
