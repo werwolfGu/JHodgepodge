@@ -1,4 +1,4 @@
-package com.guce.sort;
+package com.guce;
 
 /**
  * Created by chengen.gu on 2019/10/10.
@@ -25,6 +25,12 @@ public class HeapSort {
     }
 
 
+    /**
+     * 建堆
+     * @param arr
+     * @param length
+     * @param idx
+     */
     public static void heapAdjust(int arr[], int length, int idx) {
 
         int tmp = arr[idx];

@@ -13,8 +13,8 @@ import redis.clients.jedis.JedisSlotBasedConnectionHandler;
 import redis.clients.jedis.PipelineBase;
 import redis.clients.jedis.exceptions.JedisMovedDataException;
 import redis.clients.jedis.exceptions.JedisRedirectionException;
-import redis.clients.util.JedisClusterCRC16;
-import redis.clients.util.SafeEncoder;
+import redis.clients.jedis.util.JedisClusterCRC16;
+import redis.clients.jedis.util.SafeEncoder;
 
 import java.io.Closeable;
 import java.lang.reflect.Field;
@@ -171,7 +171,8 @@ public class JedisClusterPipeline extends PipelineBase implements Closeable {
 
     private void flushCachedData(Jedis jedis) {
         try {
-            jedis.getClient().getAll();
+            //3.1.0 版本 缺少 getAll 命令
+           // jedis.getClient().getAll();
         } catch (RuntimeException ex) {
             // 其中一个client出问题，后面出问题的几率较大
         }

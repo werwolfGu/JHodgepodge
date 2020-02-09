@@ -6,6 +6,11 @@ package com.guce;
  */
 public class MaxArea {
 
+    /**
+     * 优化解法
+     * @param height
+     * @return
+     */
     public static int solution(int[] height) {
 
         int maxArea = 0;
@@ -19,6 +24,18 @@ public class MaxArea {
                 j--;
             } else {
                 i++;
+            }
+        }
+        return maxArea;
+    }
+
+    public int maxArea(int[] height) {
+        int maxArea = 0 ;
+        for ( int i = 0 ; i < height.length -1; i++){
+            for ( int j = i + 1 ; j < height.length ; j++ ){
+                int x = j - i;
+                int y = Math.min(height[i],height[j]);
+                maxArea = Math.max(maxArea, x * y);
             }
         }
         return maxArea;

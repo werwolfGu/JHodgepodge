@@ -4,7 +4,6 @@ import org.junit.Test;
 import redis.clients.jedis.HostAndPort;
 import redis.clients.jedis.JedisCluster;
 
-import java.io.IOException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -52,7 +51,7 @@ public class JedisClusterPipelineTest {
         // 实际业务代码中，close要在finally中调，这里之所以没这么写，是因为懒
         try {
             jedisCluster.close();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }

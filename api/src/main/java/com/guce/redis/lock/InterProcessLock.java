@@ -1,6 +1,6 @@
 package com.guce.redis.lock;
 
-import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.commands.JedisCommands;
 
 import java.util.concurrent.TimeUnit;
 

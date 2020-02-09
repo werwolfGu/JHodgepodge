@@ -4,7 +4,8 @@ import com.guce.redis.lock.InterProcessLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.JedisCommands;
+import redis.clients.jedis.commands.JedisCommands;
+import redis.clients.jedis.params.SetParams;
 
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -65,7 +66,10 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
             currTime = System.currentTimeMillis();
             String result = null;
             try {
-                result = jedisCommands.set(key, currTime.toString(), SET_IF_NOT_EXIST, SET_WITH_EXPIRE_TIME, overtime);
+                SetParams setParams = new SetParams();
+                setParams.nx()
+                        .px(overtime);
+                result = jedisCommands.set(key, currTime.toString(), setParams);
             } catch (Exception e) {
                 logger.error("redis lock Exception key:{}  -> message:{}", key, e.getMessage(), e);
             }
