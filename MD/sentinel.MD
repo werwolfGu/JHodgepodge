@@ -36,6 +36,10 @@
 - count:  限流阈值
 - grade:  限流阈值类型（QPS 或并发线程数）
 - limitApp: 流控针对的调用来源，若为 default 则不区分调用来源
+    
+    
+    使用limitApp限制调用方时 需要使用 ContextUtil.enter(resourceName, origin) 来记录统计origin调用的次数
+    记住  调用完后需要  ContextUtil.exit() ；来退出 否则限流会出现问题；
 - strategy: 调用关系限流策略
 - controlBehavior: 流量控制效果（直接拒绝、Warm Up、匀速排队） 默认直接拒绝
 

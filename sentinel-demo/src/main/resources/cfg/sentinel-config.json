@@ -12,9 +12,25 @@
     {
       "resource": "test",
       "controlBehavior": 0,
-      "count": 5.0,
+      "count": 2.0,
       "grade": 1,
-      "limitApp": "default",
+      "limitApp": "caller1",
+      "strategy": 0
+    },
+    {
+      "resource": "test",
+      "controlBehavior": 0,
+      "count": 10.0,
+      "grade": 1,
+      "limitApp": "other",
+      "strategy": 0
+    },
+    {
+      "resource": "test",
+      "controlBehavior": 0,
+      "count": 4.0,
+      "grade": 1,
+      "limitApp": "caller2",
       "strategy": 0
     }
   ]

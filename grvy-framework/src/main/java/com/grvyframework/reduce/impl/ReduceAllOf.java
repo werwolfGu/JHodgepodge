@@ -22,7 +22,6 @@ public class ReduceAllOf<T extends BaseScriptEvalResult> extends Reduce<T> {
 
         if (predicate.test(data)){
             result.add(data);
-            return false;
         }
         return false;
     }

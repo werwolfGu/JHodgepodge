@@ -67,6 +67,23 @@ public class FlowQpsDemo {
         rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
         rule1.setLimitApp("default");
         rules.add(rule1);
+
+        rule1 = new FlowRule();
+        rule1.setResource(KEY);
+        // set limit qps to 20
+        rule1.setCount(10);
+        rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        rule1.setLimitApp("caller1");
+        rules.add(rule1);
+
+
+        rule1 = new FlowRule();
+        rule1.setResource(KEY);
+        // set limit qps to 20
+        rule1.setCount(20);
+        rule1.setGrade(RuleConstant.FLOW_GRADE_QPS);
+        rule1.setLimitApp("caller2");
+        rules.add(rule1);
         FlowRuleManager.loadRules(rules);
     }
 

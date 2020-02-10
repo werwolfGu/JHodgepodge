@@ -14,12 +14,14 @@ public class TestServiceImpl implements ITestService {
     @Override
     @SentinelResource(value = "test", blockHandler = "handleException", blockHandlerClass = {ExceptionUtil.class})
     public void test() {
+
         System.out.println("Test");
     }
 
     @Override
     @SentinelResource(value = "hello", fallback = "helloFallback")
     public String hello(long s) {
+
         if (s < 0) {
             throw new IllegalArgumentException("invalid arg");
         }

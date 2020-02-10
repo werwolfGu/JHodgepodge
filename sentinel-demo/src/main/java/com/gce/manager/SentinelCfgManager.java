@@ -80,7 +80,7 @@ public class SentinelCfgManager implements InitializingBean {
         List<DegradeRule> degradeRules = sentinelCfg.getDegradeRules();
         if (CollectionUtils.isNotEmpty(degradeRules)){
             DegradeRuleManager.loadRules(degradeRules);
-            logger.warn("========sentinel熔断降级配置 end ； config info：{}",flowRules);
+            logger.warn("========sentinel熔断降级配置 end ； config info：{}",degradeRules);
         }
     }
 }

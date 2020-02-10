@@ -62,6 +62,8 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
     private final static long DEFAULT_ASYNC_TIMEOUT = 3;
 
+    private final static long DEFAULT_SERIAL_ASYNC_TIMEOUT = 5;
+
     /**
      * 串行执行规则
      * @param request
@@ -88,18 +90,22 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         CompletableFuture future = CompletableFuture.runAsync( () -> {
 
             for (GrvyRuleConfigEntry ruleInfo : ruleList ){
-
                 GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
-                BaseScriptEvalResult result = this.executor(param);
+                try{
+                    BaseScriptEvalResult result = this.executor(param);
 
-                if (reduce.execute(result)){
-                    break;
+                    if (result != null && reduce.execute(result)){
+                        break;
+                    }
+                }catch(GrvyExecutorException ex){
+                    logger.warn("####grvy脚本执行异常:{}",param,ex);
                 }
+
             }
         },tpe);
 
         try {
-            future.get(DEFAULT_ASYNC_TIMEOUT,TimeUnit.SECONDS);
+            future.get(DEFAULT_SERIAL_ASYNC_TIMEOUT,TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             logger.error("GrvyScript executor time out",e);
             return null;
@@ -143,10 +149,15 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         future.get(DEFAULT_ASYNC_TIMEOUT,TimeUnit.SECONDS);
 
         for (CompletableFuture<BaseScriptEvalResult> resultFuture : futureList){
-            BaseScriptEvalResult value = resultFuture.get();
-            if (reduce.execute(value)){
-                break;
+            try {
+                BaseScriptEvalResult value = resultFuture.get();
+                if (reduce.execute(value)){
+                    break;
+                }
+            }catch(GrvyExecutorException ex){
+                logger.warn("####grvy脚本执行异常",ex);
             }
+
         }
 
         resultList.addAll(reduce.getResult());
