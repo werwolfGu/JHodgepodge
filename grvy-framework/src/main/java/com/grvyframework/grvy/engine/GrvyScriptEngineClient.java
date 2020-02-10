@@ -20,7 +20,6 @@ import java.security.PrivilegedAction;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
 
 /**
  * grvy类加载每次都要加载一次的，可能会导致metaspace oom  ,现在将script脚本类缓存起来 ；就无需每次都要重新生成class了
@@ -41,7 +40,7 @@ public class GrvyScriptEngineClient {
     private LoadingCache<String,Class<?>> grvyClassLoaderCache =
             CacheBuilder.newBuilder().maximumSize(1000)
                     ///访问30分钟后无再访问 失效
-                    .expireAfterAccess(30, TimeUnit.MINUTES)
+                    //.expireAfterAccess(30, TimeUnit.MINUTES)
                     .removalListener( notification ->
                             logger.warn("######guava cache grvy script:{}",notification.getKey()))
                     .build(new CacheLoader<String, Class<?>>() {

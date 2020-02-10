@@ -85,15 +85,17 @@ public class TestAutoConfiguration {
         request.setGrvyRuleInfoList(grvyRuleInfoList);
         GrvyRuleConfigEntry ruleInfo = new GrvyRuleConfigEntry();
         grvyRuleInfoList.add(ruleInfo);
-        IGrvyScriptResultHandler handle = SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class);
+        Class clazz = Thread.currentThread().getContextClassLoader()
+                .loadClass("com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler");
+        ruleInfo.setGrvyResultClazzPath("com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler");
+        IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
         ruleInfo.setGrvyScriptResultHandler(handle);
         ruleInfo.setScript(script);
         Bindings bindings = new SimpleBindings();
         bindings.put("交易码","1101");
         bindings.put("渠道","NET");
         request.setBindings(bindings);
-        /*Class clazz = Thread.currentThread().getContextClassLoader()
-                .loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");*/
+
         GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
 
         BaseScriptEvalResultCalculateParam calculateParam = new BaseScriptEvalResultCalculateParam();

@@ -60,6 +60,8 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     @Resource(name = "grvyScriptEngineClient")
     private GrvyScriptEngineClient grvyScriptEngineClient;
 
+    private final static long DEFAULT_ASYNC_TIMEOUT = 3;
+
     /**
      * 串行执行规则
      * @param request
@@ -69,7 +71,8 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
      * @throws InterruptedException
      * @throws ExecutionException
      */
-    public List<BaseScriptEvalResult> serialExecutor(GrvyRequest request , GrvyResponse response ,Reduce<BaseScriptEvalResult> reduce) throws InterruptedException, ExecutionException {
+    public List<BaseScriptEvalResult> serialExecutor(GrvyRequest request , GrvyResponse response
+            , Reduce<BaseScriptEvalResult> reduce) throws InterruptedException, ExecutionException {
 
         List<BaseScriptEvalResult> resultList = new ArrayList<>();
 
@@ -96,7 +99,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         },tpe);
 
         try {
-            future.get(3,TimeUnit.SECONDS);
+            future.get(DEFAULT_ASYNC_TIMEOUT,TimeUnit.SECONDS);
         } catch (TimeoutException e) {
             logger.error("GrvyScript executor time out",e);
             return null;
@@ -137,7 +140,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         });
         CompletableFuture[] arr = futureList.toArray(new CompletableFuture[0]);
         CompletableFuture future = CompletableFuture.allOf(arr);
-        future.get(3,TimeUnit.SECONDS);
+        future.get(DEFAULT_ASYNC_TIMEOUT,TimeUnit.SECONDS);
 
         for (CompletableFuture<BaseScriptEvalResult> resultFuture : futureList){
             BaseScriptEvalResult value = resultFuture.get();
@@ -159,6 +162,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         param.setCalculateParam(request.getCalculateParam());
         param.setScript(ruleEntitry.getScript());
         param.setGrvyScriptResultHandler(ruleEntitry.getGrvyScriptResultHandler());
+        param.setGrvyResultClazzPath(ruleEntitry.getGrvyResultClazzPath());
         return param;
     }
 
@@ -204,7 +208,28 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
             IGrvyScriptResultHandler grvyScriptResultHandler = Optional.of(ruleExecParam)
                     .map(GrvyRuleExecParam::getGrvyScriptResultHandler)
-                    .orElseGet(() -> SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class));
+
+                    .orElseGet(() -> {
+
+                        IGrvyScriptResultHandler handler = null;
+                        try {
+                            if (ruleExecParam.getGrvyResultClazzPath() != null){
+
+                                Class clazz = Thread.currentThread().getContextClassLoader()
+                                        .loadClass(ruleExecParam.getGrvyResultClazzPath());
+
+                                handler = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
+                            }
+                        } catch (ClassNotFoundException e) {
+                            logger.error("######无法找到结果处理类，将使用默认grvy结果处理类;",e);
+                        }
+                        if (handler == null){
+                            logger.warn("######grvy result 使用默认grvy结果处理类;");
+                            handler=  SpringApplicationBean.getBean(DefaultGrvyScriptResultHandler.class);
+
+                        }
+                        return handler;
+                    } );
 
             Object scriptResult;
             if (GrvyScriptEngineExeEnum.SCRIPT_COMPILER == executorEnum){

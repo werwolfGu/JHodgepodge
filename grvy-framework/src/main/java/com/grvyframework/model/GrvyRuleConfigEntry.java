@@ -21,6 +21,11 @@ public class GrvyRuleConfigEntry {
     private IGrvyScriptResultHandler grvyScriptResultHandler;
 
     /**
+     * grvy脚本结果处理类
+     */
+    private String grvyResultClazzPath;
+
+    /**
      * 规则类型
      */
     private String type;

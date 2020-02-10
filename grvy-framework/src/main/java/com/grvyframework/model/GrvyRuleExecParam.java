@@ -37,4 +37,9 @@ public class GrvyRuleExecParam {
      * 输出结果计算参数
      */
     private BaseScriptEvalResultCalculateParam calculateParam;
+
+    /**
+     * grvy脚本结果处理类
+     */
+    private String grvyResultClazzPath;
 }
