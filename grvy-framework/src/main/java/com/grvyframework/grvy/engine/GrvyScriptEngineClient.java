@@ -4,19 +4,23 @@ import com.google.common.cache.CacheBuilder;
 import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import groovy.lang.GroovyClassLoader;
+import org.apache.commons.collections.CollectionUtils;
 import org.codehaus.groovy.control.CompilerConfiguration;
 import org.codehaus.groovy.jsr223.GroovyCompiledScript;
 import org.codehaus.groovy.jsr223.GroovyScriptEngineImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import java.security.AccessController;
 import java.security.PrivilegedAction;
+import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 /**
  * grvy类加载每次都要加载一次的，可能会导致metaspace oom  ,现在将script脚本类缓存起来 ；就无需每次都要重新生成class了
@@ -28,20 +32,25 @@ import java.util.concurrent.ExecutionException;
 public class GrvyScriptEngineClient {
 
     private static Logger logger = LoggerFactory.getLogger(GrvyScriptEngineClient.class);
-    @Autowired
+
+    @Resource(name = "grvyScriptEngine")
     private GrvyScriptEngine grvyScriptEngine;
 
     private GroovyClassLoader loader;
 
     private LoadingCache<String,Class<?>> grvyClassLoaderCache =
             CacheBuilder.newBuilder().maximumSize(1000)
-            .build(new CacheLoader<String, Class<?>>() {
-                @Override
-                public Class<?> load(String key) {
+                    ///访问30分钟后无再访问 失效
+                    .expireAfterAccess(30, TimeUnit.MINUTES)
+                    .removalListener( notification ->
+                            logger.warn("######guava cache grvy script:{}",notification.getKey()))
+                    .build(new CacheLoader<String, Class<?>>() {
+                        @Override
+                        public Class<?> load(String key) {
 
-                    return loaderGrvyClazz(key);
-                }
-            });
+                                return loaderGrvyClazz(key);
+                        }
+                    });
 
     public GrvyScriptEngineClient() {
         this(AccessController.doPrivileged(new PrivilegedAction<GroovyClassLoader>() {
@@ -92,5 +101,19 @@ public class GrvyScriptEngineClient {
         }
         // exception was thrown or we get wrong class
         return GrvyScriptEngineClient.class.getClassLoader();
+    }
+
+    public void flushLoadingCache(String key){
+
+        flushLoadingCache(Arrays.asList(key));
+    }
+
+    public void flushLoadingCache(List<String> keyList){
+
+        logger.warn("####guava cache invalid grvy script info:{}" ,keyList);
+        if (CollectionUtils.isNotEmpty(keyList)){
+            grvyClassLoaderCache.invalidateAll(keyList);
+
+        }
     }
 }

@@ -5,7 +5,6 @@ import com.grvyframework.config.GrvyExecutorConfig;
 import com.grvyframework.exception.GrvyExceptionEnum;
 import com.grvyframework.exception.GrvyExecutorException;
 import com.grvyframework.grvy.GrvyScriptEngineExeEnum;
-import com.grvyframework.pool.ThreadPoolFactory;
 import com.grvyframework.grvy.engine.GrvyScriptEngine;
 import com.grvyframework.grvy.engine.GrvyScriptEngineClient;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
@@ -15,6 +14,7 @@ import com.grvyframework.model.GrvyRequest;
 import com.grvyframework.model.GrvyResponse;
 import com.grvyframework.model.GrvyRuleConfigEntry;
 import com.grvyframework.model.GrvyRuleExecParam;
+import com.grvyframework.pool.ThreadPoolFactory;
 import com.grvyframework.reduce.Reduce;
 import com.grvyframework.spring.container.SpringApplicationBean;
 import lombok.Getter;
@@ -22,9 +22,9 @@ import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
 import javax.script.SimpleScriptContext;
@@ -43,7 +43,7 @@ import java.util.concurrent.TimeoutException;
  * @date 2020-01-20 16:13
  * @description
  */
-@Component
+@Component("grvyScriptEngineExecutor")
 public class GrvyScriptEngineExecutor implements InitializingBean {
 
     private static Logger logger = LoggerFactory.getLogger(GrvyScriptEngineExecutor.class);
@@ -51,13 +51,13 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     @Getter
     private ThreadPoolExecutor tpe ;
 
-    @Autowired
+    @Resource(name = "grvyScriptEngine")
     private GrvyScriptEngine grvyScriptEngine;
 
-    @Autowired
+    @Resource(name = "grvyExecutorConfig")
     private GrvyExecutorConfig config ;
 
-    @Autowired
+    @Resource(name = "grvyScriptEngineClient")
     private GrvyScriptEngineClient grvyScriptEngineClient;
 
     /**
@@ -220,7 +220,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
             if (logger.isInfoEnabled()) {
 
-                logger.info("executor script :\n{{}} ; evalResult:{} ; cost time:{}."
+                logger.info("executor script :\n{{}}  ; ######evalResult : {} ; cost time : {}."
                         , script, evalResult,watch.elapsed(TimeUnit.MILLISECONDS));
 
             }

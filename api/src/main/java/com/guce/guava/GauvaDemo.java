@@ -16,7 +16,7 @@ public class GauvaDemo {
 
     private LoadingCache<String,String> loadingCache = CacheBuilder
 
-            .newBuilder().maximumSize(3)
+            .newBuilder().maximumSize(5)
             //.refreshAfterWrite(30000, TimeUnit.SECONDS)
             .removalListener(new RemovalListener<String, String>() {
                 @Override
@@ -43,10 +43,23 @@ public class GauvaDemo {
         try {
             for(int i = 0 ; i < 10 ; i++){
                 int idx = i;
-                if (i == 2){
+                if (i == 3){
+                    idx = 0;
+                }
+                if ( i == 4){
+                    idx = 1;
+                }
+                if ( i == 5){
                     idx = 0;
                 }
                 String value = simpleExample.getValue("key" + idx);
+
+            }
+
+            int idx = 0;
+            while(idx <= 100000){
+                simpleExample.getValue("key" + 0);
+                idx++;
 
             }
         } catch (ExecutionException e) {
