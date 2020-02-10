@@ -1,7 +1,7 @@
 package com.grvyframework.grvy.engine;
 
 import com.grvyframework.bootstrap.SpringbootStartup;
-import com.grvyframework.grvy.GrvyScriptEngineExecutor;
+import com.grvyframework.executor.GrvyScriptEngineExecutor;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.model.GrvyRequest;
 import com.grvyframework.model.GrvyResponse;

@@ -1,6 +1,6 @@
 package com.grvyframework.grvy.engine;
 
-import com.grvyframework.grvy.GrvyScriptEngineExecutor;
+import com.grvyframework.executor.GrvyScriptEngineExecutor;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler;
 import com.grvyframework.model.BaseScriptEvalResult;
