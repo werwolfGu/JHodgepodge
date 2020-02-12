@@ -51,6 +51,20 @@ public class GrvyScriptEngineClient {
                         }
                     });
 
+    private LoadingCache<String,GroovyCompiledScript> grvyCompileScriptCache =
+            CacheBuilder.newBuilder().maximumSize(1000)
+            ///访问30分钟后无再访问 失效
+            //.expireAfterAccess(30, TimeUnit.MINUTES)
+            .removalListener( notification ->
+                    logger.warn("######guava cache grvy script:{}",notification.getKey()))
+            .build(new CacheLoader<String, GroovyCompiledScript>() {
+                @Override
+                public GroovyCompiledScript load(String key) {
+
+                    return loadGrvyCompiledScript(key);
+                }
+            });
+
     public GrvyScriptEngineClient() {
         this(AccessController.doPrivileged(new PrivilegedAction<GroovyClassLoader>() {
             @Override
@@ -77,12 +91,19 @@ public class GrvyScriptEngineClient {
 
     }
 
+    private GroovyCompiledScript loadGrvyCompiledScript(String grvyScript){
+        long start = System.currentTimeMillis();
+        Class<?> clazz = loader.parseClass(grvyScript);
+        if (logger.isInfoEnabled()){
+            logger.info("====loader Grvy clazz -> {{}} ; cost time:{}" ,grvyScript,System.currentTimeMillis() - start);
+        }
+        return  new GroovyCompiledScript((GroovyScriptEngineImpl)grvyScriptEngine.getScriptEngine(),clazz);
+
+    }
+
     public <T> T eval(String script, ScriptContext scripCtx) throws ExecutionException, ScriptException {
 
-
-        Class clazz = grvyClassLoaderCache.get(script);
-        GroovyCompiledScript compiledScript =
-                new GroovyCompiledScript((GroovyScriptEngineImpl)grvyScriptEngine.getCurrentGrvyScriptEngine(),clazz);
+        GroovyCompiledScript compiledScript = grvyCompileScriptCache.get(script);
         Object result = compiledScript.eval(scripCtx);
         return (T) result;
     }
@@ -111,6 +132,7 @@ public class GrvyScriptEngineClient {
 
         logger.warn("####guava cache invalid grvy script info:{}" ,keyList);
         if (CollectionUtils.isNotEmpty(keyList)){
+            grvyCompileScriptCache.invalidateAll(keyList);
             grvyClassLoaderCache.invalidateAll(keyList);
 
         }

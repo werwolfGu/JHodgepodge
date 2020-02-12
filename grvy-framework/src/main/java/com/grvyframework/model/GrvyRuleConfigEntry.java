@@ -29,4 +29,9 @@ public class GrvyRuleConfigEntry {
      * 规则类型
      */
     private String type;
+
+    /**
+     * 规则优先级
+     */
+    private Integer priority;
 }

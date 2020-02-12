@@ -87,10 +87,10 @@ public class TestGrvyScriptEngineClient {
                 "    def channels = [\"NET\",\"xyz\"]\n" +
                 "    if (list.contains(交易码) && channels.contains(渠道))\n" +
                 "        return true ");
-        List<String> list = Arrays.asList("NET","unknow" ,"NCUP","xyz");
+        List<String> list = Arrays.asList("NET","unknow" ,"NCUP2","xyz3");
 
         List<CompletableFuture> futures = new ArrayList<>();
-        for (int i = 0 ; i < 50 ; i++ ){
+        for (int i = 0 ; i < 200 ; i++ ){
 
             CompletableFuture future = CompletableFuture.runAsync( () -> {
 
@@ -108,8 +108,8 @@ public class TestGrvyScriptEngineClient {
 
                 try {
                     Object obj = client.eval(script,scriptContext);
-                    logger.info(" param:{} ; \n result: {}  ; idx :{}; cost time:{}"
-                            ,param,obj,idx , System.currentTimeMillis() - start);
+                    logger.info(" script:{} ; param:{} ; \n result: {}  ; idx :{}; cost time:{}"
+                            ,script,map,obj,idx , System.currentTimeMillis() - start);
 
                 } catch (ScriptException | ExecutionException e) {
                     e.printStackTrace();

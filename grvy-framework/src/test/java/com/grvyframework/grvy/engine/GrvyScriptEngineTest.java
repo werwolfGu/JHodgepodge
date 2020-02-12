@@ -54,13 +54,14 @@ public class GrvyScriptEngineTest {
         List<String> card = Arrays.asList("1","2","3");
 
         grvyScriptEngine.bingingGlobalScopeMapper("卡集合",card);
-        grvyScriptEngine.bindingEngineScopeMapper("卡","2");
+        grvyScriptEngine.bindingEngineScopeMapper("卡","5");
         //GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("卡集合",card);
 
-        String script = " if (卡集合.contains(卡) ) return 卡 ";
+        String script = " if (卡集合.contains(卡) ) return true ";
         Object obj = grvyScriptEngine.eval(script);
         System.out.println(obj);
-        assert "2".equals(obj);
+        System.out.println(Objects.isNull(obj));   ///  true
+       // assert "2".equals(obj);
     }
 
     @Test

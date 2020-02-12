@@ -31,6 +31,7 @@ import javax.script.SimpleScriptContext;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -86,6 +87,11 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
             logger.error(" List<GrvyRuleConfigEntry> ruleList 规则参数不能为空！");
             throw new GrvyExecutorException(GrvyExceptionEnum.Grvy_ILLEGAL_ARGUMMENT_ERROR);
         }
+        //默认取第一个有效值
+        if (reduce == null){
+            reduce = Reduce.firstOf(Objects::nonNull);
+        }
+        final Reduce<BaseScriptEvalResult> finalReduce = reduce;
 
         CompletableFuture future = CompletableFuture.runAsync( () -> {
 
@@ -94,7 +100,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                 try{
                     BaseScriptEvalResult result = this.executor(param);
 
-                    if (result != null && reduce.execute(result)){
+                    if (result != null && finalReduce.execute(result)){
                         break;
                     }
                 }catch(GrvyExecutorException ex){
@@ -110,7 +116,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
             logger.error("GrvyScript executor time out",e);
             return null;
         }
-        resultList.addAll(reduce.getResult());
+        resultList.addAll(finalReduce.getResult());
         return resultList;
     }
 

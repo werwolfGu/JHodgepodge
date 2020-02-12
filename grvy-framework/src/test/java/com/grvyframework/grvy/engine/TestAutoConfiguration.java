@@ -147,8 +147,7 @@ public class TestAutoConfiguration {
 
                 BaseScriptEvalResultCalculateParam calculateParam = new BaseScriptEvalResultCalculateParam();
 
-                Long amt = ThreadLocalRandom.current().nextLong(seed);
-                calculateParam.setAmt(amt);
+                calculateParam.setAmt(Long.valueOf(idx));
                 request.setCalculateParam(calculateParam);
                 List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.parallelExecutor(request,response, Reduce.firstOf(Objects::nonNull));
                 System.out.println(evalResults);
