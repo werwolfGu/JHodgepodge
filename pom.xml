@@ -22,6 +22,7 @@
     <module>grvy-framework</module>
       <module>sentinel-demo</module>
     <module>jmh-sample</module>
+    <module>chain-framework</module>
   </modules>
   <packaging>pom</packaging>
 
