@@ -24,7 +24,6 @@ public class SpringBootstrapTest {
     @Test
     public void test(){
         String[] name = SpringContextBean.getBeanNamesForType(IChainService.class);
-        System.out.println(name);
 
         chainExecutor.execute("service1",null,null);
 

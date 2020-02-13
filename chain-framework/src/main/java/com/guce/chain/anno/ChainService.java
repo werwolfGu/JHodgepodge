@@ -11,11 +11,29 @@ import java.lang.annotation.Target;
  */
 @Target({ ElementType.TYPE })
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ChainSerivce {
+public @interface ChainService {
 
+    /**
+     * 资源名称
+     * @return
+     */
     String value()  default "";
 
+    /**
+     * service 执行顺序   order 越小  执行优先级越高
+     * @return
+     */
     int order() default 0;
 
+    /**
+     * 是否异步执行
+     * @return
+     */
     boolean isAsync() default false;
+
+    /**
+     * 异步超时时间 配合 isAsync 使用  责任链Service中 取最大值
+     * @return
+     */
+    long asyncTimeout() default 1000;
 }
