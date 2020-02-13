@@ -16,13 +16,16 @@
 package com.gce.service;
 
 import com.alibaba.csp.sentinel.slots.block.BlockException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Eric Zhao
  */
 public final class ExceptionUtil {
 
-    public static void handleException(BlockException ex) throws Exception {
+    private static Logger logger = LoggerFactory.getLogger(ExceptionUtil.class);
+    public static void handleException(String origin, BlockException ex) throws Exception {
         // Handler method that handles BlockException when blocked.
         // The method parameter list should match original method, with the last additional
         // parameter with type BlockException. The return type should be same as the original method.
@@ -30,5 +33,6 @@ public final class ExceptionUtil {
         // If you want to use method in other classes, you can set the blockHandlerClass
         // with corresponding Class (Note the method in other classes must be static).
         System.out.println("Oops: " + ex.getClass().getCanonicalName());
+        logger.warn("Oops: " + ex.getClass().getCanonicalName());
     }
 }

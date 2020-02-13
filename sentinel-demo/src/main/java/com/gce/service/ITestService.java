@@ -6,7 +6,7 @@ package com.gce.service;
  */
 public interface ITestService {
 
-    public void test();
+    public void test(String origin);
     public String hello(long s);
     public String helloAnother(String name);
 }

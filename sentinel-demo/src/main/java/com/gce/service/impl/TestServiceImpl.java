@@ -13,7 +13,7 @@ import org.springframework.stereotype.Service;
 public class TestServiceImpl implements ITestService {
     @Override
     @SentinelResource(value = "test", blockHandler = "handleException", blockHandlerClass = {ExceptionUtil.class})
-    public void test() {
+    public void test(String origin) {
 
         System.out.println("Test");
     }
@@ -43,7 +43,7 @@ public class TestServiceImpl implements ITestService {
 
     public String helloFallback(long s, Throwable ex) {
         // Do some log here.
-        ex.printStackTrace();
+        System.out.println("=======" + ex.getClass().getCanonicalName());
         return "Oops, error occurred at " + s;
     }
 

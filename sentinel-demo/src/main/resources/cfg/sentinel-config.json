@@ -20,7 +20,7 @@
     {
       "resource": "test",
       "controlBehavior": 0,
-      "count": 10.0,
+      "count": 6.0,
       "grade": 1,
       "limitApp": "other",
       "strategy": 0

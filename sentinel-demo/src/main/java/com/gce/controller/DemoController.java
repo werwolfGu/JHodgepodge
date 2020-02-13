@@ -32,13 +32,13 @@ public class DemoController {
         try{
 
             if (count.getAndIncrement() %   6 == 1 ){
-                t = -1;
+               t = -1;
             }
-            testService.test();
+            testService.test(origin);
         }catch (Exception e){
 
         }finally {
-            ContextUtil.exit();
+           ContextUtil.exit();
         }
 
         return testService.hello(t);
