@@ -43,6 +43,10 @@ public class ChainExecutor {
 
     private static Comparator<ChainExecServiceWrapper> rankChainServices =
             Comparator.comparingInt(ChainExecServiceWrapper::getOrder);
+
+    /**
+     * lazy加载
+     */
     private void init(){
 
         if (LOADER_FINISHED.get()){
