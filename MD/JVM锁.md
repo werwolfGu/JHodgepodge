@@ -25,6 +25,7 @@ JDK 6之前synchronized效率低的原因。这种依赖于操作系统Mutex Loc
 四种锁状态对应的的Mark Word内容，然后再分别讲解四种锁状态的思路以及特点：
 ![](./picture/锁对象存储值.jpeg)
 
+synchronized锁升级流程
 
 ![](./picture/synchronize_lock.png)
 
