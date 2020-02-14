@@ -238,7 +238,8 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                                 handler = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
                             }
                         } catch (ClassNotFoundException e) {
-                            logger.error("######无法找到结果处理类，将使用默认grvy结果处理类;",e);
+                            logger.error("######无法找到结果处理类，将使用默认grvy结果处理类; classpath:{}"
+                                    ,ruleExecParam.getGrvyResultClazzPath(),e);
                         }
                         if (handler == null){
                             logger.warn("######grvy result 使用默认grvy结果处理类;");
@@ -255,7 +256,6 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
                 scriptResult = grvyScriptEngine.eval(script);
 
             }
-
 
             evalResult = grvyScriptResultHandler.dealResult(scriptResult, ruleExecParam.getCalculateParam());
 

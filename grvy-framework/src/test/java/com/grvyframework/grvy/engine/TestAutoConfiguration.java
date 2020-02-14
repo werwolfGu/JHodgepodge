@@ -93,12 +93,12 @@ public class TestAutoConfiguration {
         bindings.put("渠道","NET");
         request.setBindings(bindings);
 
-        GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
-
         BaseScriptEvalResultCalculateParam calculateParam = new BaseScriptEvalResultCalculateParam();
         calculateParam.setAmt(2L);
         request.setCalculateParam(calculateParam);
-        List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.parallelExecutor(request,response,Reduce.allof(Objects::nonNull));
+
+        GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
+        List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.serialExecutor(request,response,Reduce.allof(Objects::nonNull));
 
         System.out.println(evalResults);
         assert "2".equals(evalResults.get(0).getAmt().toString());
