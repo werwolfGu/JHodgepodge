@@ -1,0 +1,23 @@
+[
+  {
+    "id": 1,
+    "script": "def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n    def channels = [\"NET\",\"NCUP\"]\n    if (list.contains(交易码) && channels.contains(渠道))\n        return true",
+    "result_handle": "com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler",
+    "result_set": 2,
+    "type": 1,
+    "priority": 1,
+    "is_pre": 0,
+    "is_del": 0,
+    "is_valid": 1
+  },{
+  "id": 2,
+  "script": "def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n    def channels = [\"NET1\",\"NCUP\"]\n    if (list.contains(交易码) && channels.contains(渠道))\n        return true",
+  "result_handle": "com.grvyframework.handle.impl.DefaultGrvyScriptResultHandler",
+  "result_set": 2,
+  "type": 1,
+  "priority": 1,
+  "is_pre": 0,
+  "is_del": 0,
+  "is_valid": 1
+}
+]
