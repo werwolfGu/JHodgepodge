@@ -23,7 +23,6 @@ public class SpringBootstrapTest {
 
     @Test
     public void test(){
-        String[] name = SpringContextBean.getBeanNamesForType(IChainService.class);
 
         chainExecutor.execute("service1",null,null);
 

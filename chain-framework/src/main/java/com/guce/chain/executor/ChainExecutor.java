@@ -3,6 +3,7 @@ package com.guce.chain.executor;
 import com.google.common.base.Stopwatch;
 import com.guce.chain.IChainService;
 import com.guce.chain.anno.ChainService;
+import com.guce.chain.model.ChainExecServiceWrapper;
 import com.guce.chain.model.ChainRequest;
 import com.guce.chain.model.ChainResponse;
 import com.guce.exception.ChainException;
@@ -34,33 +35,28 @@ public class ChainExecutor {
 
     private static Logger logger = LoggerFactory.getLogger(ChainExecutor.class);
 
-    private static Map<String, List<IChainService>> chainExecutorMap = new ConcurrentHashMap<>(32);
+    private static Map<String, List<ChainExecServiceWrapper>> chainExecutorMap = new ConcurrentHashMap<>(32);
 
-    private static volatile AtomicBoolean loaderFinished = new AtomicBoolean(false);
+    private static final AtomicBoolean LOADER_FINISHED = new AtomicBoolean(false);
 
     private volatile static int DEFAULT_CHAIN_SERVICE_LIST_CAPACITY = 8;
 
-    private static Comparator<IChainService> rankChainServices = (ch1, ch2) -> {
-
-        ChainService ann1 = ch1.getClass().getAnnotation(ChainService.class);
-        ChainService ann2 = ch2.getClass().getAnnotation(ChainService.class);
-
-        return ann1.order() - ann2.order() ;
-    };
+    private static Comparator<ChainExecServiceWrapper> rankChainServices =
+            Comparator.comparingInt(ChainExecServiceWrapper::getOrder);
     private void init(){
 
-        if (loaderFinished.get()){
+        if (LOADER_FINISHED.get()){
             return ;
         }
-        //todo 责任链加载各个责任
-        if (!loaderFinished.get()){
 
-            synchronized (loaderFinished){
+        if (!LOADER_FINISHED.get()){
 
-                if ( !loaderFinished.get()){
+            synchronized (LOADER_FINISHED){
+
+                if ( !LOADER_FINISHED.get()){
 
                     initChain();
-                    loaderFinished.set(true);
+                    LOADER_FINISHED.set(true);
                 }
             }
         }
@@ -70,7 +66,7 @@ public class ChainExecutor {
 
         init();
 
-        List<IChainService> chainServiceList = chainExecutorMap.get(chainResourceName);
+        List<ChainExecServiceWrapper> chainServiceList = chainExecutorMap.get(chainResourceName);
 
         if (CollectionUtils.isEmpty(chainServiceList)){
 
@@ -81,23 +77,23 @@ public class ChainExecutor {
         boolean rollback = false;
         List<CompletableFuture> futureList = new ArrayList<>(4);
         long maxAsyncTimeout = 0 ;
-        for (IChainService service : chainServiceList ){
-            servcieStack.push(service);
-            ChainService annoService = service.getClass().getAnnotation(ChainService.class);
+        for (ChainExecServiceWrapper service : chainServiceList ){
+            IChainService chainService = service.getChainService();
+            servcieStack.push(service.getChainService());
 
-            boolean isAsync = annoService.isAsync();
+            boolean isAsync = service.isAsync();
 
             if (isAsync){
-                long asyncTimeout = annoService.asyncTimeout();
+                long asyncTimeout = service.getAsyncTimeout();
                 if (maxAsyncTimeout < asyncTimeout){
                     maxAsyncTimeout = asyncTimeout;
                 }
-                CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> doService(service,request,response));
+                CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> doService(chainService,request,response));
                 futureList.add(future);
                 continue;
             }
 
-            boolean doNext = doService(service,request,response);
+            boolean doNext = doService(chainService,request,response);
             if ( !doNext ){
                 break;
             }
@@ -164,20 +160,25 @@ public class ChainExecutor {
                     continue;
                 }
 
+                ChainExecServiceWrapper serviceWrapper = new ChainExecServiceWrapper();
+                serviceWrapper.setChainService(service);
+                serviceWrapper.annoParamWrapper(annoService);
+
                 String chainResourceName = annoService.value();
-                List<IChainService> list = chainExecutorMap
+                List<ChainExecServiceWrapper> list = chainExecutorMap
                         .computeIfAbsent(chainResourceName , k -> new ArrayList<>(DEFAULT_CHAIN_SERVICE_LIST_CAPACITY));
 
-                list.add(service);
+                list.add(serviceWrapper);
             }
 
             logger.warn("========chain services init rank compose ...");
-            for ( Map.Entry<String,List<IChainService>> entry : chainExecutorMap.entrySet()){
+            for ( Map.Entry<String,List<ChainExecServiceWrapper>> entry : chainExecutorMap.entrySet()){
 
-                List<IChainService> chainServiceList = entry.getValue();
+                List<ChainExecServiceWrapper> chainServiceList = entry.getValue();
                 if (CollectionUtils.isNotEmpty(chainServiceList)){
-                    logger.warn("chain service name:{}  sort; chain service num:{}",entry.getKey(),chainServiceList.size());
                     chainServiceList.sort(rankChainServices);
+                    logger.warn("chain service name:{}  sort; chain service :{}",entry.getKey(),chainServiceList);
+
                 }
             }
 
