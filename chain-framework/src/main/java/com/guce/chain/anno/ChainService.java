@@ -37,5 +37,9 @@ public @interface ChainService {
      */
     long asyncTimeout() default 1000;
 
+    /**
+     * 流程节点是否为必须节点；默认为必须节点；
+     * @return
+     */
     boolean isNeedNode() default true;
 }

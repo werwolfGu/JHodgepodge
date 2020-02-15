@@ -1,7 +1,6 @@
 package com.guce.service.impl;
 
 import com.guce.chain.IChainService;
-import com.guce.chain.anno.ChainService;
 import com.guce.chain.model.ChainRequest;
 import com.guce.chain.model.ChainResponse;
 import org.slf4j.Logger;
@@ -12,7 +11,6 @@ import org.springframework.stereotype.Service;
  * @Author chengen.gu
  * @DATE 2020/2/13 3:02 下午
  */
-@ChainService(value = "service1" ,order = 200,isAsync = true)
 @Service
 public class ChainService3 implements IChainService {
 

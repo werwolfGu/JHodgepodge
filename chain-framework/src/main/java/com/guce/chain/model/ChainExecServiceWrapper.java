@@ -53,24 +53,23 @@ public class ChainExecServiceWrapper {
     @Getter
     private boolean isNeedNode = true;
 
-    public ChainExecServiceWrapper annoParamWrapper(ChainService anno){
+    public void annoParamWrapper(ChainService anno){
         this.chainResourceName = anno.value();
         this.order = anno.order();
         this.isAsync = anno.isAsync();
         this.asyncTimeout = anno.asyncTimeout();
         this.isNeedNode = anno.isNeedNode();
-        return this;
     }
 
     @Override
     public String  toString(){
 
-        return "{chainSerivce:" + chainService
-                + ", chainResourceName:" + chainResourceName
-                + ", order:" + order
-                + ", isAsync:" + isAsync
-                + ", asyncTimeout:" + asyncTimeout
-                + ", servicePath" + servicePath
-                + ", isNeedNode" + isNeedNode + "}";
+        return "{\"chainSerivce\":" + chainService
+                + ", \"chainResourceName\":" + chainResourceName
+                + ", \"order\":" + order
+                + ", \"isAsync\":" + isAsync
+                + ", \"asyncTimeout\":" + asyncTimeout
+                + ", \"servicePath\":" + servicePath
+                + ", \"isNeedNode\":" + isNeedNode + "}";
     }
 }

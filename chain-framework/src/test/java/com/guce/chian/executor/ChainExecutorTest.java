@@ -11,6 +11,6 @@ public class ChainExecutorTest {
 
     @Test
     public void initLoadFlowNodeInfoTest(){
-        ChainExecutor.initLoadFlowNodeInfo();
+        ChainExecutor.initLoadFileFlowNodeInfo();
     }
 }

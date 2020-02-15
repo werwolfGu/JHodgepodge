@@ -176,68 +176,35 @@ public class ChainExecutor {
         Stopwatch watch = Stopwatch.createStarted();
         try{
             logger.warn("========chain services init start...");
-            String[] name = SpringContextBean.getBeanNamesForType(IChainService.class);
-            if (name != null && name.length > 0){
 
-                Arrays.stream(name).forEach( serviceName -> {
+            List<ChainExecServiceWrapper> springFlowList = initLoaderAnnotationFlowNodeInfo();
 
-                    IChainService service = SpringContextBean.getBean(serviceName);
+            List<ChainExecServiceWrapper> fileChainServiceList = initLoadFileFlowNodeInfo();
 
-                    ChainService annoService = service.getClass().getAnnotation(ChainService.class);
+            springFlowList.addAll(fileChainServiceList);
 
-                    if (annoService == null){
-                        logger.warn("init chain service no annotation:{} ; 有可能在配置文件中",serviceName);
-                        return ;
-                    }
+            long sortStart = System.currentTimeMillis();
+            logger.warn("========chain services flow node sort  start...");
+            springFlowList.sort(rankChainServices);
 
-                    ChainExecServiceWrapper serviceWrapper = new ChainExecServiceWrapper();
-                    serviceWrapper.setChainService(service);
-                    serviceWrapper.annoParamWrapper(annoService);
+            long rangeComposeStart = System.currentTimeMillis();
+            logger.warn("========chain services flow node sort  end... cost time:{}",(rangeComposeStart - sortStart));
 
-                    String chainResourceName = annoService.value();
-                    List<ChainExecServiceWrapper> list = chainExecutorMap
-                            .computeIfAbsent(chainResourceName , k -> new ArrayList<>(DEFAULT_CHAIN_SERVICE_LIST_CAPACITY));
+            logger.warn("========chain services init rank compose start ...");
+            Map<String,List<ChainExecServiceWrapper>> chainExecMap = new ConcurrentHashMap<>(16);
 
-                    list.add(serviceWrapper);
-                });
-            }
+            springFlowList.forEach(chainExecServiceWrapper -> {
+                String resourceName = chainExecServiceWrapper.getChainResourceName();
+                List<ChainExecServiceWrapper> chainList =chainExecMap
+                        .computeIfAbsent(resourceName , k -> new ArrayList<>(DEFAULT_CHAIN_SERVICE_LIST_CAPACITY));
+                chainList.add(chainExecServiceWrapper);
 
-            List<ChainExecServiceWrapper> fileChainServiceList = initLoadFlowNodeInfo();
+            });
+            logger.warn("========chain services init rank compose end ... cost time:{} ms."
+                    ,(System.currentTimeMillis() - rangeComposeStart));
 
-            if (CollectionUtils.isNotEmpty(fileChainServiceList)){
-
-                fileChainServiceList.forEach(serviceWrapper -> {
-
-                    String resourceName = serviceWrapper.getChainResourceName();
-                    List<ChainExecServiceWrapper> chainList =chainExecutorMap
-                            .computeIfAbsent(resourceName , k -> new ArrayList<>(DEFAULT_CHAIN_SERVICE_LIST_CAPACITY));
-
-                    if (serviceWrapper.getChainService() == null){
-
-                        try {
-                            Class clazz = Thread.currentThread().getContextClassLoader()
-                                    .loadClass(serviceWrapper.getServicePath());
-                            IChainService chainService = (IChainService) SpringContextBean.getBean(clazz);
-                            serviceWrapper.setChainService(chainService);
-                        } catch (ClassNotFoundException e) {
-                            logger.error("######无法找到结果处理类,请检查配置文件; classpath:{}"
-                                    ,serviceWrapper.getServicePath());
-                        }
-                    }
-                    chainList.add(serviceWrapper);
-                });
-            }
-
-            logger.warn("========chain services init rank compose ...");
-            for ( Map.Entry<String,List<ChainExecServiceWrapper>> entry : chainExecutorMap.entrySet()){
-
-                List<ChainExecServiceWrapper> chainServiceList = entry.getValue();
-                if (CollectionUtils.isNotEmpty(chainServiceList)){
-                    chainServiceList.sort(rankChainServices);
-                    logger.warn("chain service name:{}  sort; chain service :{}",entry.getKey(),chainServiceList);
-
-                }
-            }
+            chainExecutorMap = chainExecMap;
+            logger.warn("========chain Executor flow service Map info:{}",chainExecutorMap);
 
             logger.warn("========chain serivces init end ; cost time :{}",watch.elapsed(TimeUnit.MILLISECONDS));
         }catch (Exception e){
@@ -249,7 +216,48 @@ public class ChainExecutor {
 
     }
 
-    public static List<ChainExecServiceWrapper> initLoadFlowNodeInfo(){
+
+
+    /**
+     * 加载配置注解的流程节点
+     * @return
+     */
+    private List<ChainExecServiceWrapper> initLoaderAnnotationFlowNodeInfo(){
+
+        logger.warn("######chain service loader annotation flow node start...");
+        List<ChainExecServiceWrapper> flowResultList = new ArrayList<>();
+        String[] name = SpringContextBean.getBeanNamesForType(IChainService.class);
+        if (name != null && name.length > 0){
+
+            Arrays.stream(name).forEach( serviceName -> {
+
+                IChainService service = SpringContextBean.getBean(serviceName);
+
+                ChainService annoService = service.getClass().getAnnotation(ChainService.class);
+
+                if (annoService == null){
+                    logger.warn("init chain service no annotation:{} ; service:{} ;有可能在配置文件中",serviceName
+                            ,service.getClass().getCanonicalName());
+                    return ;
+                }
+
+                ChainExecServiceWrapper serviceWrapper = new ChainExecServiceWrapper();
+                serviceWrapper.setChainService(service);
+                serviceWrapper.annoParamWrapper(annoService);
+
+                flowResultList.add(serviceWrapper);
+            });
+        }
+        logger.warn("######chain service loader annotation flow node end...");
+
+        return flowResultList;
+    }
+
+    /**
+     * 初始化加载 后缀为 Flow.json的文件
+     * @return
+     */
+    public static List<ChainExecServiceWrapper> initLoadFileFlowNodeInfo(){
 
         Stopwatch watch = Stopwatch.createStarted();
         logger.info("######Chain Service loader flow config file info start...");
@@ -265,73 +273,9 @@ public class ChainExecutor {
             if (CollectionUtils.isNotEmpty(listFiles)){
 
                 listFiles.forEach( flowFile -> {
-                    try {
-                        long start = System.currentTimeMillis();
-                        logger.warn("loader flow config file  start :{} ",flowFile.getAbsolutePath());
-                        String context = FileUtils.readFileToString(flowFile,"UTF-8");
-                        if (StringUtils.isNoneBlank(context)){
-                            JSONObject jsonObject = JSON.parseObject(context);
-
-                            jsonObject.forEach((key, value) -> {
-
-                                if (value instanceof JSONArray){
-                                    JSONArray jsonArr = (JSONArray) value;
-                                    List<ChainExecServiceWrapper> serviceWrapperList =
-                                            jsonArr.toJavaList(ChainExecServiceWrapper.class);
-
-                                    if (CollectionUtils.isNotEmpty(serviceWrapperList)){
-                                        /**
-                                         * 某个流程节点配置有问题时，删除该流程节点
-                                         */
-                                        List<ChainExecServiceWrapper> removeList = new ArrayList<>();
-
-                                        /**
-                                         * 如果某个流程节点不存在且 是必须执行的节点 那此时就需要删除该流程 不让其往下执行
-                                         */
-                                        AtomicBoolean addExecFLow = new AtomicBoolean(true);
-
-                                        serviceWrapperList.forEach( chainExecServiceWrapper -> {
-                                            chainExecServiceWrapper.setChainResourceName(key);
-                                            String servicePath = chainExecServiceWrapper.getServicePath();
-                                            if (StringUtils.isNoneBlank(servicePath)){
-                                                try {
-                                                    Class clazz = Thread.currentThread().getContextClassLoader().loadClass(servicePath);
-                                                    IChainService chainService = (IChainService) SpringContextBean.getBean(clazz);
-                                                    chainExecServiceWrapper.setChainService(chainService);
-                                                } catch (ClassNotFoundException e) {
-
-                                                    StringBuilder logSb = new StringBuilder();
-                                                    logSb.append("######执行流程：").append(key)
-                                                            .append("; 找不到流程节点：").append(servicePath);
-                                                    if (chainExecServiceWrapper.isNeedNode()){
-
-                                                        logSb.append("；此流程将不纳入可执行流程中！！");
-                                                        addExecFLow.set(false);
-                                                    }else {
-                                                        logSb.append("；该流程节点不是必须节点，remove该流程节点！！");
-                                                        removeList.add(chainExecServiceWrapper);
-                                                    }
-                                                   logger.error(logSb.toString());
-                                                }
-                                            }
-                                        });
-
-                                        if (CollectionUtils.isNotEmpty(removeList)){
-                                            serviceWrapperList.removeAll(removeList);
-                                        }
-
-                                        if (addExecFLow.get() && CollectionUtils.isNotEmpty(serviceWrapperList)){
-                                            result.addAll(serviceWrapperList);
-                                        }
-                                    }
-                                }
-                            });
-
-                        }
-                        logger.warn("loader flow config file  end :{} ; cost time:{} "
-                                ,flowFile.getAbsolutePath(),(System.currentTimeMillis() - start));
-                    } catch (IOException e) {
-                        logger.error("chain flow node init reader file error ; file:{}",flowFile.getAbsolutePath());
+                    List<ChainExecServiceWrapper> flowList = loaderFlowFileConfigInfo(flowFile);
+                    if (CollectionUtils.isNotEmpty(flowList)){
+                        result.addAll(flowList);
                     }
 
                 });
@@ -340,6 +284,80 @@ public class ChainExecutor {
         }
 
         logger.info("######Chain Service loader flow config file info start... and cost time:{}",watch.elapsed(TimeUnit.MILLISECONDS));
+        return result;
+    }
+
+    private static List<ChainExecServiceWrapper> loaderFlowFileConfigInfo(File flowFile){
+
+        List<ChainExecServiceWrapper> result = new ArrayList<>();
+        try {
+            long start = System.currentTimeMillis();
+            logger.warn("loader flow config file  start :{} ",flowFile.getAbsolutePath());
+            String context = FileUtils.readFileToString(flowFile,"UTF-8");
+            if (StringUtils.isNoneBlank(context)){
+                JSONObject jsonObject = JSON.parseObject(context);
+
+                jsonObject.forEach((key, value) -> {
+
+                    if (value instanceof JSONArray){
+                        JSONArray jsonArr = (JSONArray) value;
+                        List<ChainExecServiceWrapper> serviceWrapperList =
+                                jsonArr.toJavaList(ChainExecServiceWrapper.class);
+
+                        if (CollectionUtils.isNotEmpty(serviceWrapperList)){
+                            /**
+                             * 某个流程节点配置有问题时，删除该流程节点
+                             */
+                            List<ChainExecServiceWrapper> removeList = new ArrayList<>();
+
+                            /**
+                             * 如果某个流程节点不存在且 是必须执行的节点 那此时就需要删除该流程 不让其往下执行
+                             */
+                            AtomicBoolean addToExecutorFLow = new AtomicBoolean(true);
+
+                            serviceWrapperList.forEach( chainExecServiceWrapper -> {
+                                chainExecServiceWrapper.setChainResourceName(key);
+                                String servicePath = chainExecServiceWrapper.getServicePath();
+                                if (StringUtils.isNoneBlank(servicePath)){
+                                    try {
+                                        Class clazz = Thread.currentThread().getContextClassLoader().loadClass(servicePath);
+                                        IChainService chainService = (IChainService) SpringContextBean.getBean(clazz);
+                                        chainExecServiceWrapper.setChainService(chainService);
+                                    } catch (ClassNotFoundException e) {
+
+                                        StringBuilder logSb = new StringBuilder();
+                                        logSb.append("######执行流程：").append(key)
+                                                .append("; 找不到流程节点：").append(servicePath);
+                                        if (chainExecServiceWrapper.isNeedNode()){
+
+                                            logSb.append("；此流程将不纳入可执行流程中！！");
+                                            addToExecutorFLow.set(false);
+                                        }else {
+                                            logSb.append("；该流程节点不是必须节点，remove该流程节点！！");
+                                            removeList.add(chainExecServiceWrapper);
+                                        }
+                                        logger.error(logSb.toString());
+                                    }
+                                }
+                            });
+
+                            if (CollectionUtils.isNotEmpty(removeList)){
+                                serviceWrapperList.removeAll(removeList);
+                            }
+
+                            if (addToExecutorFLow.get() && CollectionUtils.isNotEmpty(serviceWrapperList)){
+                                result.addAll(serviceWrapperList);
+                            }
+                        }
+                    }
+                });
+
+            }
+            logger.warn("loader flow config file  end :{} ; cost time:{} "
+                    ,flowFile.getAbsolutePath(),(System.currentTimeMillis() - start));
+        } catch (IOException e) {
+            logger.error("chain flow node init reader file error ; file:{}",flowFile.getAbsolutePath());
+        }
         return result;
     }
 
