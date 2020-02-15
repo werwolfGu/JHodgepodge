@@ -109,6 +109,27 @@ public class ChainExecutor {
                 continue;
             }
 
+            /**
+             * 后续还有节点的话 那么需要先将等到这个异步执行完毕才继续；
+             */
+            if ( CollectionUtils.isNotEmpty(futureList) ){
+                CompletableFuture[] arr = futureList.toArray(new CompletableFuture[0]);
+                CompletableFuture future = CompletableFuture.allOf(arr);
+                try {
+                    future.get(maxAsyncTimeout,TimeUnit.MILLISECONDS);
+                } catch (InterruptedException | ExecutionException | TimeoutException e) {
+
+                    logger.error("chain service async exception;resourceName:{}; exception{}"
+                            ,chainResourceName,e.getMessage());
+                    if (e.getCause() instanceof ChainRollbackException){
+                        rollback = true;
+                    }
+                    break;
+                }finally {
+                    futureList.clear();
+                }
+            }
+
             try{
                 boolean doNext = doService(chainService,request,response);
                 if ( !doNext ){
@@ -125,29 +146,31 @@ public class ChainExecutor {
 
         }
 
-        if ( !CollectionUtils.isEmpty(futureList) ){
+        if ( CollectionUtils.isNotEmpty(futureList) ){
             CompletableFuture[] arr = futureList.toArray(new CompletableFuture[0]);
             CompletableFuture future = CompletableFuture.allOf(arr);
             try {
                 future.get(maxAsyncTimeout,TimeUnit.MILLISECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
 
-                logger.error("chain service async exception;{}",e.getMessage());
+                logger.error("chain service async exception;resourceName:{}; exception{}"
+                        ,chainResourceName,e.getMessage());
                 if (e.getCause() instanceof ChainRollbackException){
                     rollback = true;
                 }
+            }finally {
+                futureList.clear();
             }
         }
 
         if ( rollback ){
             logger.warn("chain service do roll back start...");
-            while (servcieStack.size() > 0){
+            while ( !servcieStack.isEmpty() ){
                 IChainService service = servcieStack.pop() ;
                 service.doRollback(request,response);
             }
             logger.warn("chain service do roll back end...");
         }
-
 
     }
 
