@@ -11,7 +11,7 @@ import com.guce.chain.model.ChainRequest;
 import com.guce.chain.model.ChainResponse;
 import com.guce.exception.ChainException;
 import com.guce.exception.ChainRollbackException;
-import com.guce.spring.SpringContextBean;
+import com.guce.spring.util.SpringContextBean;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -59,7 +59,7 @@ public class ChainExecutor {
     /**
      * lazy加载
      */
-    private void init(){
+    public void init(){
 
         if (LOADER_FINISHED.get()){
             return ;
@@ -86,7 +86,7 @@ public class ChainExecutor {
 
         if (CollectionUtils.isEmpty(chainServiceList)){
 
-            throw new ChainException("没有相关 chainService chainResouceName : " + chainResourceName);
+            throw new ChainException("#######chain service 没有相关流程 chainResouceName : " + chainResourceName);
         }
 
         Stack<IChainService> servcieStack = new Stack<>();

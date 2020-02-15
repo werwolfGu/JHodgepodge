@@ -1,5 +1,5 @@
 {
-  "fileConfig": [
+  "flowServiceName": [
 
     {
       "servicePath": "com.guce.service.impl.ChainService1",

@@ -1,4 +1,4 @@
-package com.guce.spring;
+package com.guce.spring.util;
 
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;

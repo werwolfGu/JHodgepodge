@@ -23,14 +23,14 @@ public class SpringBootstrapTest {
     public void test(){
 
         chainExecutor.execute("service1",null,null);
-        chainExecutor.execute("fileConfig",null,null);
+        chainExecutor.execute("flowServiceName",null,null);
         try{
             chainExecutor.execute("points_2Flow",null,null);
         }catch (Exception e){
             System.out.println(e.getMessage());
         }
 
-        chainExecutor.execute("fileConfig",null,null);
+        chainExecutor.execute("flowServiceName",null,null);
 
     }
 }
