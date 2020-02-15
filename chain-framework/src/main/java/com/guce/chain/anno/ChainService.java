@@ -36,4 +36,6 @@ public @interface ChainService {
      * @return
      */
     long asyncTimeout() default 1000;
+
+    boolean isNeedNode() default true;
 }

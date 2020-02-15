@@ -4,7 +4,6 @@ import com.guce.chain.IChainService;
 import com.guce.chain.anno.ChainService;
 import com.guce.chain.model.ChainRequest;
 import com.guce.chain.model.ChainResponse;
-import com.guce.exception.ChainRollbackException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -15,17 +14,15 @@ import org.springframework.stereotype.Service;
  */
 @ChainService(value = "service1" ,order = 200,isAsync = true)
 @Service
-public class ChainService1 implements IChainService {
+public class ChainService3 implements IChainService {
 
-    private static Logger logger = LoggerFactory.getLogger(ChainService1.class);
+    private static Logger logger = LoggerFactory.getLogger(ChainService3.class);
 
     @Override
     public boolean handle(ChainRequest request, ChainResponse response) {
 
-        System.out.println("test chainSerive1");
-        if (true){
-            throw new ChainRollbackException("rollback");
-        }
+        System.out.println("test chainSerive3");
+
         return true;
     }
 
@@ -36,6 +33,6 @@ public class ChainService1 implements IChainService {
 
     @Override
     public void doRollback(ChainRequest request, ChainResponse response ){
-        System.out.println(" ChainService1 do roll back.......");
+        System.out.println(" ChainService3 do roll back.......");
     }
 }

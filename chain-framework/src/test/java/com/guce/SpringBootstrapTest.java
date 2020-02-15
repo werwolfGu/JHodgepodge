@@ -1,8 +1,6 @@
 package com.guce;
 
-import com.guce.chain.IChainService;
 import com.guce.chain.executor.ChainExecutor;
-import com.guce.spring.SpringContextBean;
 import com.guce.spring.bootstrap.SpringbootStartup;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +23,14 @@ public class SpringBootstrapTest {
     public void test(){
 
         chainExecutor.execute("service1",null,null);
+        chainExecutor.execute("fileConfig",null,null);
+        try{
+            chainExecutor.execute("points_2Flow",null,null);
+        }catch (Exception e){
+            System.out.println(e.getMessage());
+        }
+
+        chainExecutor.execute("fileConfig",null,null);
 
     }
 }

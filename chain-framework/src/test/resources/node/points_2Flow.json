@@ -1,0 +1,26 @@
+{
+  "points_2Flow": [
+
+    {
+      "servicePath": "com.guce.service.impl.ChainService1",
+      "order": "200",
+      "isAsync" : false,
+      "asyncTimeout": 1000
+    },{
+      "servicePath": "com.guce.service.impl.ChainService2",
+      "order": 100,
+      "isAsync" : false,
+      "asyncTimeout": 1000
+    },{
+      "servicePath": "com.guce.service.impl.ChainService3",
+      "order": 300,
+      "isAsync" : false,
+      "asyncTimeout": 1000
+    },{
+      "servicePath": "com.guce.service.impl.ChainService4",
+      "order": 400,
+      "isAsync" : false,
+      "asyncTimeout": 1000
+    }
+  ]
+}

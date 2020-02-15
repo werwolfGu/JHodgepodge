@@ -11,7 +11,6 @@
 
     <artifactId>chain-framework</artifactId>
 
-
     <dependencies>
 
         <dependency>
@@ -40,12 +39,6 @@
             <artifactId>commons-io</artifactId>
             <version>2.6</version>
         </dependency>
-        <dependency>
-            <groupId>org.codehaus.groovy</groupId>
-            <artifactId>groovy-all</artifactId>
-            <version>3.0.0-rc-3</version>
-            <type>pom</type>
-        </dependency>
 
         <dependency>
             <groupId>com.google.guava</groupId>
@@ -63,17 +56,6 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.7.0</version>
-        </dependency>
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.7.0</version>
         </dependency>
     </dependencies>
 

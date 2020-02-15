@@ -1,5 +1,8 @@
 package com.guce.chain.executor;
 
+import com.alibaba.fastjson.JSON;
+import com.alibaba.fastjson.JSONArray;
+import com.alibaba.fastjson.JSONObject;
 import com.google.common.base.Stopwatch;
 import com.guce.chain.IChainService;
 import com.guce.chain.anno.ChainService;
@@ -10,11 +13,18 @@ import com.guce.exception.ChainException;
 import com.guce.exception.ChainRollbackException;
 import com.guce.spring.SpringContextBean;
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.FileFilterUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -43,6 +53,8 @@ public class ChainExecutor {
 
     private static Comparator<ChainExecServiceWrapper> rankChainServices =
             Comparator.comparingInt(ChainExecServiceWrapper::getOrder);
+
+    private static volatile String FILE_FILTER_SUFFIX = "Flow.json";
 
     /**
      * lazy加载
@@ -97,10 +109,20 @@ public class ChainExecutor {
                 continue;
             }
 
-            boolean doNext = doService(chainService,request,response);
-            if ( !doNext ){
+            try{
+                boolean doNext = doService(chainService,request,response);
+                if ( !doNext ){
+                    break;
+                }
+            }catch (Throwable th){
+
+                logger.error("chain service sync exception;{}",th.getMessage());
+                if ( th instanceof ChainRollbackException ){
+                    rollback = true;
+                }
                 break;
             }
+
         }
 
         if ( !CollectionUtils.isEmpty(futureList) ){
@@ -110,7 +132,7 @@ public class ChainExecutor {
                 future.get(maxAsyncTimeout,TimeUnit.MILLISECONDS);
             } catch (InterruptedException | ExecutionException | TimeoutException e) {
 
-                logger.error("chain service async exception;",e);
+                logger.error("chain service async exception;{}",e.getMessage());
                 if (e.getCause() instanceof ChainRollbackException){
                     rollback = true;
                 }
@@ -155,24 +177,55 @@ public class ChainExecutor {
         try{
             logger.warn("========chain services init start...");
             String[] name = SpringContextBean.getBeanNamesForType(IChainService.class);
+            if (name != null && name.length > 0){
 
-            for (int i = 0 ; i < name.length ; i++ ){
-                IChainService service = SpringContextBean.getBean(name[i]);
-                ChainService annoService = service.getClass().getAnnotation(ChainService.class);
+                Arrays.stream(name).forEach( serviceName -> {
 
-                if (annoService == null){
-                    continue;
-                }
+                    IChainService service = SpringContextBean.getBean(serviceName);
 
-                ChainExecServiceWrapper serviceWrapper = new ChainExecServiceWrapper();
-                serviceWrapper.setChainService(service);
-                serviceWrapper.annoParamWrapper(annoService);
+                    ChainService annoService = service.getClass().getAnnotation(ChainService.class);
 
-                String chainResourceName = annoService.value();
-                List<ChainExecServiceWrapper> list = chainExecutorMap
-                        .computeIfAbsent(chainResourceName , k -> new ArrayList<>(DEFAULT_CHAIN_SERVICE_LIST_CAPACITY));
+                    if (annoService == null){
+                        logger.warn("init chain service no annotation:{} ; 有可能在配置文件中",serviceName);
+                        return ;
+                    }
 
-                list.add(serviceWrapper);
+                    ChainExecServiceWrapper serviceWrapper = new ChainExecServiceWrapper();
+                    serviceWrapper.setChainService(service);
+                    serviceWrapper.annoParamWrapper(annoService);
+
+                    String chainResourceName = annoService.value();
+                    List<ChainExecServiceWrapper> list = chainExecutorMap
+                            .computeIfAbsent(chainResourceName , k -> new ArrayList<>(DEFAULT_CHAIN_SERVICE_LIST_CAPACITY));
+
+                    list.add(serviceWrapper);
+                });
+            }
+
+            List<ChainExecServiceWrapper> fileChainServiceList = initLoadFlowNodeInfo();
+
+            if (CollectionUtils.isNotEmpty(fileChainServiceList)){
+
+                fileChainServiceList.forEach(serviceWrapper -> {
+
+                    String resourceName = serviceWrapper.getChainResourceName();
+                    List<ChainExecServiceWrapper> chainList =chainExecutorMap
+                            .computeIfAbsent(resourceName , k -> new ArrayList<>(DEFAULT_CHAIN_SERVICE_LIST_CAPACITY));
+
+                    if (serviceWrapper.getChainService() == null){
+
+                        try {
+                            Class clazz = Thread.currentThread().getContextClassLoader()
+                                    .loadClass(serviceWrapper.getServicePath());
+                            IChainService chainService = (IChainService) SpringContextBean.getBean(clazz);
+                            serviceWrapper.setChainService(chainService);
+                        } catch (ClassNotFoundException e) {
+                            logger.error("######无法找到结果处理类,请检查配置文件; classpath:{}"
+                                    ,serviceWrapper.getServicePath());
+                        }
+                    }
+                    chainList.add(serviceWrapper);
+                });
             }
 
             logger.warn("========chain services init rank compose ...");
@@ -194,6 +247,100 @@ public class ChainExecutor {
         }
 
 
+    }
+
+    public static List<ChainExecServiceWrapper> initLoadFlowNodeInfo(){
+
+        Stopwatch watch = Stopwatch.createStarted();
+        logger.info("######Chain Service loader flow config file info start...");
+        List<ChainExecServiceWrapper> result = new ArrayList<>();
+
+        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+        File file = new File(rootPath + File.separator + "node");
+        if (file.exists() && file.isDirectory()){
+
+            Collection<File> listFiles = FileUtils.listFiles( file,
+                    FileFilterUtils.suffixFileFilter(FILE_FILTER_SUFFIX),null);
+
+            if (CollectionUtils.isNotEmpty(listFiles)){
+
+                listFiles.forEach( flowFile -> {
+                    try {
+                        long start = System.currentTimeMillis();
+                        logger.warn("loader flow config file  start :{} ",flowFile.getAbsolutePath());
+                        String context = FileUtils.readFileToString(flowFile,"UTF-8");
+                        if (StringUtils.isNoneBlank(context)){
+                            JSONObject jsonObject = JSON.parseObject(context);
+
+                            jsonObject.forEach((key, value) -> {
+
+                                if (value instanceof JSONArray){
+                                    JSONArray jsonArr = (JSONArray) value;
+                                    List<ChainExecServiceWrapper> serviceWrapperList =
+                                            jsonArr.toJavaList(ChainExecServiceWrapper.class);
+
+                                    if (CollectionUtils.isNotEmpty(serviceWrapperList)){
+                                        /**
+                                         * 某个流程节点配置有问题时，删除该流程节点
+                                         */
+                                        List<ChainExecServiceWrapper> removeList = new ArrayList<>();
+
+                                        /**
+                                         * 如果某个流程节点不存在且 是必须执行的节点 那此时就需要删除该流程 不让其往下执行
+                                         */
+                                        AtomicBoolean addExecFLow = new AtomicBoolean(true);
+
+                                        serviceWrapperList.forEach( chainExecServiceWrapper -> {
+                                            chainExecServiceWrapper.setChainResourceName(key);
+                                            String servicePath = chainExecServiceWrapper.getServicePath();
+                                            if (StringUtils.isNoneBlank(servicePath)){
+                                                try {
+                                                    Class clazz = Thread.currentThread().getContextClassLoader().loadClass(servicePath);
+                                                    IChainService chainService = (IChainService) SpringContextBean.getBean(clazz);
+                                                    chainExecServiceWrapper.setChainService(chainService);
+                                                } catch (ClassNotFoundException e) {
+
+                                                    StringBuilder logSb = new StringBuilder();
+                                                    logSb.append("######执行流程：").append(key)
+                                                            .append("; 找不到流程节点：").append(servicePath);
+                                                    if (chainExecServiceWrapper.isNeedNode()){
+
+                                                        logSb.append("；此流程将不纳入可执行流程中！！");
+                                                        addExecFLow.set(false);
+                                                    }else {
+                                                        logSb.append("；该流程节点不是必须节点，remove该流程节点！！");
+                                                        removeList.add(chainExecServiceWrapper);
+                                                    }
+                                                   logger.error(logSb.toString());
+                                                }
+                                            }
+                                        });
+
+                                        if (CollectionUtils.isNotEmpty(removeList)){
+                                            serviceWrapperList.removeAll(removeList);
+                                        }
+
+                                        if (addExecFLow.get() && CollectionUtils.isNotEmpty(serviceWrapperList)){
+                                            result.addAll(serviceWrapperList);
+                                        }
+                                    }
+                                }
+                            });
+
+                        }
+                        logger.warn("loader flow config file  end :{} ; cost time:{} "
+                                ,flowFile.getAbsolutePath(),(System.currentTimeMillis() - start));
+                    } catch (IOException e) {
+                        logger.error("chain flow node init reader file error ; file:{}",flowFile.getAbsolutePath());
+                    }
+
+                });
+            }
+
+        }
+
+        logger.info("######Chain Service loader flow config file info start... and cost time:{}",watch.elapsed(TimeUnit.MILLISECONDS));
+        return result;
     }
 
 }
