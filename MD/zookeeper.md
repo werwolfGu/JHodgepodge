@@ -19,6 +19,15 @@ Zookeeper有以下角色
 - ***Observer***：一种与`Follower` 功能相同，但是不参与Leader选举时投票；他主要是为了扩展系统，提高读取速度；
 - ***Client***：客户端用来发起请求，严格来说不属于zookeeper集群
 
+zookeeper数据操作流程
+
+1.在Client向Follwer发出一个写的请求  
+2.Follwer把请求发送给Leader  
+3.Leader接收到以后开始发起投票并通知Follwer进行投票  
+4.Follwer把投票结果发送给Leader  
+5.Leader将结果汇总后如果需要写入，则开始写入同时把写入操作通知给Leader，然后commit;  
+6.Follwer把请求结果返回给Client
+
 ## 工作机制
 zookeeper的核心是Zab(zookeeper atomic Broadcast)协议，Zab协议有2种模式分别为：`恢复模式` 和 `广播模式`
 ### 恢复模式
@@ -31,6 +40,15 @@ Leader选举完毕后,Leader需要与Follower进行数据同步：
 3. Leader根据Follower确认同步点；
 4. 完成同步后通知Follower已经成为update状态；
 5. Follower接收到update消息后，就可以重新接受client的请求进行服务了；
+
+## 消息广播的实现原理
+1. leader 接收到消息请求后，将消息赋予一个全局唯一的64 位自增 id，叫：zxid，通过 zxid 的大小比较既可以实
+现因果有序这个特征
+2. leader 为每个 follower 准备了一个 FIFO 队列（通过 TCP协议来实现，以实现了全局有序这一个特点）将带有 zxid
+的消息作为一个提案（proposal）分发给所有的 follower
+3. 当 follower 接收到 proposal，先把 proposal 写到磁盘，写入成功以后再向 leader 回复一个 ack
+4. 当 leader 接收到合法数量（超过半数节点）的 ACK 后，leader 就会向这些 follower 发送 commit 命令，同时会在本地执行该消息
+5. 当 follower 收到消息的 commit 命令以后，会提交该消息
 
 ### Watch监听机制
 
