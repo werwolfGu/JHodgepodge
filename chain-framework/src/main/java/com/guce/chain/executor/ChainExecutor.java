@@ -200,11 +200,15 @@ public class ChainExecutor {
         try{
             logger.warn("========chain services init start...");
 
+            //loader annotation flow service
             List<ChainExecServiceWrapper> springFlowList = initLoaderAnnotationFlowNodeInfo();
 
+            // loader config file flow service
             List<ChainExecServiceWrapper> fileChainServiceList = initLoadFileFlowNodeInfo();
 
-            springFlowList.addAll(fileChainServiceList);
+            if (CollectionUtils.isNotEmpty(fileChainServiceList)){
+                springFlowList.addAll(fileChainServiceList);
+            }
 
             long sortStart = System.currentTimeMillis();
             logger.warn("========chain services flow node sort  start...");
@@ -238,8 +242,6 @@ public class ChainExecutor {
 
 
     }
-
-
 
     /**
      * 加载配置注解的流程节点
@@ -285,28 +287,33 @@ public class ChainExecutor {
         Stopwatch watch = Stopwatch.createStarted();
         logger.info("######Chain Service loader flow config file info start...");
         List<ChainExecServiceWrapper> result = new ArrayList<>();
+        try{
+            String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
+            File file = new File(rootPath + File.separator + "node");
+            if (file.exists() && file.isDirectory()){
 
-        String rootPath = Thread.currentThread().getContextClassLoader().getResource("").getPath();
-        File file = new File(rootPath + File.separator + "node");
-        if (file.exists() && file.isDirectory()){
+                Collection<File> listFiles = FileUtils.listFiles( file,
+                        FileFilterUtils.suffixFileFilter(FILE_FILTER_SUFFIX),null);
 
-            Collection<File> listFiles = FileUtils.listFiles( file,
-                    FileFilterUtils.suffixFileFilter(FILE_FILTER_SUFFIX),null);
+                if (CollectionUtils.isNotEmpty(listFiles)){
 
-            if (CollectionUtils.isNotEmpty(listFiles)){
+                    listFiles.forEach( flowFile -> {
+                        List<ChainExecServiceWrapper> flowList = loaderFlowFileConfigInfo(flowFile);
+                        if (CollectionUtils.isNotEmpty(flowList)){
+                            result.addAll(flowList);
+                        }
 
-                listFiles.forEach( flowFile -> {
-                    List<ChainExecServiceWrapper> flowList = loaderFlowFileConfigInfo(flowFile);
-                    if (CollectionUtils.isNotEmpty(flowList)){
-                        result.addAll(flowList);
-                    }
+                    });
+                }
 
-                });
             }
+            logger.info("######Chain Service loader flow config file info start... and cost time:{}",watch.elapsed(TimeUnit.MILLISECONDS));
 
+        }catch (Exception e){
+            logger.error("init flow service from config file error;",e);
+        }finally {
+            watch.stop();
         }
-
-        logger.info("######Chain Service loader flow config file info start... and cost time:{}",watch.elapsed(TimeUnit.MILLISECONDS));
         return result;
     }
 
