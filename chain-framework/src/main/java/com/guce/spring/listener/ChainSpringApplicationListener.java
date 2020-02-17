@@ -1,6 +1,6 @@
 package com.guce.spring.listener;
 
-import com.guce.chain.executor.ChainExecutor;
+import com.guce.chain.manager.ChainServiceManager;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
@@ -13,18 +13,18 @@ import org.springframework.stereotype.Component;
 public class ChainSpringApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
 
 
-    private ChainExecutor chainExecutor ;
+    private ChainServiceManager chainServiceManager ;
 
-    public ChainSpringApplicationListener(ChainExecutor executor){
+    public ChainSpringApplicationListener(ChainServiceManager chainServiceManager){
 
-        this.chainExecutor = executor;
+        this.chainServiceManager = chainServiceManager;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
 
         if (contextRefreshedEvent.getApplicationContext().getParent() != null){
-            chainExecutor.init();
+            chainServiceManager.init();
         }
     }
 }

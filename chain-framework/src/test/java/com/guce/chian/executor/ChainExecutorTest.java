@@ -1,6 +1,6 @@
 package com.guce.chian.executor;
 
-import com.guce.chain.executor.ChainExecutor;
+import com.guce.chain.manager.ChainServiceManager;
 import org.junit.Test;
 
 /**
@@ -11,6 +11,6 @@ public class ChainExecutorTest {
 
     @Test
     public void initLoadFlowNodeInfoTest(){
-        ChainExecutor.initLoadFileFlowNodeInfo();
+    ChainServiceManager.initLoadFileFlowNodeInfo();
     }
 }
