@@ -1,5 +1,6 @@
 package com.grvyframework.executor;
 
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.google.common.base.Stopwatch;
 import com.grvyframework.config.GrvyExecutorConfig;
 import com.grvyframework.exception.GrvyExceptionEnum;
@@ -35,7 +36,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
@@ -50,7 +51,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     private static Logger logger = LoggerFactory.getLogger(GrvyScriptEngineExecutor.class);
 
     @Getter
-    private ThreadPoolExecutor tpe ;
+    private ExecutorService tpe ;
 
     @Resource(name = "grvyScriptEngine")
     private GrvyScriptEngine grvyScriptEngine;
@@ -144,7 +145,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
             CompletableFuture<BaseScriptEvalResult> future = CompletableFuture.supplyAsync( () -> {
 
-                GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
+                GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo); 
                 return this.executor(param);
 
             } ,tpe);
@@ -296,5 +297,6 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     public void afterPropertiesSet() {
 
         tpe = ThreadPoolFactory.getThreadPoolExecutor(config);
+        tpe = TtlExecutors.getTtlExecutorService(tpe);
     }
 }
