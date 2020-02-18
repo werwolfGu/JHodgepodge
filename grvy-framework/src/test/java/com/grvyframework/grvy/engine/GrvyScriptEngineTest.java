@@ -53,11 +53,18 @@ public class GrvyScriptEngineTest {
 
         List<String> card = Arrays.asList("1","2","3");
 
-        grvyScriptEngine.bingingGlobalScopeMapper("卡集合",card);
-        grvyScriptEngine.bindingEngineScopeMapper("卡","5");
+        grvyScriptEngine.bingingGlobalScopeMapper("渠道","NET");
+        grvyScriptEngine.bindingEngineScopeMapper("交易码","1101");
+        grvyScriptEngine.bindingEngineScopeMapper("name","name is grvy");
         //GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("卡集合",card);
 
-        String script = " if (卡集合.contains(卡) ) return true ";
+        String script = "    def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
+                        "    def channels = [\"NET\",\"NCUP\"]\n" +
+                        "    def str = com.grvyframework.grvy.GrvyInvokeInterface.test(name)\n" +
+                        "    println( \"str:->\" + str)\n" +
+                        "    if (list.contains(交易码) && channels.contains(渠道)){\n" +
+                        "        return 2\n" +
+                        "    } ";
         Object obj = grvyScriptEngine.eval(script);
         System.out.println(obj);
         System.out.println(Objects.isNull(obj));   ///  true

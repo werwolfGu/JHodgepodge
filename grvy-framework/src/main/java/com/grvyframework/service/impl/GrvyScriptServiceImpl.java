@@ -26,9 +26,6 @@ public class GrvyScriptServiceImpl implements IGrvyScriptService {
         if (Objects.isNull(grvyKey)){
             logger.warn("grvy key is empty!");
         }
-
-       /* String keyArr[] = grvyKey.split(",");
-        List<String> keyList = Lists.newArrayList(keyArr);*/
         engineClient.flushLoadingCache(grvyKey);
 
         return "success";
