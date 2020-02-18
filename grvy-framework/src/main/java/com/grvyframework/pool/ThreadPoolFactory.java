@@ -1,9 +1,10 @@
 package com.grvyframework.pool;
 
+import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.grvyframework.config.ExecutorConfig;
 
 import java.util.Optional;
-import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
@@ -13,6 +14,8 @@ import java.util.concurrent.atomic.AtomicInteger;
  * @author chengen.gu
  * @date 2020-01-20 16:27
  * @description
+ *
+ * 线程池使用了 ttl修饰，解决问题：可以保证父线程的ThreadLocal 可以传入到子线程中
  */
 public class ThreadPoolFactory {
 
@@ -20,7 +23,7 @@ public class ThreadPoolFactory {
 
     private final static String GRVY_THREAD_NAME_PREFIX = "grvy-t-pool-";
 
-    public static ThreadPoolExecutor getThreadPoolExecutor(ExecutorConfig config){
+    public static ExecutorService getThreadPoolExecutor(ExecutorConfig config){
 
 
         int capacity = Optional.ofNullable(config)
@@ -47,9 +50,7 @@ public class ThreadPoolFactory {
                 .map(ExecutorConfig::getThreadName)
                 .orElse(GRVY_THREAD_NAME_PREFIX);
 
-        BlockingQueue queue = new LinkedBlockingQueue(capacity);
-
-        return new ThreadPoolExecutor(coreCpu, maximumPoolSize, keepAliveTime, TimeUnit.MINUTES, queue
+        ExecutorService executorService = new ThreadPoolExecutor(coreCpu, maximumPoolSize, keepAliveTime, TimeUnit.MINUTES, new LinkedBlockingQueue<>(capacity)
                 , r -> {
 
             String name = threadNamePrefix + threadNumber.getAndIncrement();
@@ -62,5 +63,7 @@ public class ThreadPoolFactory {
             }
             return t;
         });
+
+        return  TtlExecutors.getTtlExecutorService(executorService);
     }
 }

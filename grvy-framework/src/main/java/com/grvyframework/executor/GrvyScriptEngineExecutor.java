@@ -1,6 +1,5 @@
 package com.grvyframework.executor;
 
-import com.alibaba.ttl.threadpool.TtlExecutors;
 import com.google.common.base.Stopwatch;
 import com.grvyframework.config.GrvyExecutorConfig;
 import com.grvyframework.exception.GrvyExceptionEnum;
@@ -145,7 +144,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
             CompletableFuture<BaseScriptEvalResult> future = CompletableFuture.supplyAsync( () -> {
 
-                GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo); 
+                GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
                 return this.executor(param);
 
             } ,tpe);
@@ -297,6 +296,5 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
     public void afterPropertiesSet() {
 
         tpe = ThreadPoolFactory.getThreadPoolExecutor(config);
-        tpe = TtlExecutors.getTtlExecutorService(tpe);
     }
 }
