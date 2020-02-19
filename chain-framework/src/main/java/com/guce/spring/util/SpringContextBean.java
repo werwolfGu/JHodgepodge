@@ -1,5 +1,6 @@
 package com.guce.spring.util;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
@@ -14,7 +15,7 @@ public class SpringContextBean implements ApplicationContextAware {
 
     private static volatile ApplicationContext ctx ;
     @Override
-    public void setApplicationContext(ApplicationContext applicationContext) throws BeansException {
+    public void setApplicationContext(@NotNull ApplicationContext applicationContext) throws BeansException {
 
         ctx = applicationContext;
     }
