@@ -61,7 +61,7 @@ public class ChainExecutor {
                 if (maxAsyncTimeout < asyncTimeout){
                     maxAsyncTimeout = asyncTimeout;
                 }
-                CompletableFuture<Boolean> future = CompletableFuture.supplyAsync( () -> doService(chainService,request,response));
+                CompletableFuture future = CompletableFuture.runAsync( () -> doService(chainService,request,response));
                 futureList.add(future);
                 continue;
             }
@@ -88,10 +88,8 @@ public class ChainExecutor {
             }
 
             try{
-                boolean doNext = doService(chainService,request,response);
-                if ( !doNext ){
-                    break;
-                }
+                doService(chainService,request,response);
+
             }catch (Throwable th){
 
                 logger.error("chain service sync exception;{}",th.getMessage());
@@ -131,20 +129,19 @@ public class ChainExecutor {
 
     }
 
-    private static boolean doService(IChainService service ,ChainRequest request,ChainResponse response ){
+    private static void doService(IChainService service ,ChainRequest request,ChainResponse response ){
 
         try{
 
-            return service.handle(request,response);
-
+            service.handle(request,response);
         }catch (Throwable th){
+
+            if (th instanceof ChainRollbackException ){
+                throw th;
+            }
 
             service.handleException(request,response,th);
 
-            if (th instanceof ChainRollbackException){
-                throw th;
-            }
-            return false;
         }finally {
             service.doComplated(request,response);
         }
