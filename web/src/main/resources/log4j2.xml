@@ -17,7 +17,7 @@ PatternLayout
                 hostAddress : 本地ip地址
  -->
 
-<Configuration status="warn" monitorInterval="30">
+<Configuration status="info" monitorInterval="30">
     <appenders>
         <Console name="Console" target="SYSTEM_OUT">
             <PatternLayout pattern="%d{yyyy-MM-dd HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
@@ -62,7 +62,7 @@ PatternLayout
 
         <Logger name="org.apache" level="warn" />
         <Logger name="com.guce" level="info" />
-        <Logger name="org.springframework" level="warn" />
+        <Logger name="org.springframework" level="info" />
 
         <!--<AsyncLogger name="org.springframework" level="warn" includeLocation="true">
             <AppenderRef ref="RandomAccessFile"/>
@@ -78,6 +78,7 @@ PatternLayout
         <root level="info">
             <appender-ref ref="RollingFile" />
             <appender-ref ref="RollingFileWarn"/>
+            <appender-ref ref="RandomAccessFile"/>
             <AppenderRef ref="Console"/>
         </root>
 

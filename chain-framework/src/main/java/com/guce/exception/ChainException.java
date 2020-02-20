@@ -6,7 +6,21 @@ package com.guce.exception;
  */
 public class ChainException extends RuntimeException {
 
+    private String code;
+    private String msg;
+
     public ChainException(String msg){
         super(msg);
     }
+
+    public ChainException(String code,String msg){
+        super(msg);
+        this.code = code;
+        this.msg = msg;
+    }
+
+    public ChainException(ExceptionEnum exEnum){
+        super();
+    }
+
 }
