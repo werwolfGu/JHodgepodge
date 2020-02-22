@@ -1,9 +1,6 @@
 package com.grvyframework.controller;
 
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
 
 /**
  * @author chengen.gu
@@ -13,9 +10,5 @@ import javax.servlet.http.HttpServletRequest;
 @RestController
 public class DemoController {
 
-    @RequestMapping(value = "/test")
-    public String test(HttpServletRequest request){
 
-        return "hello grvy";
-    }
 }
