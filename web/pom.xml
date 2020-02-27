@@ -98,6 +98,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.guce</groupId>
+            <artifactId>chain-framework</artifactId>
+            <version>1.0.0.SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>com.guce.server</groupId>
+            <artifactId>service</artifactId>
+            <version>1.0.0.SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

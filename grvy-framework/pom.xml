@@ -79,17 +79,6 @@
         </dependency>
     </dependencies>
 
-    <!--<dependencyManagement>
-        <dependencies> &lt;!&ndash; The parent should provide all that &ndash;&gt;
-            <dependency>
-                <groupId>org.springframework.boot</groupId>
-                <artifactId>spring-boot-dependencies</artifactId>
-                <version>3.0.1</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
-        </dependencies>
-    </dependencyManagement>-->
 
     <build>
         <plugins>

@@ -1,6 +1,6 @@
 package com.grvyframework.grvy.engine;
 
-import com.grvyframework.bootstrap.SpringbootStartup;
+import com.grvyframework.bootstrap.GrvySpringbootStartup;
 import com.grvyframework.executor.GrvyScriptEngineExecutor;
 import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.model.GrvyRequest;
@@ -33,7 +33,7 @@ import java.util.concurrent.TimeUnit;
  * @description
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes={SpringbootStartup.class})// 指定启动类
+@SpringBootTest(classes={GrvySpringbootStartup.class})// 指定启动类
 public class GrvyScriptEngineTest {
 
     private static ThreadPoolExecutor pool;

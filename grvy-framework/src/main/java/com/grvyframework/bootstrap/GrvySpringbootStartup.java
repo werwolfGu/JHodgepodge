@@ -12,11 +12,11 @@ import org.springframework.context.annotation.Import;
  */
 @SpringBootApplication
 @Import(GrvyAutoConfiguration.class)
-public class SpringbootStartup {
+public class GrvySpringbootStartup {
 
     public static void main(String[] args) {
 
-        SpringApplication.run(SpringbootStartup.class, args);
+        SpringApplication.run(GrvySpringbootStartup.class, args);
 
     }
 }
