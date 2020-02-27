@@ -26,6 +26,12 @@ public @interface ChainService {
     int order() default 0;
 
     /**
+     * 异常流程服务节点；在流程节点出现异常后，需要执行的流程节点
+     * @return
+     */
+    String exceptionFlowServiceNode() default "";
+
+    /**
      * 是否异步执行
      * @return
      */

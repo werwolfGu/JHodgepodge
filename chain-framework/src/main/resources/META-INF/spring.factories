@@ -1,2 +1,5 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.guce.spring.autoconfigurature.AutoConfigurature
+
+org.springframework.context.ApplicationListener=\
+com.guce.spring.listener.ChainSpringApplicationListener

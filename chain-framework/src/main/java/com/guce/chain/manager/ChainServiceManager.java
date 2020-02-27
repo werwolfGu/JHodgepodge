@@ -11,10 +11,10 @@ import com.guce.spring.util.SpringContextBean;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
+import org.springframework.util.StringUtils;
 
 import java.io.File;
 import java.io.IOException;
@@ -131,10 +131,13 @@ public class ChainServiceManager {
 
         logger.warn("######chain service loader annotation flow node start...");
         List<ChainExecServiceWrapper> flowResultList = new ArrayList<>();
-        String[] name = SpringContextBean.getBeanNamesForType(IChainService.class);
-        if (name != null && name.length > 0){
+        String[] names = SpringContextBean.getBeanNamesForType(IChainService.class);
+        StringBuffer sb = new StringBuffer();
+        Arrays.stream(names).forEach( name -> sb.append(name) .append("|"));
+        logger.warn("spring init chain service beanNames:{}",sb.toString());
+        if (names != null && names.length > 0){
 
-            Arrays.stream(name).forEach(serviceName -> {
+            Arrays.stream(names).forEach(serviceName -> {
 
                 IChainService service = SpringContextBean.getBean(serviceName);
 
@@ -150,10 +153,21 @@ public class ChainServiceManager {
                 serviceWrapper.setChainService(service);
                 serviceWrapper.annoParamWrapper(annoService);
 
+                String otherServicePath = annoService.exceptionFlowServiceNode();
+                if (!StringUtils.isEmpty(otherServicePath)){
+                    try {
+                        IChainService chainService = loaderChainService(otherServicePath);
+                        serviceWrapper.setOtherChainService(chainService);
+                    } catch (ClassNotFoundException e) {
+                        logger.error("无法获取到节点异常处理节点数据：{}",otherServicePath,e);
+                    }
+                }
+
+
                 flowResultList.add(serviceWrapper);
             });
         }
-        logger.warn("######chain service loader annotation flow node end...");
+        logger.warn("######chain service loader annotation flow node end... and loader flow resource:{}",flowResultList);
 
         return flowResultList;
     }
@@ -204,7 +218,7 @@ public class ChainServiceManager {
             long start = System.currentTimeMillis();
             logger.warn("loader flow config file  start :{} ",flowFile.getAbsolutePath());
             String context = FileUtils.readFileToString(flowFile,"UTF-8");
-            if (StringUtils.isNoneBlank(context)){
+            if (!StringUtils.isEmpty(context)){
                 JSONObject jsonObject = JSON.parseObject(context);
 
                 jsonObject.forEach((key, value) -> {
@@ -228,11 +242,15 @@ public class ChainServiceManager {
                             serviceWrapperList.forEach( chainExecServiceWrapper -> {
                                 chainExecServiceWrapper.setChainResourceName(key);
                                 String servicePath = chainExecServiceWrapper.getServicePath();
-                                if (StringUtils.isNoneBlank(servicePath)){
+                                if (!StringUtils.isEmpty(servicePath)){
                                     try {
-                                        Class clazz = Thread.currentThread().getContextClassLoader().loadClass(servicePath);
-                                        IChainService chainService = (IChainService) SpringContextBean.getBean(clazz);
+                                        IChainService chainService = loaderChainService(servicePath);
                                         chainExecServiceWrapper.setChainService(chainService);
+                                        String otherServicePath = chainExecServiceWrapper.getOtherServicePath();
+                                        if (!StringUtils.isEmpty(otherServicePath)){
+                                            chainService = loaderChainService(servicePath);
+                                            chainExecServiceWrapper.setOtherChainService(chainService);
+                                        }
                                     } catch (ClassNotFoundException e) {
 
                                         StringBuilder logSb = new StringBuilder();
@@ -271,4 +289,10 @@ public class ChainServiceManager {
         return result;
     }
 
+    public static <T> T loaderChainService(String classpath) throws ClassNotFoundException {
+
+        Class clazz = Thread.currentThread().getContextClassLoader().loadClass(classpath);
+        return (T) SpringContextBean.getBean(clazz);
+
+    }
 }

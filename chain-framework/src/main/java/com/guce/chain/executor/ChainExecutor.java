@@ -6,6 +6,7 @@ import com.guce.chain.model.ChainExecServiceWrapper;
 import com.guce.chain.model.ChainRequest;
 import com.guce.chain.model.ChainResponse;
 import com.guce.exception.ChainException;
+import com.guce.exception.ChainExceptionEnum;
 import com.guce.exception.ChainRollbackException;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
@@ -61,7 +62,7 @@ public class ChainExecutor {
                 if (maxAsyncTimeout < asyncTimeout){
                     maxAsyncTimeout = asyncTimeout;
                 }
-                CompletableFuture future = CompletableFuture.runAsync( () -> doService(chainService,request,response));
+                CompletableFuture future = CompletableFuture.runAsync( () -> doService(service,request,response));
                 futureList.add(future);
                 continue;
             }
@@ -88,7 +89,7 @@ public class ChainExecutor {
             }
 
             try{
-                doService(chainService,request,response);
+                doService(service,request,response);
 
             }catch (Throwable th){
 
@@ -129,21 +130,33 @@ public class ChainExecutor {
 
     }
 
-    private static void doService(IChainService service ,ChainRequest request,ChainResponse response ){
+    private static void doService(ChainExecServiceWrapper service ,ChainRequest request,ChainResponse response ){
 
+        IChainService chainService = service.getChainService();
         try{
 
-            service.handle(request,response);
+            chainService.handle(request,response);
         }catch (Throwable th){
 
             if (th instanceof ChainRollbackException ){
                 throw th;
             }
+            if (th instanceof ChainException){
 
-            service.handleException(request,response,th);
+                ChainException ex = (ChainException) th;
+                if (ChainExceptionEnum.EXCEPTION_FLOW_NODE_EXECUTE.getCode().equals(ex.getCode())){
+                    IChainService otherChainService = service.getOtherChainService();
+                    if (otherChainService != null){
+                        otherChainService.handle(request,response);
+                        return ;
+                    }
+                }
+            }
+
+            chainService.handleException(request,response,th);
 
         }finally {
-            service.doComplated(request,response);
+            chainService.doComplated(request,response);
         }
 
     }

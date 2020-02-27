@@ -17,6 +17,10 @@ public class ChainExecServiceWrapper {
     @Getter
     @Setter
     private IChainService chainService;
+
+    @Setter
+    @Getter
+    private IChainService otherChainService;
     /**
      * 执行chainResourceName
      */
@@ -49,6 +53,10 @@ public class ChainExecServiceWrapper {
     @Getter
     private String servicePath;
 
+    @Getter
+    @Setter
+    private String otherServicePath;
+
     @Setter
     @Getter
     private boolean isNeedNode = true;
@@ -70,6 +78,7 @@ public class ChainExecServiceWrapper {
                 + ", \"isAsync\":" + isAsync
                 + ", \"asyncTimeout\":" + asyncTimeout
                 + ", \"servicePath\":" + servicePath
+                + ", \"otherService\":" + otherServicePath
                 + ", \"isNeedNode\":" + isNeedNode + "}";
     }
 }
