@@ -83,6 +83,11 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-log4j2</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springdoc</groupId>
+            <artifactId>springdoc-openapi-ui</artifactId>
+        </dependency>
+
         <!-- 反应式编程 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -110,6 +115,7 @@
             <artifactId>service</artifactId>
             <version>1.0.0.SNAPSHOT</version>
         </dependency>
+
     </dependencies>
 
     <build>
