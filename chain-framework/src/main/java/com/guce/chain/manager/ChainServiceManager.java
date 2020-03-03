@@ -39,7 +39,7 @@ public class ChainServiceManager {
 
     private static Map<String, List<ChainExecServiceWrapper>> chainExecutorMap = new ConcurrentHashMap<>(32);
 
-    private static final AtomicBoolean LOADER_FINISHED = new AtomicBoolean(false);
+    private static volatile AtomicBoolean LOADER_FINISHED = new AtomicBoolean(false);
 
     private volatile static int DEFAULT_CHAIN_SERVICE_LIST_CAPACITY = 8;
 

@@ -52,7 +52,6 @@ public class ChainExecutor {
         List<CompletableFuture> futureList = new ArrayList<>(4);
         long maxAsyncTimeout = 0 ;
         for (ChainExecServiceWrapper service : chainServiceList ){
-            IChainService chainService = service.getChainService();
             servcieStack.push(service.getChainService());
 
             boolean isAsync = service.isAsync();
