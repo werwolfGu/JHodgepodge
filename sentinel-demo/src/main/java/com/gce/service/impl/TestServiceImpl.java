@@ -47,6 +47,7 @@ public class TestServiceImpl implements ITestService {
         return "Oops, error occurred at " + s;
     }
 
+
     public String defaultFallback() {
         System.out.println("Go to default fallback");
         return "default_fallback";
