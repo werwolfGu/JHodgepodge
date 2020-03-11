@@ -15,22 +15,17 @@ import java.util.Map;
  * @DATE 2020/2/17 9:54 下午
  *
  * 参考：org.apache.logging.log4j.ThreadContext#init()
+ * reference: org.apache.logging.log4j.spi.DefaultThreadContextMap
  * 可以发现  ContextMap 是可以自定义的 ；
  */
 public class ExtendThreadContextMap implements ThreadContextMap, ReadOnlyStringMap {
 
     private static final long serialVersionUID = 8218007901108944053L;
 
-    /**
-     * Property name ({@value} ) for selecting {@code InheritableThreadLocal} (value "true") or plain
-     * {@code ThreadLocal} (value is not "true") in the implementation.
-     */
-    public static final String INHERITABLE_MAP = "isThreadContextMapInheritable";
 
     private final boolean useMap;
     private final ThreadLocal<Map<String, String>> localMap;
 
-    private static boolean inheritableMap;
 
     // LOG4J2-479: by default, use a plain ThreadLocal, only use InheritableThreadLocal if configured.
     // (This method is package protected for JUnit tests.)
