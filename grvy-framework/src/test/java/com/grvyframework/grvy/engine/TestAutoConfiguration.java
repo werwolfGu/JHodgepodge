@@ -58,10 +58,10 @@ public class TestAutoConfiguration {
     @Test
     public void testGrvyScriptEngine() throws ScriptException, ExecutionException, InterruptedException {
 
-        List<String> card = Arrays.asList("1","2","3");
+        List<String> card = Arrays.asList("1", "2", "3");
         GrvyScriptEngine grvyScriptEngine = this.context.getBean(GrvyScriptEngine.class);
-        grvyScriptEngine.bingingGlobalScopeMapper("交易码","1101");
-        grvyScriptEngine.bindingEngineScopeMapper("渠道","NET");
+        grvyScriptEngine.bingingGlobalScopeMapper("交易码", "1101");
+        grvyScriptEngine.bindingEngineScopeMapper("渠道", "NET");
         System.out.println(grvyScriptEngine.getCurrentGrvyScriptEngine().getBindings(100));
         String script = " def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
                 "    def channels = [\"NET\",\"NCUP\"]\n" +
@@ -77,7 +77,7 @@ public class TestAutoConfiguration {
 
         List<String> mccList = new ArrayList<>();
         int seed = 10;
-        for (int i = 0 ; i < seed ; i++ ){
+        for (int i = 0; i < seed; i++) {
             mccList.add(String.valueOf(i));
         }
 
@@ -89,16 +89,15 @@ public class TestAutoConfiguration {
         request.setGrvyRuleInfoList(grvyRuleInfoList);
 
         Bindings bindings = new SimpleBindings();
-        bindings.put("交易码","1101");
-        bindings.put("渠道","NET");
+        bindings.put("交易码", "1101");
+        bindings.put("渠道", "NET");
         request.setBindings(bindings);
-
         BaseScriptEvalResultCalculateParam calculateParam = new BaseScriptEvalResultCalculateParam();
         calculateParam.setAmt(2L);
         request.setCalculateParam(calculateParam);
 
         GrvyScriptEngineExecutor grvyScriptEngineExecutor = this.context.getBean(GrvyScriptEngineExecutor.class);
-        List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.serialExecutor(request,response,Reduce.allof(Objects::nonNull));
+        List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.serialExecutor(request, response, Reduce.allof(Objects::nonNull));
 
         System.out.println(evalResults);
         assert "2".equals(evalResults.get(0).getAmt().toString());
@@ -111,10 +110,10 @@ public class TestAutoConfiguration {
         List<CompletableFuture> list = new ArrayList<>();
         List<String> mccList = new ArrayList<>();
         int seed = 1000;
-        for (int i = 0 ; i < seed ; i++ ){
+        for (int i = 0; i < seed; i++) {
             mccList.add(String.valueOf(i));
         }
-        for (int i = 0 ; i < seed ; i++ ){
+        for (int i = 0; i < seed; i++) {
 
             GrvyRequest request = new GrvyRequest();
             GrvyResponse response = new GrvyResponse();
@@ -131,10 +130,10 @@ public class TestAutoConfiguration {
             ruleInfo.setGrvyScriptResultHandler(handle);
             ruleInfo.setScript(script);
             Bindings bindings = new SimpleBindings();
-            bindings.put("交易码","1101");
-            bindings.put("渠道","NET");
+            bindings.put("交易码", "1101");
+            bindings.put("渠道", "NET");
             Integer idx = ThreadLocalRandom.current().nextInt(seed);
-            bindings.put("卡",idx.toString());
+            bindings.put("卡", idx.toString());
             request.setBindings(bindings);
             try {
 
@@ -144,7 +143,7 @@ public class TestAutoConfiguration {
 
                 calculateParam.setAmt(Long.valueOf(idx));
                 request.setCalculateParam(calculateParam);
-                List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.parallelExecutor(request,response, Reduce.firstOf(Objects::nonNull));
+                List<BaseScriptEvalResult> evalResults = grvyScriptEngineExecutor.parallelExecutor(request, response, Reduce.firstOf(Objects::nonNull));
                 System.out.println(evalResults);
             } catch (Exception e) {
                 e.printStackTrace();
@@ -153,15 +152,15 @@ public class TestAutoConfiguration {
         }
     }
 
-    public static List<GrvyRuleConfigEntry> getRuleConfigInfos(){
+    public static List<GrvyRuleConfigEntry> getRuleConfigInfos() {
         InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream("ruleconfigInfo.json");
 
         List<GrvyRuleConfigEntry> list = new ArrayList<>();
         try {
-            String str = IOUtils.toString(in,"UTF-8");
+            String str = IOUtils.toString(in, "UTF-8");
             JSONArray arr = JSON.parseArray(str);
 
-            for (int i = 0 ; i < arr.size() ; i++ ){
+            for (int i = 0; i < arr.size(); i++) {
                 JSONObject obj = arr.getJSONObject(i);
                 GrvyRuleConfigEntry entry = new GrvyRuleConfigEntry();
                 entry.setGrvyResultClazzPath(obj.getString("result_handle"));
