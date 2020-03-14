@@ -5,4 +5,4 @@
 
 
 参考：
-[美团技术](https://tech.meituan.com/DDD_in_%20practice.html)
+[美团技术](https://tech.meituan.com/2017/12/22/ddd-in-practice.html)
