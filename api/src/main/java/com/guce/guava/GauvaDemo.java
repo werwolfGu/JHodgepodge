@@ -7,6 +7,7 @@ import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
 
+import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -16,7 +17,7 @@ public class GauvaDemo {
 
     private LoadingCache<String,String> loadingCache = CacheBuilder
 
-            .newBuilder().maximumSize(5)
+            .newBuilder().maximumSize(100000)
             //.refreshAfterWrite(30000, TimeUnit.SECONDS)
             .removalListener(new RemovalListener<String, String>() {
                 @Override
@@ -57,13 +58,16 @@ public class GauvaDemo {
             }
 
             int idx = 0;
-            while(idx <= 100000){
-                simpleExample.getValue("key" + 0);
+            while (idx <= 1000000) {
+                simpleExample.getValue("key" + idx);
                 idx++;
 
             }
+            System.in.read();
         } catch (ExecutionException e) {
 
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 }
