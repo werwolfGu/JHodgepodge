@@ -36,14 +36,30 @@ public class HeapSort {
         int tmp = arr[idx];
         for (int i = 2 * idx + 1; i < length; i = 2 * i + 1) {
             if (i + 1 < length) {
-                if (arr[i] < arr[i + 1]) {
+                if (arr[i] > arr[i + 1]) {
                     i = i + 1;
                 }
             }
-            if (arr[i] > tmp) {
+            if (arr[i] < tmp) {
                 arr[idx] = arr[i];
                 idx = i;
 
+            }
+        }
+        arr[idx] = tmp;
+    }
+
+    public static void minHeapAdjust(int arr[], int idx, int length) {
+        int tmp = arr[idx];
+        for (int i = 2 * idx + 1; i < length; i = 2 * i + 1) {
+            if (i + 1 < length) {
+                if (arr[i] > arr[i + 1]) {
+                    i = i + 1;
+                }
+            }
+            if (arr[i] < tmp) {
+                arr[idx] = arr[i];
+                idx = i;
             }
         }
         arr[idx] = tmp;
@@ -65,7 +81,6 @@ public class HeapSort {
         for (int i = arr.length - 1; i >= 1; i--) {
             swap(arr, 0, i);
             System.out.println("");
-            ;
             print(arr);
             heapAdjust(arr, i, 0);
         }

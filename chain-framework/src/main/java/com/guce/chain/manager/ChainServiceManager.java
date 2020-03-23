@@ -8,6 +8,7 @@ import com.guce.chain.IChainService;
 import com.guce.chain.anno.ChainService;
 import com.guce.chain.model.ChainExecServiceWrapper;
 import com.guce.spring.util.SpringContextBean;
+import com.guce.utils.ClassUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
@@ -291,7 +292,7 @@ public class ChainServiceManager {
 
     public static <T> T loaderChainService(String classpath) throws ClassNotFoundException {
 
-        Class clazz = Thread.currentThread().getContextClassLoader().loadClass(classpath);
+        Class clazz = ClassUtils.getClassLoder(ChainServiceManager.class).loadClass(classpath);
         return (T) SpringContextBean.getBean(clazz);
 
     }

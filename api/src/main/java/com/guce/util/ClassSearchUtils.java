@@ -1,13 +1,19 @@
 package com.guce.util;
 
+import com.google.common.collect.Lists;
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.collections.CollectionUtils;
+
 import java.io.File;
 import java.io.IOException;
-import java.net.JarURLConnection;
+import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -15,81 +21,146 @@ import java.util.jar.JarFile;
  * @Author chengen.gce
  * @DATE 2020/3/11 10:59 下午
  */
+@Slf4j
 public class ClassSearchUtils {
 
-    public static List<Class> searchProjClass(String basePackage){
+    private static final String POINT = ".";
 
-        String clazzPath = Thread.currentThread().getClass().getResource("/").getPath();
+    private static final String KLASS_SUFFIX = ".class";
 
-        basePackage = basePackage.replace(".", File.separator);
-        doPath(basePackage,null);
-        return null;
-    }
+    private final static String FILE_PROTOCOL = "file";
+    private final static String JAR_PROTOCOL = "jar";
 
-    private static void doPath(String path,List<String> clazzList){
-         doPath(new File(path),clazzList);
-    }
 
-    private static void doPath(File file,List<String> clazzList) {
+    public static List<Class<?>> searchKlassList(String packageName) throws IOException {
+        Set<String> klassPathList = getClassName(packageName, true);
 
-        if (file.isDirectory()) {//文件夹
-            //文件夹我们就递归
-            File[] files = file.listFiles();
-            for (File f1 : files) {
-                doPath(f1,clazzList);
+        if (CollectionUtils.isEmpty(klassPathList)) {
+            return null;
+        }
+        List<Class<?>> klassList = Lists.newArrayListWithCapacity(klassPathList.size());
+
+        klassPathList.stream().forEach(klassPath -> {
+            try {
+                Class klass = ClassUtils.getClassLoder().loadClass(klassPath);
+                klassList.add(klass);
+            } catch (ClassNotFoundException e) {
+                log.error("无法加载到类：classpath:{}", klassPath, e);
             }
-        } else {//标准文件
-            //标准文件我们就判断是否是class文件
-            if (file.getName().endsWith(".class")) {
-                //如果是class文件我们就放入我们的集合中。
-                clazzList.add(file.getPath());
+        });
+        return klassList;
+    }
+
+    public static Set<String> getClassName(String packageName, boolean childPackage) throws IOException {
+        Set<String> fileNames = new HashSet<>();
+        ClassLoader loader = ClassUtils.getClassLoder();
+        String packagePath = packageName.replace(POINT, File.separator);
+        Enumeration<URL> urls = loader.getResources(packagePath);
+        while (urls.hasMoreElements()) {
+            URL url = urls.nextElement();
+            if (url == null) {
+                continue;
+            }
+            String type = url.getProtocol();
+            if (type.equals(FILE_PROTOCOL)) {
+                fileNames.addAll(getClassNameByFile(packageName, url.getPath(), childPackage));
+            } else if (type.equals(JAR_PROTOCOL)) {
+                fileNames.addAll(getClassNameByJar(url.getPath(), childPackage));
             }
         }
-        return ;
+        //fileNames.addAll(getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath, childPackage));
+        return fileNames;
     }
 
-    public static void searchJarClass(String packagepath,List<String> clazzPathList) throws IOException, URISyntaxException {
+    private static List<String> getClassNameByFile(String packagePath, String filePath, boolean childPackage) throws UnsupportedEncodingException {
+        List<String> myClassName = new ArrayList<>();
 
-        Enumeration<URL> urlEnumeration = Thread.currentThread().getContextClassLoader()
-                .getResources(packagepath.replace(".", "/"));
-        while(urlEnumeration.hasMoreElements()){
-            URL url = urlEnumeration.nextElement();
-            String protocol = url.getProtocol();
-            if ("jar".equalsIgnoreCase(protocol)) {
-                JarURLConnection connection = (JarURLConnection) url.openConnection();
-                if (connection != null) {
-                    JarFile jarFile = connection.getJarFile();
-                    if (jarFile != null) {
-                        Enumeration<JarEntry> jarEntryEnumeration = jarFile.entries();
-                        while (jarEntryEnumeration.hasMoreElements()) {
-                            JarEntry entry = jarEntryEnumeration.nextElement();
-                            String jarEntryName = entry.getName();
-                            //这里我们需要过滤不是class文件和不在basePack包名下的类
-                            if (jarEntryName.contains(".class") && jarEntryName.replaceAll("/",".").startsWith(packagepath)) {
-                                String className = jarEntryName.substring(0, jarEntryName.lastIndexOf(".")).replace("/", ".");
-                                clazzPathList.add(className);
-                            }
+        File file = new File(filePath);
+        File[] childFiles = file.listFiles();
+        if (childFiles == null) {
+            return myClassName;
+        }
+        for (File childFile : childFiles) {
+
+            if (childFile.isDirectory()) {
+                if (childPackage) {
+                    String currentPathName = childFile.getAbsolutePath().substring(childFile.getAbsolutePath().lastIndexOf(File.separator) + 1);
+                    currentPathName = packagePath + "." + currentPathName;
+                    myClassName.addAll(getClassNameByFile(currentPathName, childFile.getPath(), childPackage));
+                }
+            } else {
+                String klassName = childFile.getName();
+                if (klassName.endsWith(KLASS_SUFFIX)) {
+                    klassName = packagePath + "." + klassName.replace(KLASS_SUFFIX, "");
+                    myClassName.add(klassName);
+                }
+            }
+        }
+        return myClassName;
+    }
+
+    private static List<String> getClassNameByJar(String jarPath, boolean childPackage) {
+        List<String> myClassName = new ArrayList<>();
+        String[] jarInfo = jarPath.split("!");
+        String jarFilePath = jarInfo[0].substring(jarInfo[0].indexOf("/"));
+        String packagePath = jarInfo[1].substring(1);
+        try {
+            JarFile jarFile = new JarFile(jarFilePath);
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry jarEntry = entries.nextElement();
+                String entryName = jarEntry.getName();
+                if (entryName.endsWith(KLASS_SUFFIX)) {
+                    if (childPackage) {
+                        if (entryName.startsWith(packagePath)) {
+                            entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
+                            myClassName.add(entryName);
+                        }
+                    } else {
+                        int index = entryName.lastIndexOf("/");
+                        String myPackagePath;
+                        if (index != -1) {
+                            myPackagePath = entryName.substring(0, index);
+                        } else {
+                            myPackagePath = entryName;
+                        }
+                        if (myPackagePath.equals(packagePath)) {
+                            entryName = entryName.replace("/", ".").substring(0, entryName.lastIndexOf("."));
+                            myClassName.add(entryName);
                         }
                     }
                 }
-            }else if("file".equals(protocol)){
-                doPath(new File(url.toURI()),clazzPathList);
+            }
+        } catch (Exception e) {
+
+        }
+        return myClassName;
+    }
+
+    private static List<String> getClassNameByJars(URL[] urls, String packagePath, boolean childPackage) throws UnsupportedEncodingException {
+        List<String> myClassName = new ArrayList<String>();
+        if (urls != null) {
+            for (int i = 0; i < urls.length; i++) {
+                URL url = urls[i];
+                String urlPath = url.getPath();
+                // 不必搜索classes文件夹
+                if (urlPath.endsWith("classes/")) {
+                    continue;
+                }
+                String jarPath = urlPath + "!/" + packagePath;
+                myClassName.addAll(getClassNameByJar(jarPath, childPackage));
             }
         }
+        return myClassName;
     }
 
     public static void main(String[] args) throws IOException, URISyntaxException {
-        String clazzPath = Thread.currentThread().getClass().getResource("/").getPath();
+
         String basePackage = "com.guce.thread";
 
-        basePackage = basePackage.replace(".", File.separator);
-        basePackage = clazzPath + basePackage;
-        List<String> clazzpathList = new ArrayList<>();
-        doPath(basePackage,clazzpathList);
-        System.out.println(clazzpathList);
-        List<String> jarClazzpathList = new ArrayList<>();
-        searchJarClass("com.grvyframework.grvy.",jarClazzpathList);
-        System.out.println(jarClazzpathList.size());
-        System.out.println(jarClazzpathList);
+        List<Class<?>> classes = searchKlassList(basePackage);
+        //判断子类是否继承自 父类或接口  clazz.isAssignableFrom(子类名称)
+        System.out.println(classes);
+
     }
 }
