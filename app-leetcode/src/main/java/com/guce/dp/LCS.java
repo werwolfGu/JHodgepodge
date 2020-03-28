@@ -3,6 +3,10 @@ package com.guce.dp;
 /**
  * Created by chengen.gu on 2019/10/23.
  * 最长公共子序列  使用动态规划
+ * 动态规划：
+ * 计算方程式：
+ * xn = ym : f[n][m] = f[n -1][m -1 ] + 1;
+ * xn != ym : f[n][m] = max(f[n - 1][m] ,f[n][m -1])
  */
 public class LCS {
 

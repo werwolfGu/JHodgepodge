@@ -7,6 +7,7 @@ import java.util.List;
  * @Author chengen.gu
  * @DATE 2019/10/29 10:15 下午
  * https://leetcode-cn.com/problems/word-break/solution/dong-tai-gui-hua-jing-dian-de-wan-quan-bei-bao-w-3/
+ * 单词拆分
  */
 public class WordBreak {
     public static boolean soluton(String str , List<String> wordDict){
