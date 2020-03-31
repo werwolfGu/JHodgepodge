@@ -4,6 +4,7 @@ package com.guce;
  * @Author chengen.gce
  * @DATE 2020/3/15 7:50 下午
  * https://leetcode-cn.com/problems/number-of-islands/
+ * 岛屿的数量
  */
 public class NumIslands {
 
