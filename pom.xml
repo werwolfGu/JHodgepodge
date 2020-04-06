@@ -25,6 +25,8 @@
     <module>chain-framework</module>
       <module>common</module>
       <module>java8</module>
+      <module>sandbox-demo</module>
+      <module>learn</module>
   </modules>
   <packaging>pom</packaging>
 

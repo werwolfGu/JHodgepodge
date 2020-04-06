@@ -32,6 +32,11 @@ select和poll都只提供了一个函数——select或者poll函数。而epoll�
 
 　　对于第三个缺点，epoll没有这个限制，它所支持的FD上限是最大可以打开文件的数目，这个数字一般远大于2048,举个例子,在1GB内存的机器上大约是10万左右，具体数目可以cat /proc/sys/fs/file-max察看,一般来说这个数目和系统内存关系很大。
 
+IO多路复用流程路  
+![](./picture/redisIO多路复用原理.png)
+
+
 数据时序图
 
 ![](./picture/NIO.png)
+
