@@ -18,6 +18,15 @@ import java.util.concurrent.atomic.AtomicInteger;
  * NX 表示 key不存在时才设置key的值
  * XX 表示 key存在才设置 key value 值
  * PX 超时间单位是 ms
+ * <p>
+ * 解决问题 ：
+ * 1. 如何实现可重入
+ *    使用thread 来判断是否是来自同一个线程；
+ * 2. 一般锁都要加过期时间  如果锁过期了，但是应用程序没执行完怎么办
+ *    续锁：定时对这个锁重新设置过期时间 ；保证任务没执行完 锁不会被释放；
+ * 3. redis服务器宕机怎么办
+ *    使用多key 锁  让锁分布在多台服务器上   最大程度上保证即使某一个服务器宕机了 也能在别的服务器上拿到锁；  当然这可能会影响性能 ；
+ * 可以使用管道来批量写；
  */
 public class InterProcessRedisMutexLock implements InterProcessLock {
 
@@ -85,6 +94,9 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
 
             if (millisToWait != null) {
 
+                /**
+                 * A 线程获取锁的时间已经够长 超时了  B线程还未释放锁，此时 A解决获取锁
+                 */
                 long currSysTime = System.currentTimeMillis();
                 if (currSysTime - startMillis > millisToWait) {
                     return false;
@@ -97,6 +109,11 @@ public class InterProcessRedisMutexLock implements InterProcessLock {
         }
     }
 
+    /**
+     * @param jedisCommands
+     * @param key
+     * @return
+     */
     @Override
     public boolean unlock(JedisCommands jedisCommands, String key) {
 
