@@ -104,7 +104,10 @@ public class GrvyScriptEngineClient {
     public <T> T eval(String script, ScriptContext scripCtx) throws ExecutionException, ScriptException {
 
         GroovyCompiledScript compiledScript = grvyCompileScriptCache.get(script);
-        Object result = compiledScript.eval(scripCtx);
+        Object result;
+        synchronized (compiledScript) {
+            result = compiledScript.eval(scripCtx);
+        }
         return (T) result;
     }
 
