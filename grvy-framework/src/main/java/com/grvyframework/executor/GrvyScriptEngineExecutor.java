@@ -67,6 +67,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
     /**
      * 串行执行规则
+     *
      * @param request
      * @param response
      * @param reduce
@@ -74,7 +75,21 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
      * @throws InterruptedException
      * @throws ExecutionException
      */
-    public List<BaseScriptEvalResult> serialExecutor(GrvyRequest request , GrvyResponse response
+    public List<BaseScriptEvalResult> serialExecutor(GrvyRequest request, GrvyResponse response
+            , Reduce<BaseScriptEvalResult> reduce) throws ExecutionException, InterruptedException {
+
+        return serialExecutor(request, response, GrvyScriptEngineExeEnum.SCRIPT_COMPILER, reduce);
+    }
+    /**
+     * 串行执行规则
+     * @param request
+     * @param response
+     * @param reduce
+     * @return
+     * @throws InterruptedException
+     * @throws ExecutionException
+     */
+    public List<BaseScriptEvalResult> serialExecutor(GrvyRequest request, GrvyResponse response, GrvyScriptEngineExeEnum grvyScriptEngineExeEnum
             , Reduce<BaseScriptEvalResult> reduce) throws InterruptedException, ExecutionException {
 
         List<BaseScriptEvalResult> resultList = new ArrayList<>();
@@ -97,8 +112,8 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
 
             for (GrvyRuleConfigEntry ruleInfo : ruleList ){
                 GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
-                try{
-                    BaseScriptEvalResult result = this.executor(param);
+                try {
+                    BaseScriptEvalResult result = this.executor(param, grvyScriptEngineExeEnum);
 
                     if (result != null && finalReduce.execute(result)){
                         break;
