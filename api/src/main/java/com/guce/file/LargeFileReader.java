@@ -84,8 +84,9 @@ public class LargeFileReader {
                 } else {
                     logger.info("The file '" + file.getName() + "' was locked successfully!");
                     logger.info("Reading the file's content ...");
-
+                    //todo  before read file
                     readLargeTextFile(channel);
+                    //todo after read file
                 }
             } catch (OverlappingFileLockException oflEx) {
                 final String MSG = "File is already locked in this thread or virtual machine";
@@ -199,6 +200,7 @@ public class LargeFileReader {
                 //logger.info(line);
                 System.out.println(line);
             }
+            //TODO  deal lines of textual content;  dealFileContent ;
             //TODO: Obtain the lines of textual content for each block of data and process it further according to your needs.
             // Feel free to adapt this - One approach is to process these blocks of lines in parallel instead of sequential processing
         }

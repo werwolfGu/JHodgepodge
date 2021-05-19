@@ -113,3 +113,6 @@ MyISAM 表的读操作与写操作之间，以及写操作之间是串行的。�
 https://www.cnblogs.com/songwenjie/p/9415016.html
 
 https://dev.mysql.com/doc/refman/5.7/en/explain-output.html
+
+http://mysql.taobao.org/monthly/2018/11/04/
+https://juejin.cn/post/6844903808376504327

@@ -1,6 +1,7 @@
 package com.guce;
 
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @Author chengen.gce
@@ -16,7 +17,7 @@ public class CompletableExceptions {
                         .thenApply(Breakable::work)
                         .thenApply(Breakable::work);
     }
-    public static void main(String[] args) {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         // Exceptions don't appear ...
         test("A", 1);
         test("B", 2);
@@ -44,5 +45,27 @@ public class CompletableExceptions {
         } catch(Exception e) {
             System.out.println(e.getMessage());
         }
+
+        CompletableFuture<String> future = CompletableFuture.supplyAsync( () -> {
+            try {
+                Thread.sleep(10L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "future";
+        });
+        future = future.applyToEither( CompletableFuture.supplyAsync( () -> {
+            try {
+                Thread.sleep(50L);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return "other";
+        }), (x) -> {
+            return x;
+        });
+
+        System.out.println(future.get());
+
     }
 }
