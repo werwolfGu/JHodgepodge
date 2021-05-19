@@ -13,6 +13,8 @@ package com.guce;
  * 示例 2：
  * 输入: "cbbd"
  * 输出: "bb"
+ *
+ * https://leetcode-cn.com/problems/longest-palindromic-substring/
  */
 public class LongestPalindrome {
 
@@ -71,14 +73,14 @@ public class LongestPalindrome {
         }
         boolean dp[][] = new boolean[size][size];
         int maxLen = 1, start = 0;
-        for (int i = 0; i < size; i++) {
-            dp[i][i] = true;
-            for (int j = 0; j < i; j++) {
-                if (s.charAt(i) == s.charAt(j) && (i - j == 1 || dp[j + 1][i - 1])) {
-                    dp[i][j] = true;
-                    if (i - j + 1 > maxLen) {
-                        maxLen = i - j + 1;
-                        start = j;
+        for (int r = 0; r < size; r++) {
+            dp[r][r] = true;
+            for (int l = 0; l < r; l++) {
+                if (s.charAt(r) == s.charAt(l) && (r - l <= 2 || dp[l + 1][r - 1])) {
+                    dp[l][r] = true;
+                    if (r - l + 1 > maxLen) {
+                        maxLen = r - l + 1;
+                        start = l;
                     }
                 }
             }
@@ -89,6 +91,7 @@ public class LongestPalindrome {
 
     public static void main(String[] args) {
         System.out.println(solution("dhabdddddd"));
+        System.out.println(dpSolution("dhabdddddd"));
         char i = '1';
         char a = 'a';
         if (i > 48 && i < 57) {

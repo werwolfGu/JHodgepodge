@@ -34,6 +34,31 @@ public class TwoSum {
         return result;
     }
 
+    /**
+     * 如果numbers是有序数组
+     *
+     * @param numbers
+     * @param target
+     * @return
+     */
+    public int[] solution2(int[] numbers, int target) {
+
+        int l = 0, r = numbers.length - 1;
+        while (l < r) {
+            int sum = numbers[l] + numbers[r];
+            if (sum == target) {
+                return new int[]{l + 1, r + 1};
+            }
+
+            if (sum < target) {
+                l++;
+            } else {
+                r--;
+            }
+        }
+        return new int[]{-1, -1};
+    }
+
     public static void main(String[] args) {
         TwoSum sum = new TwoSum();
         int[] nums = new int[]{2, 7, 11, 15};

@@ -4,6 +4,7 @@ package com.guce;
  * @Author chengen.gce
  * @DATE 2020/3/22 8:36 上午
  * https://leetcode-cn.com/problems/zui-xiao-de-kge-shu-lcof/
+ * 最小的k个数
  */
 public class LeastNumbers {
 
@@ -35,6 +36,7 @@ public class LeastNumbers {
         arr[left] = arr[left] - arr[right];
     }
 
+    ////堆调整
     public static void heapAdjust(int arr[], int length, int idx) {
         int tmp = arr[idx];
         for (int i = 2 * idx + 1; i < length; i = 2 * i + 1) {

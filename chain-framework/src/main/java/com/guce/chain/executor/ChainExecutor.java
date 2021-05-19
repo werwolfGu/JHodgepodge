@@ -11,11 +11,13 @@ import com.guce.exception.ChainRollbackException;
 import org.apache.commons.collections.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Stack;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
@@ -27,15 +29,31 @@ import java.util.concurrent.TimeoutException;
  * @DATE 2020/2/13 2:07 下午
  */
 @Component
-public class ChainExecutor {
+public class ChainExecutor implements InitializingBean {
 
     private static Logger logger = LoggerFactory.getLogger(ChainExecutor.class);
 
+    @Autowired
     private ChainServiceManager chainServiceManager;
 
-    @Autowired
-    public ChainExecutor(ChainServiceManager manager){
-        this.chainServiceManager = manager;
+    private static volatile ChainExecutor chainExecutor;
+
+    private static Object lock = new Object();
+
+
+    public static ChainExecutor getInstance() {
+
+        if (chainExecutor == null) {
+            synchronized (lock) {
+                if (chainExecutor == null) {
+                    chainExecutor = new ChainExecutor();
+                }
+            }
+        }
+        return chainExecutor;
+    }
+
+    public ChainExecutor() {
     }
 
     public void execute(String chainResourceName , ChainRequest request , ChainResponse response){
@@ -134,7 +152,13 @@ public class ChainExecutor {
         IChainService chainService = service.getChainService();
         try{
 
-            chainService.handle(request,response);
+            boolean flag = chainService.handle(request, response);
+
+            String subResourceName = service.getSuccessSubResourceName();
+
+            if (!Objects.isNull(subResourceName)) {
+                ChainExecutor.getInstance().execute(subResourceName, request, response);
+            }
         }catch (Throwable th){
 
             if (th instanceof ChainRollbackException ){
@@ -144,10 +168,11 @@ public class ChainExecutor {
 
                 ChainException ex = (ChainException) th;
                 if (ChainExceptionEnum.EXCEPTION_FLOW_NODE_EXECUTE.getCode().equals(ex.getCode())){
-                    IChainService otherChainService = service.getOtherChainService();
-                    if (otherChainService != null){
-                        otherChainService.handle(request,response);
-                        return ;
+
+                    String exSubResurceName = service.getExceptionSubResourceName();
+
+                    if (!Objects.isNull(exSubResurceName)) {
+                        ChainExecutor.getInstance().execute(exSubResurceName, request, response);
                     }
                 }
             }
@@ -158,5 +183,11 @@ public class ChainExecutor {
             chainService.doComplated(request,response);
         }
 
+    }
+
+    @Override
+    public void afterPropertiesSet() {
+
+        chainExecutor = this;
     }
 }

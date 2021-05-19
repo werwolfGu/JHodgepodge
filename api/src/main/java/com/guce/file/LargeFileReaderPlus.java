@@ -31,7 +31,7 @@ public class LargeFileReaderPlus {
      * <p>
      * Buffers are therefore initialised with an initial capacity, that's typically a memory-page size.
      */
-    public static final int BLOCK_SIZE = 4096;
+    public static final int BLOCK_SIZE = 8192;
 
     public final static String NEW_LINE = System.getProperty("line.separator");
 
@@ -192,7 +192,7 @@ public class LargeFileReaderPlus {
 
             }
 
-            //logger.info("\n***** BLOCK CONTENT *****\n"+blockContent);
+            logger.info("***** BLOCK CONTENT *****" + blockContent);
 
             List<String> lines = tokenise(blockContent);
 

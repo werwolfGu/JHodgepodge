@@ -31,7 +31,7 @@ public class LargeFileReader {
      * <p>
      * Buffers are therefore initialised with an initial capacity, that's typically a memory-page size.
      */
-    public static final int BLOCK_SIZE = 8192;
+    public static final int BLOCK_SIZE = 1024;
 
     public final static String NEW_LINE = System.getProperty("line.separator");
 
@@ -156,17 +156,6 @@ public class LargeFileReader {
                 finalBlockContent = true;
             }
 
-
-            /**
-             * Produce a MappedByteBuffer from the channel, which is a particular kind of direct buffer.
-             * Specify the starting point and the length of the region that you want to map in the file;
-             * this means that you have the option to map smaller regions of a large file.
-             *
-             *  The file created is 1 MB long. It appears to be accessible all at once because only
-             *  portions of it are brought into memory, and other parts are swapped out. This way, a
-             *  large file (up to 2 GB) can easily be modified. Note that the file-mapping facilities
-             *  of the underlying operating system are used to maximise performance.
-             */
             MappedByteBuffer mappedByteBuffer = fileChannel.map(FileChannel.MapMode.READ_WRITE, position, size);
 
             /*
@@ -207,7 +196,8 @@ public class LargeFileReader {
             // Printing the content of each line to proove this works!
             logger.info("********** Content of 8 kb block printed one line at a time. **********");
             for (String line : lines) {
-                logger.info(line);
+                //logger.info(line);
+                System.out.println(line);
             }
             //TODO: Obtain the lines of textual content for each block of data and process it further according to your needs.
             // Feel free to adapt this - One approach is to process these blocks of lines in parallel instead of sequential processing
@@ -271,6 +261,12 @@ public class LargeFileReader {
         } else {
             return Arrays.asList(strArray);
         }
+    }
+
+    public static void main(String[] args) {
+        LargeFileReader reader = new LargeFileReader();
+        File file = new File("/Users/chengen.gu/Documents/介绍.txt");
+        reader.lockRead(file);
     }
 
 }

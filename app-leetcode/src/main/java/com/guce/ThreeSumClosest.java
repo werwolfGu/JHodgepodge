@@ -1,8 +1,6 @@
 package com.guce;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Vector;
+import java.util.Arrays;
 
 /**
  * Created by chengen.gu on 2018/9/27.
@@ -13,34 +11,51 @@ public class ThreeSumClosest {
 
     public static int solution(int[] nums, int target) {
 
-        int minClosest = Integer.MAX_VALUE;
+        Arrays.sort(nums);
+        int minClosest = 1000000;
+        for (int i = 0; i < nums.length; i++) {
 
-        for (int i = 0; i < nums.length - 1; i++) {
+            if (i > 0 && nums[i] == nums[i - 1]) {
+                continue;
+            }
+            int j = i + 1, k = nums.length - 1;
+            while (j < k) {
 
-            int target1 = target - nums[i];
-            for (int j = i + 1; j < nums.length; j++) {
+
+                int sum = nums[i] + nums[j] + nums[k];
+
+                if (sum == target) {
+                    return sum;
+                }
+                if (Math.abs(sum - target) < Math.abs(minClosest - target)) {
+                    minClosest = sum;
+                }
+
+                if (sum > target) {
+                    k--;
+                    while (j < k && nums[k] == nums[k + 1]) {
+                        k--;
+                    }
+                    continue;
+                }
+
+                if (sum < target) {
+                    j++;
+                    while (j < k && nums[j] == nums[j - 1]) {
+                        j++;
+                    }
+
+                }
+
 
             }
         }
-        return 1;
+        return minClosest;
     }
 
     public static void main(String[] args) {
-        List<Integer> list = new ArrayList<>();
-        List<Integer> list1 = new ArrayList<>();
+        int[] nums = new int[]{-3, -2, -5, 3, -4};
 
-        list.add(1);
-        list.add(2);
-        list1.add(2);
-        list1.add(1);
-        System.out.println(list.equals(list1));
-
-        Vector<Integer> vector = new Vector<>();
-        Vector<Integer> vector1 = new Vector<>();
-        vector.add(1);
-        vector.add(2);
-        vector1.add(1);
-        vector1.add(2);
-        System.out.println(vector == vector1);
+        System.out.println(solution(nums, -1));
     }
 }

@@ -6,8 +6,9 @@ import com.google.common.cache.CacheLoader;
 import com.google.common.cache.LoadingCache;
 import com.google.common.cache.RemovalListener;
 import com.google.common.cache.RemovalNotification;
+import com.google.common.hash.HashFunction;
+import com.google.common.hash.Hashing;
 
-import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -38,10 +39,12 @@ public class GauvaDemo {
         return loadingCache.get(key);
     }
     public static void main(String[] args) {
+
+        HashFunction hashFunction = Hashing.sipHash24();
         Splitter.on(",").split("a,b,c,d").forEach(s -> System.out.println(s));
 
         GauvaDemo simpleExample = new GauvaDemo();
-        try {
+        /*try {
             for(int i = 0 ; i < 10 ; i++){
                 int idx = i;
                 if (i == 3){
@@ -68,6 +71,9 @@ public class GauvaDemo {
 
         } catch (IOException e) {
             e.printStackTrace();
-        }
+        }*/
+
+        System.out.println(0x3F);
+        System.out.println();
     }
 }

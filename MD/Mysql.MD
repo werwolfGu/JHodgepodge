@@ -1,6 +1,14 @@
 #MySQL
 
-## MySQL 事务 
+## 目录
+
+- [MySQL事务](#MySQL事务)
+
+- [MySQL间隙锁](#间隙锁)
+
+- [执行计划explain](#MySQL执行计划)
+
+## MySQL事务 
 MySQL默认的事务隔离级别为：`可重复读`
 - 未提交读   `脏读`  
     - A事务开始查询数据
@@ -94,3 +102,14 @@ MyISAM 表的读操作与写操作之间，以及写操作之间是串行的。�
 
 
 总结：表锁，读锁会阻塞写，不会阻塞读。而写锁则会把读写都阻塞。
+
+## MySQL执行计划
+
+参考:cnblogs.com/songwenjie/p/9409852.html
+
+
+
+参考：
+https://www.cnblogs.com/songwenjie/p/9415016.html
+
+https://dev.mysql.com/doc/refman/5.7/en/explain-output.html

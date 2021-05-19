@@ -20,6 +20,9 @@ import java.util.jar.JarFile;
 /**
  * @Author chengen.gce
  * @DATE 2020/3/11 10:59 下午
+ *
+ *
+ * 可以参考  ClassPathBeanDefinitionScanner
  */
 @Slf4j
 public class ClassSearchUtils {
@@ -161,6 +164,7 @@ public class ClassSearchUtils {
         List<Class<?>> classes = searchKlassList(basePackage);
         //判断子类是否继承自 父类或接口  clazz.isAssignableFrom(子类名称)
         System.out.println(classes);
+
 
     }
 }

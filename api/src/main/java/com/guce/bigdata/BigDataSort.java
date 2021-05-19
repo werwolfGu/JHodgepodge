@@ -1,3 +1,4 @@
+/*
 package com.guce.bigdata;
 
 import sun.misc.Unsafe;
@@ -5,10 +6,12 @@ import sun.misc.Unsafe;
 import java.lang.reflect.Field;
 import java.util.concurrent.atomic.AtomicInteger;
 
+*/
 /**
  * @Author chengen.gce
  * @DATE 2020/4/11 11:25 上午
- */
+ *//*
+
 public class BigDataSort implements IBigData {
 
     private final static int DEFAULT_SEGMENT_ARR_LEN = 10000;
@@ -173,3 +176,4 @@ public class BigDataSort implements IBigData {
 
     }
 }
+*/

@@ -6,7 +6,11 @@ import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.ParameterMapping;
 import org.apache.ibatis.mapping.SqlCommandType;
-import org.apache.ibatis.plugin.*;
+import org.apache.ibatis.plugin.Interceptor;
+import org.apache.ibatis.plugin.Intercepts;
+import org.apache.ibatis.plugin.Invocation;
+import org.apache.ibatis.plugin.Plugin;
+import org.apache.ibatis.plugin.Signature;
 import org.apache.ibatis.reflection.MetaObject;
 import org.apache.ibatis.session.Configuration;
 import org.apache.ibatis.session.ResultHandler;
@@ -15,12 +19,17 @@ import org.apache.ibatis.type.TypeHandlerRegistry;
 import org.mybatis.spring.transaction.SpringManagedTransaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.jdbc.datasource.lookup.AbstractRoutingDataSource;
 import org.springframework.util.ReflectionUtils;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.DateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 
@@ -53,7 +62,7 @@ public class CatMybatisPlugin implements Interceptor {
         String[] strArr = mappedStatement.getId().split("\\.");
         String methodName = strArr[strArr.length - 2] + "." + strArr[strArr.length - 1];
 
-        Transaction t = Cat.newTransaction("SQL", methodName);
+        //Transaction t = Cat.newTransaction("SQL", methodName);
 
 
         //得到sql语句
@@ -68,23 +77,23 @@ public class CatMybatisPlugin implements Interceptor {
         //获取SQL类型
         SqlCommandType sqlCommandType = mappedStatement.getSqlCommandType();
 
-        Cat.logEvent("SQL.Method", sqlCommandType.name().toLowerCase(), Message.SUCCESS, sql);
+       // Cat.logEvent("SQL.Method", sqlCommandType.name().toLowerCase(), Message.SUCCESS, sql);
         logger.info("intercept sql:{}",sql);
         String s = this.getSQLDatabase();
-        Cat.logEvent("SQL.Database", s);
+        //Cat.logEvent("SQL.Database", s);
 
-        Transaction tSqlConnection = Cat.newTransaction("SQL.Connection", s);
+       // Transaction tSqlConnection = Cat.newTransaction("SQL.Connection", s);
 
         Object returnObj = null;
         try {
             returnObj = invocation.proceed();
-            t.setStatus(Transaction.SUCCESS);
-            tSqlConnection.setStatus(Transaction.SUCCESS);
+           // t.setStatus(Transaction.SUCCESS);
+            //tSqlConnection.setStatus(Transaction.SUCCESS);
         } catch (Exception e) {
-            Cat.logError(e);
+            //Cat.logError(e);
         } finally {
-            t.complete();
-            tSqlConnection.complete();
+            //t.complete();
+            //tSqlConnection.complete();
         }
 
         return returnObj;
@@ -149,7 +158,7 @@ public class CatMybatisPlugin implements Interceptor {
     }
 
     private String getSQLDatabase() {
-        DruidDataSource dataSource = (DruidDataSource) SpringContextBean.getBean("pointDataSource");
+        DruidDataSource dataSource = null; // (DruidDataSource) SpringContextBean.getBean("pointDataSource");
         String dbName = dataSource.getUrl(); //根据设置的多数据源修改此处,获取dbname
         if (dbName == null) {
             dbName = "DEFAULT";

@@ -11,7 +11,7 @@ public enum ChainExceptionEnum {
     /**
      * 流程异常时，执行异常流程节点错误码
      */
-    EXCEPTION_FLOW_NODE_EXECUTE("EX_FLOW_NODE_EXECUTE","流程异常时，执行异常流程节点");
+    EXCEPTION_FLOW_NODE_EXECUTE("EX_FLOW_EXECUTE", "流程异常时，执行异常子流程[exceptionSubResourceName]");
 
     @Getter
     private String code;

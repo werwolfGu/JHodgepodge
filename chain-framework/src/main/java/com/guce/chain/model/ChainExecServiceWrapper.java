@@ -18,15 +18,27 @@ public class ChainExecServiceWrapper {
     @Setter
     private IChainService chainService;
 
-    @Setter
-    @Getter
-    private IChainService otherChainService;
     /**
      * 执行chainResourceName
      */
     @Getter
     @Setter
     private String chainResourceName ;
+
+    /**
+     * 流程节点执行成功后，先执行子流程节点，再执行其他流程节点
+     */
+    @Getter
+    @Setter
+    private String successSubResourceName;
+
+    /**
+     * 流程节点执行异常后，先执行子流程节点，再执行后续流程节点，当然 当前节点不做结束流程和异常回滚
+     */
+    @Getter
+    @Setter
+    private String exceptionSubResourceName;
+
 
     /**
      * 执行顺序
@@ -53,10 +65,6 @@ public class ChainExecServiceWrapper {
     @Getter
     private String servicePath;
 
-    @Getter
-    @Setter
-    private String otherServicePath;
-
     @Setter
     @Getter
     private boolean isNeedNode = true;
@@ -67,6 +75,8 @@ public class ChainExecServiceWrapper {
         this.isAsync = anno.isAsync();
         this.asyncTimeout = anno.asyncTimeout();
         this.isNeedNode = anno.isNeedNode();
+        this.successSubResourceName = anno.successSubResourceName();
+        this.exceptionSubResourceName = anno.exceptionSubResourceName();
     }
 
     @Override
@@ -78,7 +88,6 @@ public class ChainExecServiceWrapper {
                 + ", \"isAsync\":" + isAsync
                 + ", \"asyncTimeout\":" + asyncTimeout
                 + ", \"servicePath\":" + servicePath
-                + ", \"otherService\":" + otherServicePath
                 + ", \"isNeedNode\":" + isNeedNode + "}";
     }
 }

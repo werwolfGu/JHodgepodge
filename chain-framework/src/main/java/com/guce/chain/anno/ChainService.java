@@ -20,16 +20,24 @@ public @interface ChainService {
     String value()  default "";
 
     /**
+     * 成功执行子流程
+     *
+     * @return
+     */
+    String successSubResourceName() default "";
+
+    /**
+     * 异常子流程
+     *
+     * @return
+     */
+    String exceptionSubResourceName() default "";
+
+    /**
      * service 执行顺序   order 越小  执行优先级越高
      * @return
      */
     int order() default 0;
-
-    /**
-     * 异常流程服务节点；在流程节点出现异常后，需要执行的流程节点
-     * @return
-     */
-    String exceptionFlowServiceNode() default "";
 
     /**
      * 是否异步执行

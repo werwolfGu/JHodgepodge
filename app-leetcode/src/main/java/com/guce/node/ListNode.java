@@ -12,10 +12,10 @@ public class ListNode<V> {
 
     @Getter
     @Setter
-    V val;
+    public V val;
     @Setter
     @Getter
-    ListNode next;
+    public ListNode next;
     public ListNode(V val){
         this.val = val;
     }

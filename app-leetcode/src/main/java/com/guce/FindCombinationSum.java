@@ -1,7 +1,9 @@
 package com.guce;
 
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Deque;
 import java.util.List;
 import java.util.Stack;
 
@@ -10,6 +12,13 @@ import java.util.Stack;
  * @DATE 2019/11/17 6:36 下午
  *
  *https://leetcode-cn.com/problems/combination-sum/C
+ * 组合总和
+ * 输入: candidates = [2,3,6,7], target = 7,
+ * 所求解集为:
+ * [
+ *   [7],
+ *   [2,2,3]
+ * ]
  */
 public class FindCombinationSum {
 
@@ -27,6 +36,9 @@ public class FindCombinationSum {
         // residue - candidates[i] 表示下一轮的剩余，如果下一轮的剩余都小于 0 ，就没有必要进行后面的循环了
         // 这一点基于原始数组是排序数组的前提，因为如果计算后面的剩余，只会越来越小
         for (int i = start; i < len && residue - candidates[i] >= 0; i++) {
+            if (residue < candidates[i]) {
+                continue;
+            }
             pre.add(candidates[i]);
             // 【关键】因为元素可以重复使用，这里递归传递下去的是 i 而不是 i + 1
             findCombinationSum(residue - candidates[i], i, pre);
@@ -53,6 +65,14 @@ public class FindCombinationSum {
         FindCombinationSum solution = new FindCombinationSum();
         List<List<Integer>> combinationSum = solution.combinationSum(candidates, target);
         System.out.println(combinationSum);
+
+        Deque<Integer> queue = new ArrayDeque<>();
+        queue.add(1);
+        queue.add(2);
+        queue.add(3);
+        queue.add(4);
+        queue.removeLast();
+        System.out.println(queue);
     }
 
 }

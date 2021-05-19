@@ -154,17 +154,6 @@ public class ChainServiceManager {
                 serviceWrapper.setChainService(service);
                 serviceWrapper.annoParamWrapper(annoService);
 
-                String otherServicePath = annoService.exceptionFlowServiceNode();
-                if (!StringUtils.isEmpty(otherServicePath)){
-                    try {
-                        IChainService chainService = loaderChainService(otherServicePath);
-                        serviceWrapper.setOtherChainService(chainService);
-                    } catch (ClassNotFoundException e) {
-                        logger.error("无法获取到节点异常处理节点数据：{}",otherServicePath,e);
-                    }
-                }
-
-
                 flowResultList.add(serviceWrapper);
             });
         }
@@ -241,17 +230,13 @@ public class ChainServiceManager {
                             AtomicBoolean addToExecutorFLow = new AtomicBoolean(true);
 
                             serviceWrapperList.forEach( chainExecServiceWrapper -> {
+
                                 chainExecServiceWrapper.setChainResourceName(key);
                                 String servicePath = chainExecServiceWrapper.getServicePath();
                                 if (!StringUtils.isEmpty(servicePath)){
                                     try {
                                         IChainService chainService = loaderChainService(servicePath);
                                         chainExecServiceWrapper.setChainService(chainService);
-                                        String otherServicePath = chainExecServiceWrapper.getOtherServicePath();
-                                        if (!StringUtils.isEmpty(otherServicePath)){
-                                            chainService = loaderChainService(servicePath);
-                                            chainExecServiceWrapper.setOtherChainService(chainService);
-                                        }
                                     } catch (ClassNotFoundException e) {
 
                                         StringBuilder logSb = new StringBuilder();

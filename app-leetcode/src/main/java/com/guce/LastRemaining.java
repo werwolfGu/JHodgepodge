@@ -4,6 +4,7 @@ package com.guce;
  * @Author chengen.gce
  * @DATE 2020/3/30 11:20 下午
  * https://leetcode-cn.com/problems/yuan-quan-zhong-zui-hou-sheng-xia-de-shu-zi-lcof/
+ * 圆圈中最后剩下的数字
  * <p>
  * 0,1,,n-1这n个数字排成一个圆圈，从数字0开始，每次从这个圆圈里删除第m个数字。求出这个圆圈里剩下的最后一个数字。
  * <p>

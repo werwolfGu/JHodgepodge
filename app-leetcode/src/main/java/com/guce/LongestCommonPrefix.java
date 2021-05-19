@@ -11,7 +11,7 @@ public class LongestCommonPrefix {
     public static String solution(String[] strs){
 
         //找到最短的str
-        int l = 0 ,minLen = strs[0].length();
+        int minLen = strs[0].length();
 
         for (int i = 1 ; i < strs.length ; i++ ){
             minLen = Math.min(minLen,strs[i].length());
@@ -19,11 +19,11 @@ public class LongestCommonPrefix {
 
         //二分查找法
 
-        int low = l , high = minLen;
-        while (low < high){
+        int low = 1, high = minLen;
+        while (low <= high) {
             int mid = (low + high) / 2;
-            if (patch(strs,low,mid)){
-                low = mid ;
+            if (patch(strs, mid)) {
+                low = mid + 1;
             }else {
                 high = mid - 1;
             }
@@ -31,25 +31,40 @@ public class LongestCommonPrefix {
         if ( high == 0 ){
             return "";
         }
-        return strs[0].substring(0,high);
+        return strs[0].substring(0, (low + high) / 2);
 
     }
 
-    public static boolean patch(String[] strs ,int low,int hight){
+    public static boolean patch(String[] strs, int len) {
 
-        String str = strs[0].substring(low,hight);
-        for ( int i = 0 ; i < strs.length ; i++ ){
-            String subString = strs[i].substring(low,hight);
-            if ( !str.equals(subString)){
+        String str = strs[0].substring(0, len);
+        for (int i = 1; i < strs.length; i++) {
+            if (!strs[i].startsWith(str)) {
                 return false;
             }
         }
         return true;
     }
 
+
+    public static String solution2(String[] strs) {
+        if (strs.length == 0) return "";
+        String prefix = strs[0];
+        for (int i = 1; i < strs.length; i++)
+            while (strs[i].indexOf(prefix) != 0) {
+                prefix = prefix.substring(0, prefix.length() - 1);
+                if (prefix.isEmpty()) return "";
+            }
+        return prefix;
+    }
     public static void main(String[] args) {
 
         System.out.println(LongestCommonPrefix.solution(new String[]{"dog","racecar","car"}));
+
+        System.out.println(LongestCommonPrefix.solution2(new String[]{"flower", "flow", "flight"}));
+
+
+        System.out.println("123445".indexOf("6"));
     }
 
 }

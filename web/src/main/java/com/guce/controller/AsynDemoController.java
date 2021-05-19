@@ -38,6 +38,7 @@ public class AsynDemoController {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+        logger.info("hellov1ddddddddd========");
         deferredResult.setResult("hello world ->" + System.currentTimeMillis());
 
         return deferredResult;

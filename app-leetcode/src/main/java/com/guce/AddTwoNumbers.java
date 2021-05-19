@@ -24,7 +24,7 @@ public class AddTwoNumbers {
             int val2 = l2 != null ? l2.val : 0;
             int val = val1 + val2 + multi;
             multi = 0;
-            if (val > 0){
+            if (val >= 10) {
                 multi = 1;
                 val = val % 10;
             }

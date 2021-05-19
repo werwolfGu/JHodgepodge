@@ -1,5 +1,8 @@
 package com.guce;
 
+import java.util.ArrayDeque;
+import java.util.Deque;
+
 /**
  * @Author chengen.gu
  * @DATE 2019/10/26 3:49 下午
@@ -7,21 +10,6 @@ package com.guce;
  */
 public class RemoveDuplicates {
 
-    public int soution(int nums[]) {
-        if (nums == null || nums.length < 2) {
-            return 1;
-        }
-        int idx = 0;
-        for (int i = 1; i < nums.length; i++) {
-            if (nums[i] != nums[idx]) {
-                if (i - idx > 1) {
-                    nums[idx + 1] = nums[i];
-                }
-                idx++;
-            }
-        }
-        return idx + 1;
-    }
 
     public int removeDuplicate(int[] nums) {
         if (nums == null || nums.length == 0) {
@@ -48,28 +36,54 @@ public class RemoveDuplicates {
         if (nums.length < 3) {
             return nums.length;
         }
-        int len = 0;
-        int idx = 0;
-        for (int i = 0; i < nums.length; i++) {
-            if (nums[idx] != nums[i]) {
-                if (i - idx > 1) {
-                    nums[idx + 2] = nums[i];
-                }
+        int idx = 2;
+        for (int i = 2; i < nums.length; i++) {
+            if (nums[idx - 2] != nums[i]) {
+                nums[idx] = nums[i];
                 idx++;
             }
         }
-        return idx + 2;
+        return idx;
+    }
+
+
+    public String removeDuplicates(String s, int k) {
+
+        StringBuilder sb = new StringBuilder();
+        Deque<Integer> stack = new ArrayDeque();
+        int top = -1;
+        for (int i = 0; i < s.length(); i++) {
+            if (sb.length() > 0) {
+                if (sb.charAt(top) != s.charAt(i)) {
+                    top++;
+                    stack.addLast(1);
+                    sb.append(s.charAt(i));
+                } else {
+                    int count = stack.pollLast() + 1;
+                    top++;
+                    stack.addLast(count);
+                    sb.append(s.charAt(i));
+                    if (count == k) {
+                        stack.pollLast();
+                        sb.delete(top - count + 1, top + 1);
+                        top = top - count;
+
+                    }
+                }
+            } else {
+                top++;
+                stack.addLast(1);
+                sb.append(s.charAt(i));
+            }
+
+        }
+        return sb.toString();
     }
 
 
     public static void main(String[] args) {
         RemoveDuplicates duplicates = new RemoveDuplicates();
         int[] nums = {0, 0, 1, 1, 1, 2, 2, 3, 3, 4, 5};
-        int x = duplicates.soution(nums);
-        System.out.println(x);
-        for (int i = 0; i < nums.length; i++) {
-            System.out.print(nums[i] + " ");
-        }
         System.out.println("");
         nums = new int[]{1, 1, 1, 2, 2, 3};
         System.out.println(removeDuplicates2(nums));
@@ -82,6 +96,9 @@ public class RemoveDuplicates {
         for (int i = 0; i < nums.length; i++) {
             System.out.print(nums[i] + " ");
         }
+
+
+        System.out.println(duplicates.removeDuplicates("deeedbbcccbdaa", 3));
 
     }
 }

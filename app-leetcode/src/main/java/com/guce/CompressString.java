@@ -4,6 +4,7 @@ package com.guce;
  * @Author chengen.gce
  * @DATE 2020/3/16 8:21 下午
  * https://leetcode-cn.com/problems/compress-string-lcci/
+ * 字符串压缩
  */
 public class CompressString {
 

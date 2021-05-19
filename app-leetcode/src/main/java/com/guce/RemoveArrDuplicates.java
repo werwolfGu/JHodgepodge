@@ -7,6 +7,7 @@ import java.util.Arrays;
  * @DATE 2020/2/16 8:39 下午
  *
  * https://leetcode-cn.com/problems/remove-duplicates-from-sorted-array/submissions/
+ * 删除排序数组中的重复项
  */
 public class RemoveArrDuplicates {
 
