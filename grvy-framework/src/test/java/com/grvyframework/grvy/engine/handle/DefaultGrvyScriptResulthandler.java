@@ -25,12 +25,13 @@ public class DefaultGrvyScriptResulthandler implements IGrvyScriptResultHandler 
 
         if ( flag ){
 
-            throw new IllegalArgumentException("BaseScriptEvalResultCalculateParam 不能为空!");
+            //throw new IllegalArgumentException("BaseScriptEvalResultCalculateParam 不能为空!");
         }
         BaseScriptEvalResult evalResult = new BaseScriptEvalResult();
         if (flag && calculateParam != null){
 
             evalResult.setAmt(calculateParam.getAmt());
+            evalResult.setAmt(1L);
         }
         return evalResult;
     }

@@ -272,12 +272,16 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
             if (GrvyScriptEngineExeEnum.SCRIPT_COMPILER == executorEnum){
                 scriptResult = grvyScriptEngineClient.eval(script,context);
             }else {
-                scriptResult = grvyScriptEngine.eval(script);
+                scriptResult = grvyScriptEngine.eval(script, context);
 
             }
 
             evalResult = grvyScriptResultHandler.dealResult(scriptResult, ruleExecParam.getCalculateParam());
 
+            if (Objects.isNull(evalResult)) {
+                grvyScriptResultHandler.dealResult(scriptResult, ruleExecParam.getCalculateParam()
+                        , context.getBindings(ScriptContext.ENGINE_SCOPE));
+            }
 
             if (logger.isInfoEnabled()) {
 

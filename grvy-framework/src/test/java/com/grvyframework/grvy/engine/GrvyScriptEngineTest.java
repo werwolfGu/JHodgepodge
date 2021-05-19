@@ -58,18 +58,25 @@ public class GrvyScriptEngineTest {
         grvyScriptEngine.bindingEngineScopeMapper("name","name is grvy");
         //GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("卡集合",card);
 
+
         String script = "    def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
                         "    def channels = [\"NET\",\"NCUP\"]\n" +
-                        "    def str = com.grvyframework.grvy.GrvyInvokeInterface.test(name)\n" +
-                        "    println( \"str:->\" + str)\n" +
+                //"    def str = com.grvyframework.grvy.GrvyInvokeInterface.test(name)\n" +
+                //"    println( \"str:->\" + str)\n" +
                         "    if (list.contains(交易码) && channels.contains(渠道)){\n" +
                         "        return 2\n" +
                         "    } ";
-        Object obj = grvyScriptEngine.eval(script);
-        System.out.println(obj);
-        System.out.println(Objects.isNull(obj));   ///  true
-       // assert "2".equals(obj);
+        for (int i = 0; i < 10; i++) {
+            long time = System.currentTimeMillis();
+            Object obj = grvyScriptEngine.eval(script);
+            System.out.println(obj);
+            System.out.println(Objects.isNull(obj));   ///  true
+            System.out.println("cost time: " + (System.currentTimeMillis() - time));
+        }
+
+        // assert "2".equals(obj);
     }
+
 
     @Test
     public void testGrvyScriptEngineExecutor() throws Exception {
@@ -79,14 +86,15 @@ public class GrvyScriptEngineTest {
              cardList.add(String.valueOf(i));
          }
          List<CompletableFuture> list = new ArrayList<>();
-         for (int i = 0 ; i < 1000 ; i++ ){
+        for (int i = 0; i < 10; i++) {
 
              CompletableFuture future = CompletableFuture.runAsync( () -> {
                  GrvyRequest request = new GrvyRequest();
                  GrvyResponse response = new GrvyResponse();
-                 String script = " if (卡集合.contains(卡) ) return 卡 ";
+                 String script = "def reg1 = ~'he*llo' \n" +
+                         "def name = \"hello\" \n" +
+                         "if (reg1.matcher(name) ) return true ";
                  List<GrvyRuleConfigEntry> grvyRuleInfoList = new ArrayList<>();
-
 
 
                  Bindings bindings = new SimpleBindings();

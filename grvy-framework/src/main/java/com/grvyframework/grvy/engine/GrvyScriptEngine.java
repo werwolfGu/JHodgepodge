@@ -45,6 +45,11 @@ public class GrvyScriptEngine {
         return (T) scriptEngineHolder.get().eval(script);
     }
 
+    public <T> T eval(String script, ScriptContext context) throws ScriptException {
+
+        return (T) scriptEngineHolder.get().eval(script, context);
+    }
+
     /**
      * 写入全局 scope Binding
      * @param key
