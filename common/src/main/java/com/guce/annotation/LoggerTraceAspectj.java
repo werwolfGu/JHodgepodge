@@ -22,11 +22,13 @@ public class LoggerTraceAspectj {
 
     private IdMaker64 idMaker64 = new IdMaker64();
     private final String THREADNO = "T";
+
     /**
      * Point cut.
      */
     @Pointcut("@annotation(com.guce.annotation.LoggerTrace) || @within(com.guce.annotation.LoggerTrace)")
-    public void pointCut(){}
+    public void pointCut() {
+    }
 
     /**
      * Around object.
@@ -38,15 +40,16 @@ public class LoggerTraceAspectj {
     @Around("pointCut()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
         Object obj = null;
-        try{
+        try {
             String threadId = idMaker64.getID();
             obj = joinPoint.proceed();
-            MDC.put(THREADNO,threadId);
-        }catch (Exception e){
-            log.error("LoggerTraceAspectj 执行异常: ",e);
-        }finally {
+            MDC.put(THREADNO, threadId);
+        } catch (Exception e) {
+            log.error("LoggerTraceAspectj 执行异常: ", e);
+        } finally {
             MDC.clear();
         }
         return obj;
     }
+    
 }
