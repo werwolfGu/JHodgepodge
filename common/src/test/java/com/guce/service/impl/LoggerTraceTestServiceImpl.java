@@ -2,8 +2,8 @@ package com.guce.service.impl;
 
 import com.guce.annotation.LoggerTrace;
 import com.guce.annotation.SwitchCache;
-import com.guce.annotation.SwitchCacheClient;
 import com.guce.annotation.ThreadPoolClient;
+import com.guce.cache.SwitchCacheClient;
 import com.guce.service.LoggerTraceTestService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -26,21 +26,26 @@ public class LoggerTraceTestServiceImpl implements LoggerTraceTestService {
 
     @Override
     @LoggerTrace
-    @SwitchCache(keys = {"key1", "key2", "key3", "key4"},
+    @SwitchCache(keys = {"key1", "key2", "key3", "key4", "key7:defaultValue"},
             valueTypes = {String.class, Set.class, List.class})
     public void test() {
         System.out.println("test");
 
-        String value1 = SwitchCacheClient.getSwtichValue("key1");
-        Set<String> val2 = SwitchCacheClient.getSwtichValue("key2");
-        List<String> val3 = SwitchCacheClient.getSwtichValue("key3");
-        String val4 = SwitchCacheClient.getSwtichValue("key4");
-        System.out.println("key1  " + value1);
-        System.out.println("key2  " + val2);
-        System.out.println("key3  " + val3);
-        System.out.println("key4  " + val4);
+
         CompletableFuture future = CompletableFuture
-                .runAsync(() -> System.out.println("thread pool test"), executorService);
+                .runAsync(() -> {
+                    System.out.println("thread pool test");
+                    String value1 = SwitchCacheClient.getSwtichValue("key1");
+                    Set<String> val2 = SwitchCacheClient.getSwtichValue("key2");
+                    List<String> val3 = SwitchCacheClient.getSwtichValue("key3");
+                    String val4 = SwitchCacheClient.getSwtichValue("key4");
+                    String val7 = SwitchCacheClient.getSwtichValue("key7");
+                    System.out.println("key1  " + value1);
+                    System.out.println("key2  " + val2);
+                    System.out.println("key3  " + val3);
+                    System.out.println("key4  " + val4);
+                    System.out.println("key7  " + val7);
+                }, executorService);
         try {
             future.get();
         } catch (Exception e) {

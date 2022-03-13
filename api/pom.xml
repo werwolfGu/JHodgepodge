@@ -61,6 +61,11 @@
             <groupId>com.squareup.okhttp3</groupId>
             <artifactId>okhttp</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>com.squareup.okhttp3</groupId>
+            <artifactId>okhttp-urlconnection</artifactId>
+        </dependency>
         <dependency>
             <groupId>com.googlecode.aviator</groupId>
             <artifactId>aviator</artifactId>
@@ -122,5 +127,20 @@
         </dependency>
 
     </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.gce</groupId>
+                <artifactId>hello-maven-plugin</artifactId>
+                <version>1.0-SNAPSHOT</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
+        </plugins>
+    </build>
 
 </project>

@@ -32,11 +32,11 @@
             <artifactId>lettuce-core</artifactId>
         </dependency>
 
-        <dependency>
+        <!--<dependency>
             <groupId>com.guce</groupId>
             <artifactId>app-dao</artifactId>
             <version>1.0-SNAPSHOT</version>
-        </dependency>
+        </dependency>-->
         <dependency>
             <groupId>com.guce</groupId>
             <artifactId>api</artifactId>

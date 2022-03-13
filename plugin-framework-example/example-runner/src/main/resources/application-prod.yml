@@ -1,0 +1,12 @@
+server:
+  port: 8080
+
+
+plugin:
+  runMode: prod
+  enable: true
+  pluginPath: /Users/chengen.gu/Applications/plugins
+  pluginConfigFilePath: /Users/chengen.gu/Applications/plugins/plugin-config
+  sortInitPluginIds:
+    - example-plugin12
+    - example-plugin3

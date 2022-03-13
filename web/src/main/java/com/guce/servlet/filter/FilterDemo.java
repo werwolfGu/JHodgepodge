@@ -19,7 +19,8 @@ public class FilterDemo implements Filter {
 
     private Logger logger = LoggerFactory.getLogger(FilterDemo.class);
 
-    private static Set<String> filterURISet ;
+    private static Set<String> filterURISet;
+
     @Override
     public void init(FilterConfig filterConfig) throws ServletException {
 
@@ -27,6 +28,7 @@ public class FilterDemo implements Filter {
         filterURISet.add("/favicon.ico");
         filterURISet.add("/error");
         filterURISet.add("/");
+
 
     }
 
@@ -36,15 +38,15 @@ public class FilterDemo implements Filter {
         HttpServletRequest request = (HttpServletRequest) servletRequest;
 
         String uri = request.getRequestURI();
-        if(StringUtils.isBlank(uri) || filterURISet.contains(uri)){
+        if (StringUtils.isBlank(uri) || filterURISet.contains(uri)) {
             return;
         }
 
-        logger.warn(" spring boot filter start asyn handler uri:{} ; curr thread:{} ; time: {}",uri,Thread.currentThread().getName(),System.currentTimeMillis());
+        logger.warn(" spring boot filter start asyn handler uri:{} ; curr thread:{} ; time: {}", uri, Thread.currentThread().getName(), System.currentTimeMillis());
 
-        filterChain.doFilter(servletRequest,servletResponse);
+        filterChain.doFilter(servletRequest, servletResponse);
 
-        logger.warn(" spring boot filter end asyn handler uri:{} ; curr thread:{} ; time: {}",uri,Thread.currentThread().getName(),System.currentTimeMillis());
+        logger.warn(" spring boot filter end asyn handler uri:{} ; curr thread:{} ; time: {}", uri, Thread.currentThread().getName(), System.currentTimeMillis());
     }
 
     @Override

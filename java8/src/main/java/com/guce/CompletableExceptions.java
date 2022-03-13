@@ -18,54 +18,28 @@ public class CompletableExceptions {
                         .thenApply(Breakable::work);
     }
     public static void main(String[] args) throws ExecutionException, InterruptedException {
-        // Exceptions don't appear ...
-        test("A", 1);
-        test("B", 2);
-        test("C", 3);
-        test("D", 4);
-        test("E", 5);
-        // ... until you try to fetch the value:
-        try {
-            test("F", 2).get(); // or join()
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
-        // Test for exceptions:
-        System.out.println(
-                test("G", 2).isCompletedExceptionally());
-        // Counts as "done":
-        System.out.println(test("H", 2).isDone());
-        // Force an exception:
-        CompletableFuture<Integer> cfi =
-                new CompletableFuture<>();
-        System.out.println("done? " + cfi.isDone());
-        cfi.completeExceptionally( new RuntimeException("forced"));
-        try {
-            cfi.get();
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-        }
+        // Exceptions don't appear ..
 
-        CompletableFuture<String> future = CompletableFuture.supplyAsync( () -> {
+        CompletableFuture abcFuture = CompletableFuture.runAsync( () -> {
             try {
-                Thread.sleep(10L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return "future";
-        });
-        future = future.applyToEither( CompletableFuture.supplyAsync( () -> {
-            try {
-                Thread.sleep(50L);
-            } catch (InterruptedException e) {
-                e.printStackTrace();
-            }
-            return "other";
-        }), (x) -> {
-            return x;
-        });
+                System.out.println("abcFuture: " + System.currentTimeMillis());
+                Thread.sleep(3_000L);
 
-        System.out.println(future.get());
+            } catch (InterruptedException e) {
+                System.out.printf("异常");
+            }
+        }).thenCombine( CompletableFuture.runAsync( () -> {
+            try {
+                System.out.println("abcFuture : " + System.currentTimeMillis());
+                Thread.sleep(3_000L);
+
+            } catch (InterruptedException e) {
+                System.out.printf("异常");
+            }
+        }),(a,b) -> {
+            System.out.println("bath:" + System.currentTimeMillis());
+            return null ;});
+        abcFuture.get();
 
     }
 }

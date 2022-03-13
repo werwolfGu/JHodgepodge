@@ -4,6 +4,7 @@ import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Pointcut;
+import org.redisson.config.Config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -24,7 +25,7 @@ public class LogAspectj {
 
     @Around("pointCut()")
     public Object around(ProceedingJoinPoint joinPoint) throws Throwable {
-
+        Config config = new Config();
         Object obj = joinPoint.proceed();
         return obj;
     }

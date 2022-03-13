@@ -1,5 +1,5 @@
 {
-  "degradeRules":[
+  "degradeRules": [
     {
       "resource": "hello",
       "count": 0.1,
@@ -8,11 +8,11 @@
       "timeWindow": 10
     }
   ],
-  "flowRules":[
+  "flowRules": [
     {
       "resource": "test",
       "controlBehavior": 0,
-      "count": 2.0,
+      "count": 1.0,
       "grade": 1,
       "limitApp": "caller1",
       "strategy": 0
@@ -20,17 +20,9 @@
     {
       "resource": "test",
       "controlBehavior": 0,
-      "count": 6.0,
+      "count": 1.0,
       "grade": 1,
-      "limitApp": "other",
-      "strategy": 0
-    },
-    {
-      "resource": "test",
-      "controlBehavior": 0,
-      "count": 4.0,
-      "grade": 1,
-      "limitApp": "caller2",
+      "limitApp": "default",
       "strategy": 0
     }
   ]

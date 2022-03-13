@@ -39,6 +39,7 @@ public class DemoDaoImpl implements DemoDao {
 
         SqlSession sqlSession = sqlSessionFactory.openSession();
         try{
+
             paramMap.put("id",1);
             DemoDao dao = sqlSession.getMapper(DemoDao.class);
             dao.getInfo(paramMap);

@@ -1,0 +1,15 @@
+plugin:
+  # 静态资源配置
+  static:
+    # 静态资源位置
+    locations:
+      - classpath:static
+      # - file:D:\aa
+  # 插件thymeleaf配置
+  thymeleaf:
+    prefix: plugin1-template
+    suffix: .html
+    mode: html
+    encoding: utf-8
+  # log-config-location: classpath:plugin1-log.xml
+  # 配置当前插件需要自动装载的类。用于集成 xxx-starter

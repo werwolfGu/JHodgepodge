@@ -9,13 +9,15 @@ import javax.servlet.http.HttpServletResponse;
 
 public class InterceptorDemo implements HandlerInterceptor {
 
+    @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
-        System.out.println("prHandler....."+ System.currentTimeMillis() + "  " + Thread.currentThread());
+        System.out.println("prHandler....." + System.currentTimeMillis() + "  " + Thread.currentThread());
         return true;
     }
 
+    @Override
     public void postHandle(HttpServletRequest request, HttpServletResponse response, Object handler, @Nullable ModelAndView modelAndView) throws Exception {
-        System.out.println("postHandler ......" + System.currentTimeMillis() + "  " + Thread.currentThread()) ;
+        System.out.println("postHandler ......" + System.currentTimeMillis() + "  " + Thread.currentThread());
     }
 
     @Override

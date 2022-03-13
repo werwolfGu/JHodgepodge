@@ -22,23 +22,23 @@ public class DemoController {
     private static AtomicInteger count = new AtomicInteger(0);
     @Autowired
     private ITestService testService;
-    @RequestMapping(value = "/test")
-    public String helloSentinel(String origin){
 
-        //统计 origin
-        ContextUtil.enter("test",origin);
+    @RequestMapping(value = "/test")
+    public String helloSentinel(String origin) {
+        //统计 origin  同时用于控制 限流中的 limitApp
+        ContextUtil.enter("test", origin);
 
         long t = System.currentTimeMillis();
-        try{
+        try {
 
-            if (count.getAndIncrement() %   6 == 1 ){
-               t = -1;
+            if (count.getAndIncrement() % 6 == 1) {
+                t = -1;
             }
             testService.test(origin);
-        }catch (Exception e){
+        } catch (Exception e) {
 
-        }finally {
-           ContextUtil.exit();
+        } finally {
+            ContextUtil.exit();
         }
 
         return testService.hello(t);

@@ -23,6 +23,6 @@ public class Search {
     }
 
     public static void main(String[] args) {
-        System.out.println(solution(new int[]{-1,0,3,5,9,12},2));
+        System.out.println(solution(new int[]{-1, 0, 3, 5, 9, 12}, 8));
     }
 }

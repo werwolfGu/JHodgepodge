@@ -2,6 +2,8 @@ package com.guce.config;
 
 import com.guce.interceptor.InterceptorAsyncHandler;
 import com.guce.interceptor.InterceptorDemo;
+import com.guce.scope.CustomSope;
+import org.springframework.beans.factory.config.CustomScopeConfigurer;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -17,19 +19,32 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class AppWebMvcConfigurer implements WebMvcConfigurer {
 
     @Bean
-    public InterceptorDemo interceptorDemo(){
+    public InterceptorDemo interceptorDemo() {
         return new InterceptorDemo();
     }
 
     @Bean
-    public AsyncHandlerInterceptor interceptorAsyncHandler(){
+    public AsyncHandlerInterceptor interceptorAsyncHandler() {
         return new InterceptorAsyncHandler();
     }
 
-   @Override
+    @Bean
+    public CustomSope customSope() {
+        return new CustomSope();
+    }
+
+    @Bean
+    public CustomScopeConfigurer customScopeConfigurer() {
+
+        CustomScopeConfigurer configurer = new CustomScopeConfigurer();
+        configurer.addScope("customScope", customSope());
+        return configurer;
+    }
+
+    @Override
     public void configureAsyncSupport(AsyncSupportConfigurer configurer) {
 
-       configurer.setDefaultTimeout(1000);   //设置异步超时时间
+        configurer.setDefaultTimeout(1000);   //设置异步超时时间
 
     }
 

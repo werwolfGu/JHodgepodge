@@ -1,12 +1,13 @@
 package com.guce;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class AppDemo {
 
-    public String doSomething(){
+    public String doSomething() {
 
         System.out.println("do something ......");
         return "hello world";
@@ -21,18 +22,19 @@ public class AppDemo {
         }
     }
 
+    private static final AtomicInteger threadNumber = new AtomicInteger(0);
+
+    public static final ForkJoinPool.ForkJoinWorkerThreadFactory factory = new ForkJoinPool.ForkJoinWorkerThreadFactory() {
+        @Override
+        public ForkJoinWorkerThread newThread(ForkJoinPool pool) {
+            final ForkJoinWorkerThread worker = ForkJoinPool.defaultForkJoinWorkerThreadFactory.newThread(pool);
+            worker.setName("my-thread-prefix-name-" + worker.getPoolIndex());
+            return worker;
+        }
+    };
 
     public static void main(String[] args) throws IOException {
-        /*int n = 7;
-        System.out.println(n >>> 1);
 
-        System.out.println(System.identityHashCode("abc"));*/
-
-        List<A> list = new ArrayList<>();
-        for (int i = 0; i < 1_000_000; i++) {
-            list.add(new A(i));
-        }
-        System.out.println("==========");
-        System.in.read();
+        System.out.println(System.getProperty("basedir"));
     }
 }

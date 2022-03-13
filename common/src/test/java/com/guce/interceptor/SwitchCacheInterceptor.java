@@ -1,6 +1,6 @@
 package com.guce.interceptor;
 
-import com.guce.annotation.AbstraceSwitchCacheInterceptor;
+import com.guce.cache.AbstraceSwitchCacheInterceptor;
 import com.guce.module.SwitchConfigInfo;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang3.time.DateUtils;
@@ -24,27 +24,31 @@ public class SwitchCacheInterceptor extends AbstraceSwitchCacheInterceptor {
 
         SwitchConfigInfo val = new SwitchConfigInfo();
         val.setSwitchVal("test");
-        val.setEndTime(DateUtils.addDays(new Date(),-1));
+        val.setEndTime(DateUtils.addDays(new Date(), -1));
         list.add(val);
-        if (StringUtils.equals("key1",key)){
+        if (StringUtils.equals("key1", key)) {
             val = new SwitchConfigInfo();
             val.setSwitchVal("val1");
             list.add(val);
         }
-        if (StringUtils.equals("key2",key)){
+        if (StringUtils.equals("key2", key)) {
             val = new SwitchConfigInfo();
-            val.setSwitchVal("val2,1,2,3,4");
+            val.setSwitchVal("val2,1;2,3|4");
             list.add(val);
         }
-        if (StringUtils.equals("key3",key)){
+        if (StringUtils.equals("key3", key)) {
             val = new SwitchConfigInfo();
-            val.setSwitchVal("val3,12,3,4,5,6");
+            val.setSwitchVal("val3,12,3;4,5,6");
             list.add(val);
         }
-        if (StringUtils.equals("key4",key)){
+        if (StringUtils.equals("key4", key)) {
             val = new SwitchConfigInfo();
-            val.setSwitchVal("val4");
+            //val.setSwitchVal("val4");
             list.add(val);
+        }
+
+        if (StringUtils.equals("key7", key)) {
+            return null;
         }
 
         return list;

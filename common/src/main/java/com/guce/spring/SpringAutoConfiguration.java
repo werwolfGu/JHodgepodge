@@ -10,6 +10,16 @@ import org.springframework.context.annotation.EnableAspectJAutoProxy;
  */
 @EnableAspectJAutoProxy
 @Configuration
-@ComponentScan(basePackages= {"com.guce"})
+@ComponentScan(basePackages = {"com.guce"})
 public class SpringAutoConfiguration {
+
+    /*@Bean("restHighLevelClient")
+    public ESClientFactory esClientFactory() {
+
+        ESClientFactory factory = new ESClientFactory();
+
+        factory.setHostsStr("");
+        return factory;
+    }*/
+
 }

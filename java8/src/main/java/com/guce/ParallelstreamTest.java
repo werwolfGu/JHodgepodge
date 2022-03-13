@@ -1,6 +1,10 @@
 package com.guce;
 
-import java.util.stream.IntStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * @Author chengen.gce
@@ -11,17 +15,27 @@ public class ParallelstreamTest {
 
     public static void main(String[] args) {
 
-        int nums = 100,nums2 = 100;
-        IntStream.range(0, nums).parallel().forEach((x) -> {
-            IntStream.range(0, nums2).parallel().forEach((y) -> {
-                IntStream.range(0, 20).parallel().forEach((z) -> {
-                    try {
-                        System.out.println(Thread.currentThread().getName() + " " + x + y + z);
+        Map<String, List<String>> map = new HashMap<>();
+        map.computeIfAbsent("key", (key) -> new ArrayList<>());
+        int nums = 1000, nums2 = 100;
+        List<Integer> list = new ArrayList<>();
+        List<Integer> list1 = new ArrayList<>();
+        for (int i = 0; i < 10000000; i++) {
+            list.add(i);
+            if (i % 100 == 0) {
+                list1.add(i);
+            }
+        }
+        System.out.println("=========================");
+        list.parallelStream().forEach(i -> {
 
-                    } catch (Exception e){
-                        e.printStackTrace();
-                    }
-                });
+            CompletableFuture future = CompletableFuture.runAsync(() -> {
+                try {
+                    System.out.println(Thread.currentThread().getName() + " " + i + " -> ");
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             });
         });
     }

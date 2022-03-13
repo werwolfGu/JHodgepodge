@@ -33,15 +33,16 @@ import java.util.concurrent.TimeUnit;
  * @description
  */
 @RunWith(SpringRunner.class)
-@SpringBootTest(classes={GrvySpringbootStartup.class})// 指定启动类
+@SpringBootTest(classes = {GrvySpringbootStartup.class})// 指定启动类
 public class GrvyScriptEngineTest {
 
     private static ThreadPoolExecutor pool;
 
     static {
         int cpuCore = Runtime.getRuntime().availableProcessors() + 2;
-        pool = new ThreadPoolExecutor(cpuCore,cpuCore * 2,3, TimeUnit.MINUTES,new LinkedBlockingQueue<>(10000));
+        pool = new ThreadPoolExecutor(cpuCore, cpuCore * 2, 3, TimeUnit.MINUTES, new LinkedBlockingQueue<>(10000));
     }
+
     @Autowired
     private GrvyScriptEngine grvyScriptEngine;
 
@@ -51,21 +52,21 @@ public class GrvyScriptEngineTest {
     @Test
     public void testGrvyScriptEngine() throws ScriptException {
 
-        List<String> card = Arrays.asList("1","2","3");
+        List<String> card = Arrays.asList("1", "2", "3");
 
-        grvyScriptEngine.bingingGlobalScopeMapper("渠道","NET");
-        grvyScriptEngine.bindingEngineScopeMapper("交易码","1101");
-        grvyScriptEngine.bindingEngineScopeMapper("name","name is grvy");
+        grvyScriptEngine.bingingGlobalScopeMapper("渠道", "NET");
+        grvyScriptEngine.bindingEngineScopeMapper("交易码", "1101");
+        grvyScriptEngine.bindingEngineScopeMapper("name", "name is grvy");
         //GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("卡集合",card);
 
 
         String script = "    def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
-                        "    def channels = [\"NET\",\"NCUP\"]\n" +
+                "    def channels = [\"NET\",\"NCUP\"]\n" +
                 //"    def str = com.grvyframework.grvy.GrvyInvokeInterface.test(name)\n" +
                 //"    println( \"str:->\" + str)\n" +
-                        "    if (list.contains(交易码) && channels.contains(渠道)){\n" +
-                        "        return 2\n" +
-                        "    } ";
+                "    if (list.contains(交易码) && channels.contains(渠道)){\n" +
+                "        return 2\n" +
+                "    } ";
         for (int i = 0; i < 10; i++) {
             long time = System.currentTimeMillis();
             Object obj = grvyScriptEngine.eval(script);
@@ -79,49 +80,67 @@ public class GrvyScriptEngineTest {
 
 
     @Test
+    public void testGrvyScriptEngine1() throws ScriptException {
+
+        //GrvyScriptEngine.getInstance().addThreadlocalEngineFieldMapper("卡集合",card);
+
+        grvyScriptEngine.bingingGlobalScopeMapper("key", 1);
+
+        String script = "   def pointMap = [2:800,\n" +
+                "               3:1000,\n" +
+                "               4:1200]\n" +
+                "return pointMap.getAt(key)";
+        Object obj = grvyScriptEngine.eval(script);
+        System.out.println(obj);
+        // assert "2".equals(obj);
+    }
+
+
+    @Test
     public void testGrvyScriptEngineExecutor() throws Exception {
 
-         List<String> cardList = new ArrayList<>();
-         for (int i = 0 ; i < 1000 ; i++ ){
-             cardList.add(String.valueOf(i));
-         }
-         List<CompletableFuture> list = new ArrayList<>();
+        List<String> cardList = new ArrayList<>();
+        for (int i = 0; i < 1000; i++) {
+            cardList.add(String.valueOf(i));
+        }
+        List<CompletableFuture> list = new ArrayList<>();
         for (int i = 0; i < 10; i++) {
 
-             CompletableFuture future = CompletableFuture.runAsync( () -> {
-                 GrvyRequest request = new GrvyRequest();
-                 GrvyResponse response = new GrvyResponse();
-                 String script = "def reg1 = ~'he*llo' \n" +
-                         "def name = \"hello\" \n" +
-                         "if (reg1.matcher(name) ) return true ";
-                 List<GrvyRuleConfigEntry> grvyRuleInfoList = new ArrayList<>();
+            CompletableFuture future = CompletableFuture.runAsync(() -> {
+                GrvyRequest request = new GrvyRequest();
+                GrvyResponse response = new GrvyResponse();
+                String script = "def reg1 = ~'he*llo' \n" +
+                        "def name = \"hello\" \n" +
+                        "if (reg1.matcher(name) ) return true ";
+                List<GrvyRuleConfigEntry> grvyRuleInfoList = new ArrayList<>();
 
 
-                 Bindings bindings = new SimpleBindings();
-                 bindings.put("卡集合",cardList);
-                 Integer idx = ThreadLocalRandom.current().nextInt(1000);
-                 bindings.put("卡",idx.toString());
-                 request.setBindings(bindings);
-                 try {
-                     request.setGrvyRuleInfoList(grvyRuleInfoList);
-                     GrvyRuleConfigEntry ruleInfo = new GrvyRuleConfigEntry();
-                     grvyRuleInfoList.add(ruleInfo);
-                     Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
-                     IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);                 ruleInfo.setGrvyScriptResultHandler(handle);
-                     ruleInfo.setScript(script);
-                     grvyScriptEngineExecutor.parallelExecutor(request,response, Reduce.firstOf(Objects::nonNull));
-                 } catch (ClassNotFoundException e) {
-                     e.printStackTrace();
-                 } catch (Exception e) {
-                     e.printStackTrace();
-                 }
+                Bindings bindings = new SimpleBindings();
+                bindings.put("卡集合", cardList);
+                Integer idx = ThreadLocalRandom.current().nextInt(1000);
+                bindings.put("卡", idx.toString());
+                request.setBindings(bindings);
+                try {
+                    request.setGrvyRuleInfoList(grvyRuleInfoList);
+                    GrvyRuleConfigEntry ruleInfo = new GrvyRuleConfigEntry();
+                    grvyRuleInfoList.add(ruleInfo);
+                    Class clazz = Thread.currentThread().getContextClassLoader().loadClass("com.grvyframework.grvy.engine.handle.DefaultGrvyScriptResulthandler");
+                    IGrvyScriptResultHandler handle = (IGrvyScriptResultHandler) SpringApplicationBean.getBean(clazz);
+                    ruleInfo.setGrvyScriptResultHandler(handle);
+                    ruleInfo.setScript(script);
+                    grvyScriptEngineExecutor.parallelExecutor(request, response, Reduce.firstOf(Objects::nonNull));
+                } catch (ClassNotFoundException e) {
+                    e.printStackTrace();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
 
-             },pool);
-             list.add(future);
-             CompletableFuture[] arr = list.toArray(new CompletableFuture[list.size()]);
-             CompletableFuture future1 =CompletableFuture.allOf(arr);
-             future1.get();
-         }
+            }, pool);
+            list.add(future);
+            CompletableFuture[] arr = list.toArray(new CompletableFuture[list.size()]);
+            CompletableFuture future1 = CompletableFuture.allOf(arr);
+            future1.get();
+        }
 
     }
 }

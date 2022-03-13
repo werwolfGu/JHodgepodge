@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashSet;
@@ -20,8 +21,8 @@ import java.util.jar.JarFile;
 /**
  * @Author chengen.gce
  * @DATE 2020/3/11 10:59 下午
- *
- *
+ * <p>
+ * <p>
  * 可以参考  ClassPathBeanDefinitionScanner
  */
 @Slf4j
@@ -65,15 +66,22 @@ public class ClassSearchUtils {
                 continue;
             }
             String type = url.getProtocol();
-            if (type.equals(FILE_PROTOCOL)) {
-                fileNames.addAll(getClassNameByFile(packageName, url.getPath(), childPackage));
-            } else if (type.equals(JAR_PROTOCOL)) {
-                fileNames.addAll(getClassNameByJar(url.getPath(), childPackage));
+            switch (type) {
+
+                case FILE_PROTOCOL:
+                    fileNames.addAll(getClassNameByFile(packageName, url.getPath(), childPackage));
+                    break;
+                case JAR_PROTOCOL:
+                    fileNames.addAll(getClassNameByJar(url.getPath(), childPackage));
+                    break;
+                default:
+
             }
+
         }
-        //fileNames.addAll(getClassNameByJars(((URLClassLoader) loader).getURLs(), packagePath, childPackage));
         return fileNames;
     }
+
 
     private static List<String> getClassNameByFile(String packagePath, String filePath, boolean childPackage) throws UnsupportedEncodingException {
         List<String> myClassName = new ArrayList<>();
@@ -157,13 +165,46 @@ public class ClassSearchUtils {
         return myClassName;
     }
 
+    private static Set<Class<?>> getClassNameByJar(String jarPath) {
+        Set<Class<?>> myClassName = new HashSet<>();
+        String[] jarInfo = jarPath.split("!");
+        String jarFilePath = jarPath;
+        File file = new File(jarFilePath);
+        try {
+            URL url = file.toURI().toURL();
+
+            ////加载外部类使用 URLClassLoader
+            URLClassLoader classLoader =
+                    new URLClassLoader(new URL[]{url}, Thread.currentThread().getContextClassLoader());
+            JarFile jarFile = new JarFile(jarFilePath);
+            Enumeration<JarEntry> entries = jarFile.entries();
+            while (entries.hasMoreElements()) {
+                JarEntry jarEntry = entries.nextElement();
+                String entryName = jarEntry.getName();
+
+                if (entryName.endsWith(KLASS_SUFFIX)) {
+                    entryName = entryName.replace(".class", "").replaceAll("/", ".");
+                    Class<?> clazz = classLoader.loadClass(entryName);
+                    myClassName.add(clazz);
+                }
+            }
+        } catch (Exception e) {
+
+        }
+        return myClassName;
+    }
+
     public static void main(String[] args) throws IOException, URISyntaxException {
 
-        String basePackage = "com.guce.thread";
+       /* String basePackage = "com.guce.uniqid";
+        List<Class<?>> classes = searchKlassList(basePackage);*/
+        String basePackage = "/Users/chengen.gu/.m2/repository/org/yaml/snakeyaml/1.25/snakeyaml-1.25.jar";
+        File file = new File(basePackage);
+        URL url = file.toURI().toURL();
 
-        List<Class<?>> classes = searchKlassList(basePackage);
+        Set<Class<?>> list = getClassNameByJar(basePackage);
+        System.out.println(list);
         //判断子类是否继承自 父类或接口  clazz.isAssignableFrom(子类名称)
-        System.out.println(classes);
 
 
     }

@@ -7,12 +7,13 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping("/sync")
 public class Demo {
 
-    /*@Resource(name = "demoService")
-    private DemoService demoService ;
+    private static final Object lock = new Object();
 
-    @RequestMapping(value = "/hello" ,method = {RequestMethod.GET,RequestMethod.POST})
-    public String helloWorld() throws ExecutionException {
-
-        return demoService.helloService("name","age");
-    }*/
+    public void test() {
+        synchronized (lock) {
+            for (int i = 0; i < 10; i++) {
+                System.out.println("sync ->" + i);
+            }
+        }
+    }
 }

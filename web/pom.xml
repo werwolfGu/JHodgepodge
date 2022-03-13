@@ -111,9 +111,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.guce.server</groupId>
-            <artifactId>service</artifactId>
-            <version>1.0.0.SNAPSHOT</version>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-core</artifactId>
+            <version>5.7.19</version>
         </dependency>
 
     </dependencies>
@@ -128,6 +128,19 @@
                 <filtering>true</filtering>
             </resource>
         </resources>
+        <plugins>
+            <plugin>
+                <groupId>com.gce</groupId>
+                <artifactId>hello-maven-plugin</artifactId>
+                <version>1.1-SNAPSHOT</version>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+            </plugin>
+        </plugins>
+
         <!--<plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
