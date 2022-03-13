@@ -1,4 +1,4 @@
-#执行计划 EXPLAIN
+# 执行计划(EXPLAIN)
 
 
 ## EXPLAIN Output Columns
