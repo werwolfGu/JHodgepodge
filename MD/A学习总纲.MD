@@ -64,7 +64,7 @@
     13. 团队管理
     14. traceId解决方案
     15. 分库分表
-    16. 接口：限流、降级、垄断；   
+    16. 接口：限流、降级、熔断；   
         (RateLimiter / 开关降级  / setinel)
         
     17. 分布式锁
@@ -195,6 +195,7 @@ mysql> explain select * from (select * from ( select * from t3 where id=123) a) 
 4. 使用redis实现at least once queue
 5. 对于数据库中突然某条SQL跑慢了，应该是执行计划跑偏了 ；绑定执行计划； MySQL指定索引；
 6. 对于大数据量跑数据 源数据使用 ID分段 ；在分布到集群中个节点执行；
+7. 开始pom插件工具判断相同类在不同jar中出现的情况；
 
    做的业务：信用卡积分主流程；
    积分笔笔抽 ；
