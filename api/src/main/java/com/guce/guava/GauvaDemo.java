@@ -39,10 +39,8 @@ public class GauvaDemo {
         return loadingCache.get(key);
     }
     public static void main(String[] args) {
-
         HashFunction hashFunction = Hashing.sipHash24();
         Splitter.on(",").split("a,b,c,d").forEach(s -> System.out.println(s));
-
         GauvaDemo simpleExample = new GauvaDemo();
         /*try {
             for(int i = 0 ; i < 10 ; i++){

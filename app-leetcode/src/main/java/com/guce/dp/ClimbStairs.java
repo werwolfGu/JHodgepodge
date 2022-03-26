@@ -3,6 +3,7 @@ package com.guce.dp;
 /**
  * @Author chengen.gce
  * @DATE 2020/9/11 11:16 下午
+ * https://leetcode-cn.com/problems/climbing-stairs/
  * 爬楼梯
  */
 public class ClimbStairs {
@@ -14,6 +15,7 @@ public class ClimbStairs {
 
     /**
      * 递归
+     * 递归实现方式：一个问题转换成子问题  dp[n] = dp[n - 1] + dp[n - 2]
      * @param n
      * @return
      */
@@ -44,13 +46,18 @@ public class ClimbStairs {
         return r;
     }
 
+    /**
+     * 类似斐波那契
+     * @param n
+     * @return
+     */
     public int climbStairs2(int n) {
 
-        int f = 0 , s = 0 ,result = 1;
+        int first = 0 , second = 0 ,result = 1;
         for (int i = 1 ; i <= n ; i++ ){
-            f = s ;
-            s = result ;
-            result = f +s ;
+            first = second ;
+            second = result ;
+            result = first +second ;
 
         }
         return result;

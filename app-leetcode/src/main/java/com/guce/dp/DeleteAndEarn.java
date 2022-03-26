@@ -5,10 +5,10 @@ package com.guce.dp;
  * @DATE 2021/3/29 12:16 下午
  *
  * https://leetcode-cn.com/problems/delete-and-earn/
+ *删除并获得点数
+ * 给定一个整数数组nums，你可以对它进行一些操作。
  *
- * 给定一个整数数组 nums ，你可以对它进行一些操作。
- *
- * 每次操作中，选择任意一个 nums[i] ，删除它并获得 nums[i] 的点数。之后，你必须删除每个等于 nums[i] - 1 或 nums[i] + 1 的元素。
+ * 每次操作中，选择任意一个nums[i]，删除它并获得nums[i]的点数。之后，你必须删除所有等于nums[i] - 1或nums[i] + 1的元素。
  *
  * 开始你拥有 0 个点数。返回你能通过这些操作获得的最大点数。
  *
@@ -22,10 +22,15 @@ package com.guce.dp;
  *
  * nums的长度最大为20000。
  * 每个整数nums[i]的大小都在[1, 10000]范围内。
+ *
+ * 该题目类似打家劫舍
+ * https://leetcode-cn.com/problems/house-robber/
+ *
  */
 public class DeleteAndEarn {
 
     public int deleteAndEarn(int[] nums) {
+
         int[] count = new int[10001];
         for (int i = 0 ; i < nums.length ;i++ ){
             count[nums[i]]++;
@@ -37,5 +42,27 @@ public class DeleteAndEarn {
             dp[i] = Math.max(dp[i -1] , dp[i -2] + (count[i] * i));
         }
         return dp[10000];
+    }
+    public int deleteAndEarnPlus(int[] nums) {
+
+        int maxLen = 0;
+        for (int i = 0 ; i < nums.length ; i++){
+            maxLen = Math.max(maxLen,nums[i]);
+        }
+
+        int[] valNum = new int[maxLen + 1];
+
+        for ( int i = 0 ; i < nums.length ; i++) {
+            valNum[nums[i]] += nums[i];
+        }
+
+        int first = valNum[0];
+        int second = Math.max(valNum[0],valNum[1]);
+        for (int i = 2 ; i < valNum.length ; i++ ){
+            int tmp = second;
+            second = Math.max(second , first + valNum[i]);
+            first = tmp;
+        }
+        return second;
     }
 }

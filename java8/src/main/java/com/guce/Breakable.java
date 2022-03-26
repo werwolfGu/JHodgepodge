@@ -23,4 +23,11 @@ public class Breakable {
         System.out.println(b);
         return b;
     }
+
+    public static void main(String[] args) {
+
+        int COUNT_BITS = Integer.SIZE - 3;
+        int SHUTDOWN   =  1 << COUNT_BITS;
+        System.out.println(SHUTDOWN);
+    }
 }
