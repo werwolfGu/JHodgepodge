@@ -14,7 +14,7 @@
   - [执行计划分析](./MySQL/explain.MD)
   - 锁 间隙锁
   - 索引存储结构
-  - 索引下推 索引覆盖  回表
+  - [索引下推 索引覆盖  回表](#索引下推、索引覆盖、回表)
 
 - redis
     1. redis数据结构  string  hash  list  set zset 
@@ -72,6 +72,11 @@
         - 数据库唯一版本号
         - 数据库乐观锁(版本号)
         - zookeeper实现
+- 自研框架
+  - 流程引擎
+  - 规则引擎
+  - 日志链
+  - 工程jar冲突，类冲突
 
 ## MySQL
 ### 事务隔离级别
@@ -186,6 +191,28 @@ mysql> explain select * from (select * from ( select * from t3 where id=123) a) 
 
 - system  
   当查询的表只有一行数据；
+
+## 索引下推 索引覆盖  回表
+> 如表 user  有如下列  id name age 
+### 回表
+
+```sql
+select * from user where name='gce'
+```
+所谓回表，比如通过普通索引查询表数据时，查询出来后，需要通过主键ID再次去查询一次；  
+比如：如上SQL 通过name(普通索引)查询一次后，查询到的是主键ID，通过主键ID再一次查询获取到需要的数据；
+### 索引覆盖
+```sql
+select name,age from user where name='gce'
+```
+如上SQL直接在索引中就能返回需要的值，就不需要回表了，这据说索引覆盖；(name,age) 联合索引
+
+### 索引下推
+```sql
+select * from user where name like 'gce%' and age='18';
+```
+如上SQL创建了联合索引(name , age) 根据索引最左匹配原则会走索引，MySQL 5.6 后name查询到后会再根据age查询是否满足18 然后再回表；
+
 
 
 ####工作中总结
