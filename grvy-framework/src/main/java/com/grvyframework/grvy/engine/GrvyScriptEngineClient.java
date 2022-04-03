@@ -105,9 +105,9 @@ public class GrvyScriptEngineClient {
 
         GroovyCompiledScript compiledScript = grvyCompileScriptCache.get(script);
         Object result;
-        synchronized (compiledScript) {
+        //synchronized (compiledScript) {
             result = compiledScript.eval(scripCtx);
-        }
+        //}
         return (T) result;
     }
 

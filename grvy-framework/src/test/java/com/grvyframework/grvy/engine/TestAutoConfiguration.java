@@ -119,8 +119,11 @@ public class TestAutoConfiguration {
             GrvyResponse response = new GrvyResponse();
             String script = " def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
                     "    def channels = [\"NET\",\"NCUP\"]\n" +
-                    "    if (list.contains(交易码) && channels.contains(渠道))\n" +
-                    "        return true ";
+                    "    def result = [\"key1\":false,\"key2\":\"abc\"]\n" +
+                    "    if (list.contains(交易码) && channels.contains(渠道)){\n" +
+                    "        result.put(\"key1\",true) \n" +
+                    "        return result }\n " +
+                    "        return result ";
             List<GrvyRuleConfigEntry> grvyRuleInfoList = new ArrayList<>();
 
             request.setGrvyRuleInfoList(grvyRuleInfoList);

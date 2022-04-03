@@ -1,10 +1,10 @@
 package com.grvyframework.model;
 
-import com.grvyframework.handle.IGrvyScriptResultHandler;
 import com.grvyframework.reduce.Reduce;
 import lombok.Data;
 
 import javax.script.Bindings;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +14,8 @@ import java.util.Map;
  * @description
  */
 @Data
-public class GrvyRequest {
+public class GrvyRequest implements Serializable {
+    private static final long serialVersionUID = 6200156302595905868L;
 
     /**
      * engine 规则表达式计算参数集

@@ -25,8 +25,10 @@ import org.springframework.beans.factory.InitializingBean;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.Resource;
+import javax.script.Bindings;
 import javax.script.ScriptContext;
 import javax.script.ScriptException;
+import javax.script.SimpleBindings;
 import javax.script.SimpleScriptContext;
 import java.util.ArrayList;
 import java.util.List;
@@ -108,10 +110,18 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         }
         final Reduce<BaseScriptEvalResult> finalReduce = reduce;
 
+        Bindings reqBindings = new SimpleBindings();
+        reqBindings.putAll(request.getBindings());
+
         CompletableFuture future = CompletableFuture.runAsync( () -> {
 
             for (GrvyRuleConfigEntry ruleInfo : ruleList ){
+
+                Bindings currRuleBinding = new SimpleBindings();
+                currRuleBinding.putAll(reqBindings);
+                request.setBindings(currRuleBinding);
                 GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
+
                 try {
                     BaseScriptEvalResult result = this.executor(param, grvyScriptEngineExeEnum);
 
@@ -143,7 +153,7 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
      * @return
      * @throws Exception
      */
-    public List<BaseScriptEvalResult> parallelExecutor(GrvyRequest request , GrvyResponse response , Reduce<BaseScriptEvalResult> reduce) throws Exception {
+    public List<BaseScriptEvalResult> parallelExecutor(final GrvyRequest request , GrvyResponse response , Reduce<BaseScriptEvalResult> reduce) throws Exception {
 
         List<BaseScriptEvalResult> resultList = new ArrayList<>();
 
@@ -154,11 +164,16 @@ public class GrvyScriptEngineExecutor implements InitializingBean {
         List<CompletableFuture<BaseScriptEvalResult>> futureList = new ArrayList<>();
 
         assert ruleList != null;
+        Bindings reqBindings = new SimpleBindings();
+        reqBindings.putAll(request.getBindings());
 
         ruleList.forEach(ruleInfo -> {
 
             CompletableFuture<BaseScriptEvalResult> future = CompletableFuture.supplyAsync( () -> {
 
+                Bindings currBinding = new SimpleBindings();
+                currBinding.putAll(reqBindings);
+                request.setBindings(currBinding);
                 GrvyRuleExecParam param = wrapperGrvyRuleParam(request,ruleInfo);
                 return this.executor(param);
 
