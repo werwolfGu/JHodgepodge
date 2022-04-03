@@ -1,10 +1,7 @@
 package com.guce.spring.listener;
 
-import com.guce.chain.IChainService;
-import com.guce.chain.manager.ChainServiceManager;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 
@@ -15,23 +12,24 @@ import org.springframework.context.event.ContextRefreshedEvent;
 public class ChainSpringApplicationListener implements ApplicationListener<ContextRefreshedEvent> {
 
 
-    private static Logger logger = LoggerFactory.getLogger(ChainSpringApplicationListener.class);
-    private ChainServiceManager chainServiceManager ;
+    private static final Logger logger = LoggerFactory.getLogger(ChainSpringApplicationListener.class);
+
+    private static volatile boolean spring_loader_finished = false;
 
     @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
+    public void onApplicationEvent(ContextRefreshedEvent event) {
 
-        String[] beanNames = contextRefreshedEvent.getApplicationContext().getBeanNamesForType(IChainService.class);
-        chainServiceManager = contextRefreshedEvent.getApplicationContext().getBean(ChainServiceManager.class);
-        if (beanNames != null && beanNames.length > 0 && chainServiceManager != null){
-            logger.warn("spring listener init chain flow service! start");
-            chainServiceManager.init();
-            logger.warn(("spring listener init chain flow service! end!"));
+        if (event.getApplicationContext().getParent() == null){
+
+            spring_loader_finished = true;
+            logger.warn(">>>>>>spring 加载完成！！！<<<<<<");
         }
+
     }
 
-    @Autowired
-    public void setChainServiceManager(ChainServiceManager chainServiceManager) {
-        this.chainServiceManager = chainServiceManager;
+    public static boolean isSpringLoaderFinished(){
+        return spring_loader_finished;
     }
+
+
 }

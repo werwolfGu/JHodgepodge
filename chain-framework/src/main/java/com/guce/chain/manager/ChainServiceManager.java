@@ -7,6 +7,7 @@ import com.google.common.base.Stopwatch;
 import com.guce.chain.IChainService;
 import com.guce.chain.anno.ChainService;
 import com.guce.chain.model.ChainExecServiceWrapper;
+import com.guce.spring.listener.ChainSpringApplicationListener;
 import com.guce.spring.util.SpringContextBean;
 import com.guce.utils.ClassUtils;
 import org.apache.commons.collections.CollectionUtils;
@@ -44,16 +45,18 @@ public class ChainServiceManager {
 
     private static Map<String, List<ChainExecServiceWrapper>> chainExecutorMap = new ConcurrentHashMap<>(32);
 
-    private static volatile AtomicBoolean LOADER_FINISHED = new AtomicBoolean(false);
+    private static final AtomicBoolean LOADER_FINISHED = new AtomicBoolean(false);
 
-    private volatile static int DEFAULT_CHAIN_SERVICE_LIST_CAPACITY = 8;
+    private static final int DEFAULT_CHAIN_SERVICE_LIST_CAPACITY = 8;
 
-    private static final String FLOW_LIST_CONFIG_FILE = "WORK_FLOW_CFG_LIST.json";
+    private static final String FLOW_LIST_CONFIG_FILE = "flow_conf.factories";
 
-    private static Comparator<ChainExecServiceWrapper> rankChainServices =
+    private final static Comparator<ChainExecServiceWrapper> RANK_CHAIN_SERVICES =
             Comparator.comparingInt(ChainExecServiceWrapper::getOrder);
 
-    private static volatile String FILE_FILTER_SUFFIX = "Flow.json";
+    private final static String FILE_FILTER_SUFFIX = "Flow.json";
+
+    private final static long SPRING_LOADER_UNFINISHED_SLEEP_MILL = 500;
 
     /**
      * lazy加载
@@ -62,6 +65,17 @@ public class ChainServiceManager {
 
         if (LOADER_FINISHED.get()) {
             return;
+        }
+
+        while (!ChainSpringApplicationListener.isSpringLoaderFinished()){
+            try {
+
+                logger.info("spring 加载未完成，休眠 {} ms." , SPRING_LOADER_UNFINISHED_SLEEP_MILL);
+                Thread.sleep(SPRING_LOADER_UNFINISHED_SLEEP_MILL);
+
+            } catch (InterruptedException e) {
+                logger.error("spring加载未完成，休眠异常;" ,e);
+            }
         }
 
         if (!LOADER_FINISHED.get()) {
@@ -100,7 +114,7 @@ public class ChainServiceManager {
 
             long sortStart = System.currentTimeMillis();
             logger.warn("========chain services flow node sort  start...");
-            springFlowList.sort(rankChainServices);
+            springFlowList.sort(RANK_CHAIN_SERVICES);
 
             long rangeComposeStart = System.currentTimeMillis();
             logger.warn("========chain services flow node sort  end... cost time:{}", (rangeComposeStart - sortStart));
@@ -321,7 +335,7 @@ public class ChainServiceManager {
 
     public static <T> T loaderChainService(String classpath) throws ClassNotFoundException {
 
-        Class clazz = ClassUtils.getClassLoder(ChainServiceManager.class).loadClass(classpath);
+        Class<?> clazz = ClassUtils.getClassLoder(ChainServiceManager.class).loadClass(classpath);
         return (T) SpringContextBean.getBean(clazz);
 
     }
@@ -334,7 +348,7 @@ public class ChainServiceManager {
         List<ChainExecServiceWrapper> chainList = chainExecutorSpringMap
                 .computeIfAbsent(resourceName, key -> new ArrayList<>());
         chainList.add(chainExecServiceWrapper);
-        chainList.sort(rankChainServices);
+        chainList.sort(RANK_CHAIN_SERVICES);
 
     }
 }
