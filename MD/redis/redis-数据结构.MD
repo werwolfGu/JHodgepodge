@@ -5,7 +5,7 @@
 ## redis dict 
 
 - 数据结构
-```java
+```c
 
 /* 哈希桶 */
 typedef struct dictEntry { 
@@ -44,7 +44,7 @@ typedef struct dict {
   
   > 对应的底层数据结构为 SDS(Simple Dynamic String);
 - 底层数据结构
-```java
+```c
 struct sdshdr {
     // 记录 buf 数组中已使用字节的数量
     // 等于 SDS 所保存字符串的长度
@@ -60,7 +60,7 @@ struct sdshdr {
 > 列表
 
 - 数据结构
-```java
+```c
 
 typedef struct listNode {
     // 前置节点
@@ -75,7 +75,7 @@ typedef struct listNode {
 ## hash 
 > hash数据结构
 
-```java
+```c
 
 /* hash表结构定义 */
 typedef struct dictht { 
@@ -94,7 +94,7 @@ typedef struct dictht {
     - 结合对象保存的所有元素都是整数值
     - 集合对象保存的元素数量不超过512个
 
-```java
+```c
 
 typedef struct intset {
     
@@ -112,7 +112,7 @@ typedef struct intset {
 
 - hashtable
     - key 为hash的值，value为 null ；
-```java
+```c
 
 typedef struct dictht { 
     dictEntry **table;   // 哈希表数组
@@ -125,7 +125,7 @@ typedef struct dictht {
 ## zset
 
 > zet  ziplist 
-```java
+```c
 
 /*
  * 有序集

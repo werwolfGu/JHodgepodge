@@ -17,13 +17,14 @@
   - [索引下推 索引覆盖  回表](#索引下推、索引覆盖、回表)
 
 - redis
-    1. redis数据结构  string  hash  list  set zset 
+    1. [redis数据结构  string  hash  list  set zset](./redis/redis-数据结构.MD) 
     2. redis内部数据结构：实现原理
-    3. redis失效策略
-    4. redis缓存淘汰策略
-    5. redis持久化策略  aof rdb
-    6. redis如何实现分布式锁 ; 
-    7. redis如何保证高性能；
+    3. [redis失效策略](./redis/redis过期以及淘汰策略.MD#redis过期策略)
+    4. [redis缓存淘汰策略](./redis/redis过期以及淘汰策略.MD#redis淘汰策略)
+    5. [redis持久化策略](./redis/redis持久化策略.MD)
+    6. [redis渐进式hash](./redis/渐进式rehash.MD)
+    7. redis如何实现分布式锁 ; 
+    8. redis如何保证高性能；
 
 - RocketMQ
     1. rocketMQ消息有哪几种
@@ -76,7 +77,7 @@
   - 流程引擎
   - 规则引擎
   - 日志链
-  - 工程jar冲突，类冲突
+  - 工程中jar冲突，类冲突maven插件工具
 
 ## MySQL
 ### 事务隔离级别
