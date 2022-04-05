@@ -66,24 +66,19 @@ public class ChainServiceManager {
         if (LOADER_FINISHED.get()) {
             return;
         }
-
         while (!ChainSpringApplicationListener.isSpringLoaderFinished()){
             try {
-
                 logger.info("spring 加载未完成，休眠 {} ms." , SPRING_LOADER_UNFINISHED_SLEEP_MILL);
                 Thread.sleep(SPRING_LOADER_UNFINISHED_SLEEP_MILL);
-
             } catch (InterruptedException e) {
                 logger.error("spring加载未完成，休眠异常;" ,e);
             }
         }
 
         if (!LOADER_FINISHED.get()) {
-
             synchronized (LOADER_FINISHED) {
 
                 if (!LOADER_FINISHED.get()) {
-
                     initChain();
                     LOADER_FINISHED.set(true);
                 }
@@ -303,11 +298,11 @@ public class ChainServiceManager {
                                 } catch (ClassNotFoundException e) {
 
                                     StringBuilder logSb = new StringBuilder();
-                                    logSb.append("######执行流程：").append(key)
+                                    logSb.append("######加载流程：").append(key)
                                             .append("; 找不到流程节点：").append(servicePath);
                                     if (chainExecServiceWrapper.isNeedNode()) {
 
-                                        logSb.append("；此流程将不纳入可执行流程中！！");
+                                        logSb.append("；在该流程中此节点为必须节点，流程将不纳入可执行流程中！！");
                                         addToExecutorFLow.set(false);
                                     } else {
                                         logSb.append("；该流程节点不是必须节点，remove该流程节点！！");

@@ -38,6 +38,8 @@ public class ChainExecutor implements InitializingBean {
 
     private static volatile ChainExecutor chainExecutor;
 
+    private static final long SLOW_NODE_EXEC_TIME_DEF = 100;
+
     private static Object lock = new Object();
 
 
@@ -61,7 +63,6 @@ public class ChainExecutor implements InitializingBean {
         List<ChainExecServiceWrapper> chainServiceList = chainServiceManager.getChainServiceInfoList(chainResourceName);
 
         if (CollectionUtils.isEmpty(chainServiceList)){
-
             throw new ChainException("#######chain service 没有相关流程 chainResouceName : " + chainResourceName);
         }
 
@@ -83,7 +84,6 @@ public class ChainExecutor implements InitializingBean {
                 futureList.add(future);
                 continue;
             }
-
             /**
              * 后续还有节点的话 那么需要先将等到这个异步执行完毕才继续；
              */
@@ -93,11 +93,17 @@ public class ChainExecutor implements InitializingBean {
                 try {
                     future.get(maxAsyncTimeout,TimeUnit.MILLISECONDS);
                 } catch (InterruptedException | ExecutionException | TimeoutException e) {
-
-                    logger.error("chain service async exception;resourceName:{}; exception{}"
-                            ,chainResourceName,e.getMessage());
-                    if (e.getCause() instanceof ChainRollbackException){
+                    if ( e.getCause()  instanceof ChainRollbackException ){
                         rollback = true;
+                    } else if (e.getCause()  instanceof ChainException) {
+                        ChainException ex = (ChainException) e.getCause();
+                        if (ChainExceptionEnum.EXCEPTION_FLOW_END.getCode().equals(ex.getCode())){
+                            logger.warn(" {} - {} 流程节点执行异常，结束流程；"
+                                    ,service.getChainResourceName(),service.getChainService().getClass().getName(),e);
+                        }
+                    } else {
+                        logger.error("chain service async exception;resourceName:{}; exception{}"
+                                ,chainResourceName,e.getMessage());
                     }
                     break;
                 }finally {
@@ -106,13 +112,26 @@ public class ChainExecutor implements InitializingBean {
             }
 
             try{
+                long start = System.currentTimeMillis();
                 doService(service,request,response);
+                long end = System.currentTimeMillis();
+
+                if (end - start > SLOW_NODE_EXEC_TIME_DEF){
+                    logger.info("流程 {} - {} 执行 cost time : {}"
+                            ,service.getChainResourceName(),service.getChainService().getClass().getName(),(end - start));
+                }
 
             }catch (Throwable th){
-
-                logger.error("chain service sync exception;{}",th.getMessage());
                 if ( th instanceof ChainRollbackException ){
                     rollback = true;
+                } else if (th instanceof ChainException) {
+                    ChainException e = (ChainException) th;
+                    if (ChainExceptionEnum.EXCEPTION_FLOW_END.getCode().equals(e.getCode())){
+                        logger.warn(" {} - {} 流程节点执行异常，结束流程；"
+                                ,service.getChainResourceName(),service.getChainService().getClass().getName(),e);
+                    }
+                } else {
+                    logger.error("chain service sync exception;{}",th.getMessage());
                 }
                 break;
             }
@@ -174,6 +193,10 @@ public class ChainExecutor implements InitializingBean {
                     if (!Objects.isNull(exSubResurceName)) {
                         ChainExecutor.getInstance().execute(exSubResurceName, request, response);
                     }
+                }
+                /////流程出现异常，结束流程
+                if(ChainExceptionEnum.EXCEPTION_FLOW_END.getCode().equals(ex.getCode())){
+                    throw th;
                 }
             }
 
