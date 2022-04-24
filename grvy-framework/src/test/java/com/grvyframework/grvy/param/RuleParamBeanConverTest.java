@@ -79,6 +79,54 @@ public class RuleParamBeanConverTest {
         System.out.println(map);
     }
 
+    @Test
+    public void test2(){
+        CObjC cObj = new CObjC();
+        cObj.setId("aaa");
+        List<RuleParamFieldAlias> pathList = new ArrayList<>();
+        RuleParamFieldAlias fieldAlias = new RuleParamFieldAlias();
+        String path = "id";
+        fieldAlias.setBeanPath(path);
+        fieldAlias.setAlias("cccccid");
+        pathList.add(fieldAlias);
+
+
+        Map<String,Object> map = BeanToMapConver.conver(cObj,pathList);
+        System.out.println(map);
+    }
+
+    @Test
+    public void test3(){
+        B bObj = new B();
+        bObj.setId("123");
+        bObj.setDesc("welcome to java");
+        A a = new A();
+        a.setAge("18");
+        a.setName("gce");
+        a.setSex("male");
+        a.setFlag(true);
+        bObj.setaObj(a);
+
+        CObjC cObj = new CObjC();
+        cObj.setB(bObj);
+        cObj.setId("aaa");
+        List<RuleParamFieldAlias> pathList = new ArrayList<>();
+
+        RuleParamFieldAlias fieldAlias = new RuleParamFieldAlias();
+        String path = "b.desc";
+        fieldAlias.setBeanPath(path);
+        pathList.add(fieldAlias);
+        path = "id";
+        fieldAlias = new RuleParamFieldAlias();
+        fieldAlias.setBeanPath(path);
+        fieldAlias.setAlias("cccccid");
+        pathList.add(fieldAlias);
+
+
+        Map<String,Object> map = BeanToMapConver.conver(cObj,pathList);
+        System.out.println(map);
+    }
+
 
 
     static class CObjC {

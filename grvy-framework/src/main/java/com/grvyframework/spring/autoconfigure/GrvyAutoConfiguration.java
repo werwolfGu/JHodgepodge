@@ -2,6 +2,7 @@ package com.grvyframework.spring.autoconfigure;
 
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.PropertySource;
 
 /**
  * @author chengen.gu
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
  */
 @ComponentScan(basePackages = "com.grvyframework")
 @Configuration
+@PropertySource(value = {"classpath:grvy-config.properties"})
 public class GrvyAutoConfiguration {
 
 }

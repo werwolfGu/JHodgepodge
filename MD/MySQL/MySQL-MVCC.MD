@@ -40,12 +40,15 @@ mysql> SELECT * FROM t;
 ![](./MVCC.png)
 
 ### readview
-readview是一种数据结构，包含如下字段：
 
-- m_ids，当前有哪些事务正在执行，且还没有提交，这些事务的 id 就会存在这里；
-- min_trx_id，是指 m_ids 里最小的值；
-- max_trx_id，是指下一个要生成的事务 id。下一个要生成的事务 id 肯定比现在所有事务的 id 都大；
-- creator_trx_id，每开启一个事务都会生成一个 ReadView，而 creator_trx_id 就是这个开启的事务的 id。
+
+当我们的隔离级别为 RR 时：每开启一个事务，系统会给该事务会分配一个事务 Id，
+在该事务执行第一个 select 语句的时候，会生成一个当前时间点的事务快照 ReadView，核心属性如下：
+
+- m_ids：创建 ReadView 时当前系统中活跃的事务 Id 列表，可以理解为生成 ReadView 那一刻还未执行提交的事务，并且该列表是个升序列表。
+- m_up_limit_id：低水位，取 m_ids 列表的第一个节点，因为 m_ids 是升序列表，因此也就是 m_ids 中事务 Id 最小的那个。
+- m_low_limit_id：高水位，生成 ReadView 时系统将要分配给下一个事务的 Id 值。
+- m_creator_trx_id：创建该 ReadView 的事务的事务 Id。
 
 判断逻辑
 从最新的版本开始判断，逻辑如下：
@@ -76,8 +79,7 @@ delete from table where ?;
 
 start transaction; 
 select * from yang; 
-select * from yang; 
-（事物3已结commit了）
+---此时session3 commit
 //新添加语句
 update yang set name='Tian' where id=4;
 select * from yang; 

@@ -100,7 +100,7 @@ public class BeanToMapConver {
      * @param beanPaths
      * @return
      */
-    public static Map<String,List<RuleParamFieldAlias> > beanPathCategorize(List<RuleParamFieldAlias> beanPaths){
+    private static Map<String,List<RuleParamFieldAlias> > beanPathCategorize(List<RuleParamFieldAlias> beanPaths){
 
         Map<String,List<RuleParamFieldAlias>> beanPathsMap = new HashMap<>(16);
         ////截取后面的那个 .  Map key

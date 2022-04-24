@@ -1,7 +1,12 @@
 # redis数据结构
 
 > redis五种数据结构：`String` `List`  `hash` `set` `sort set`  `bitmaps` `hyperloglogs` 
-  
+
+内部存储如图  
+![](.redis-数据结构.MD_images/cdcb8c5f.png)
+如图所示：
+ht[0]作为DB在使用；  
+ht[1]在做hash的是否用到；
 ## redis dict 
 
 - 数据结构

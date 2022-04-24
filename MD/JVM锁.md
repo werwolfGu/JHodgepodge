@@ -82,4 +82,5 @@ synchronized 锁的升级流程如下
 参考
 
 [不可不说的Java“锁”事](https://tech.meituan.com/2018/11/15/java-lock.html)   
-[聊聊 Java 的几把 JVM 级锁](https://mp.weixin.qq.com/s/h3VIUyH9L0v14MrQJiiDbw)
+[聊聊 Java 的几把 JVM 级锁](https://mp.weixin.qq.com/s/h3VIUyH9L0v14MrQJiiDbw)  
+[synchronized 面试题深度解析](https://zhuanlan.zhihu.com/p/378429667)
