@@ -4,10 +4,6 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpHost;
-import org.elasticsearch.client.RestClient;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.beans.factory.FactoryBean;
-import org.springframework.beans.factory.InitializingBean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,16 +17,15 @@ import java.util.Objects;
  * https://www.elastic.co/guide/en/elasticsearch/client/java-rest/current/index.html
  */
 @Slf4j
-public class ESClientFactory implements InitializingBean, FactoryBean {
+public class ESClientFactory {
 
-    private  RestClient restClient;
+    //private  RestClient restClient;
 
-    private RestHighLevelClient highLevelClient;
+    //private RestHighLevelClient highLevelClient;
 
     @Setter
     private String hostsStr ;
 
-    @Override
     public void afterPropertiesSet() {
         init();
     }
@@ -47,7 +42,7 @@ public class ESClientFactory implements InitializingBean, FactoryBean {
                 log.warn("ESClient init error ,服务端配置为空");
                 return ;
             }
-            highLevelClient = new RestHighLevelClient( RestClient.builder(httpHosts));
+            //highLevelClient = new RestHighLevelClient( RestClient.builder(httpHosts));
             log.warn("初始化 ESClient sucessed...");
         }catch (Exception e){
             log.error("init ESClient error " , e);
@@ -78,7 +73,7 @@ public class ESClientFactory implements InitializingBean, FactoryBean {
         return hostList.toArray(new HttpHost[0]);
     }
 
-    @Override
+    /*@Override
     public Object getObject() throws Exception {
         return highLevelClient;
     }
@@ -87,5 +82,5 @@ public class ESClientFactory implements InitializingBean, FactoryBean {
     public Class<?> getObjectType() {
         return RestHighLevelClient.class;
     }
-
+*/
 }

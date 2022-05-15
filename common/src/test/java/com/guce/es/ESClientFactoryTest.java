@@ -1,8 +1,6 @@
 package com.guce.es;
 
 import lombok.extern.slf4j.Slf4j;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * @Author chengen.gce
@@ -14,8 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class ESClientFactoryTest {
 
 
-    @Autowired
-    private RestHighLevelClient highLevelClient;
+    /*@Autowired
+    private RestHighLevelClient highLevelClient;*/
 
 
     public void indexTest(){
