@@ -1,6 +1,8 @@
 package com.guce.backtrace;
 
 /**
+ *
+ * https://leetcode-cn.com/problems/additive-number/
  * @Author chengen.gce
  * @DATE 2021/4/18 2:57 下午
  */
@@ -10,46 +12,50 @@ public class IsAdditiveNumber {
     public boolean isAdditiveNumber(String s){
 
         char[] chArr = s.toCharArray() ;
-        return dfs(chArr , chArr.length , 0,0,0,0);
+        return dfs(chArr , 0,0,0,0);
     }
 
-    //////
-    public boolean dfs(char[] chArr , int len ,int idx , int preVal ,int sum ,int count){
-        if (idx == len) {
-            return count >= 3 ;
+    /**
+     *
+     * @param chArr
+     * @param idx
+     * @param count
+     * @param prevPre
+     * @param pre
+     * @return
+     */
+    public boolean dfs(char[] chArr , int idx ,int count, long prevPre ,long pre ){
+        if (idx == chArr.length) {
+            return count > 2 ;
         }
 
-        for (int i = idx ; i < len ; i++ ){
+        long curr = 0 ;
+        for (int i = idx ; i < chArr.length ; i++ ){
 
-            ///转换成数字
-            int curr = toNumber(chArr,idx , i);
-
-            if (curr < 0){
-                continue;
+            /// 如果首字母是 0 ；比如是 01 这类的数 直接返回
+            if (i > idx && chArr[idx] == '0'){
+                return false;
             }
-            if (  count >= 2 && sum != curr){
-                continue;
+            curr = curr * 10 + chArr[i] - '0';
+            /////前面已经有2个值了
+            if (  count >= 2 ){
+                long sum = pre + prevPre;
+                /////2. 如果前2个数的和 < 当前的数 直接返回 false;
+                if (curr > sum) {
+                    return false;
+                }
+                ////3. 如果前2个数的和 > 当前数 ，说明当前数还要继续往后加数
+                if (curr < sum){
+                    continue;
+                }
             }
-
-            if (dfs(chArr ,len, i + 1 ,curr , preVal + curr , count + 1)){
+            /////prevPre + pre = curr 或 count < 2
+            if (dfs(chArr , i + 1, count + 1 ,pre , curr )){
                 return true;
             }
         }
         return false;
     }
-
-    public int toNumber(char[] chArr , int start , int end){
-
-        if (start != end && chArr[start] == '0' ){
-            return -1 ;
-        }
-        int res = 0 ;
-        for (int i = start ; i <= end ; i++ ){
-            res = res * 10 + chArr[i] - '0';
-        }
-        return res;
-    }
-
     public static void main(String[] args) {
 
         IsAdditiveNumber number = new IsAdditiveNumber();

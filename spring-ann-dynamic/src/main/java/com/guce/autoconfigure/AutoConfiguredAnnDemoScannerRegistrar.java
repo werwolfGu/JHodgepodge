@@ -3,7 +3,6 @@ package com.guce.autoconfigure;
 import com.guce.anntation.AnnDemo;
 import com.guce.anntation.AnnDemoScan;
 import com.guce.dynamicBean.AnnDemoScannerConfigurer;
-import com.guce.dynamicBean.ClassPathAnnDemoScanner;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.BeanWrapperImpl;
@@ -12,9 +11,7 @@ import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.BeanFactoryAware;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.ImportBeanDefinitionRegistrar;
 import org.springframework.core.annotation.AnnotationAttributes;
 import org.springframework.core.io.ResourceLoader;
@@ -35,8 +32,8 @@ import java.util.stream.Stream;
  * https://felord.cn/custom-importBeanDefinitionRegistrar.html
  */
 @Slf4j
-@Configuration
-@ConditionalOnMissingBean({AnnDemoScannerConfigurer.class, ClassPathAnnDemoScanner.class})
+//@Configuration
+//@ConditionalOnMissingBean({AnnDemoScannerConfigurer.class, ClassPathAnnDemoScanner.class})
 public class AutoConfiguredAnnDemoScannerRegistrar  implements ImportBeanDefinitionRegistrar, BeanFactoryAware , ResourceLoaderAware {
 
     private BeanFactory beanFactory ;

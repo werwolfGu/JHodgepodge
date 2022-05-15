@@ -123,5 +123,6 @@ public class ClassInit {
     public static void main(String[] args) {
         Object obj = initInstance("boolean","true");
         System.out.println(obj);
+
     }
 }

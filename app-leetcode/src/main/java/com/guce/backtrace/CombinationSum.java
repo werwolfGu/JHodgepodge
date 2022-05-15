@@ -2,6 +2,7 @@ package com.guce.backtrace;
 
 import java.util.ArrayDeque;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Deque;
 import java.util.List;
 
@@ -16,7 +17,7 @@ public class CombinationSum {
     public static List<List<Integer>> solution(int[] candidates , int target){
 
         List<List<Integer>> result = new ArrayList<>();
-
+        Arrays.sort(candidates);
         Deque<Integer> list = new ArrayDeque<>();
         backtrack(candidates,target,list,result,0);
         return result;
@@ -31,7 +32,7 @@ public class CombinationSum {
 
         for (int i = idx ; i < candidates.length ; i++ ){
             if (target < candidates[i]){
-                continue;
+                break;
             }
             list.add(candidates[i]);
             backtrack(candidates,target - candidates[i],list,result,i);

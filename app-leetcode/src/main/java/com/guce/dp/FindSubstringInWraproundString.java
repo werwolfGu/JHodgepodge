@@ -6,7 +6,8 @@ package com.guce.dp;
  * https://leetcode-cn.com/problems/unique-substrings-in-wraparound-string/
  * 环绕字符串中唯一的子字符串
  *
- * 把字符串 s 看作是“abcdefghijklmnopqrstuvwxyz”的无限环绕字符串，所以 s 看起来是这样的："...zabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd....". 
+ * 把字符串 s 看作是“abcdefghijklmnopqrstuvwxyz”的无限环绕字符串，所以
+ * s 看起来是这样的："...zabcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyzabcd....".
  *
  * 现在我们有了另一个字符串 p 。你需要的是找出 s 中有多少个唯一的 p 的非空子串，尤其是当你的输入是字符串 p ，你需要输出字符串 s 中 p 的不同的非空子串的数目。 
  *
@@ -48,11 +49,13 @@ public class FindSubstringInWraproundString {
         int count = 0 ;
         for (int i = 0 ; i < p.length() ; i++ ){
 
-            if (i > 0 && (p.charAt(i) - p.charAt(i - 1) - 1)  == 0){
+            /////如果连续的话 那么 dp(i) = dp(i-1) + 1;
+            if (i > 0 && (p.charAt(i) - p.charAt(i - 1) - 1) % 26 == 0){
                 count++;
             } else {
                 count = 1;
             }
+
             int idx = p.charAt(i) - 'a';
             dp[idx] = Math.max(dp[idx],count);
         }

@@ -28,10 +28,10 @@ public class TouTiaoInterview {
                 }else {
                     dp[i] = dp[i -1] + dp[i -2];
                 }
+            }else if (y == 0){
+                return 0;
+
             }else {
-                if (x == 0){
-                    return 0;
-                }
                 dp[i] = dp[i -1] ;
             }
         }

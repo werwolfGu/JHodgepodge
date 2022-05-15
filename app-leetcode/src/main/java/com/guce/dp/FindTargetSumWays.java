@@ -35,6 +35,13 @@ public class FindTargetSumWays {
         return count;
     }
 
+    /**
+     * 回溯法
+     * @param nums
+     * @param idx
+     * @param sum
+     * @param S
+     */
     public void calculate(int[] nums ,int idx , int sum ,int S){
         if (idx == nums.length){
             if (sum == S){

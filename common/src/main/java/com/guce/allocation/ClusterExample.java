@@ -1,6 +1,6 @@
 package com.guce.allocation;
 
-import com.guce.allocation.manager.ClusterAllocationManager;
+import com.guce.allocation.manager.ClusterDispatchManager;
 import com.guce.allocation.manager.IClusterConsumerThreadService;
 import com.guce.loadbalance.impl.ConsistentHashLoadBalance;
 
@@ -45,7 +45,7 @@ public class ClusterExample {
                     return true;
         }).build();
 
-        ClusterAllocationManager allocationManager = clusterAllocationBuilder.buildClusterAllocation();
+        ClusterDispatchManager allocationManager = clusterAllocationBuilder.buildClusterAllocation();
         allocationManager.simulateClusterServer();
         IClusterConsumerThreadService clusterConsumerThreadService = clusterAllocationBuilder
                 .buildClusterConsumerThreadsManager();

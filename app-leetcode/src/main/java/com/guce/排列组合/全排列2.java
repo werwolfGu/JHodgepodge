@@ -7,6 +7,8 @@ import java.util.Deque;
 import java.util.List;
 
 /**
+ * https://leetcode-cn.com/problems/permutations-ii/
+ * 给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
  * @Author chengen.gce
  * @DATE 2021/5/16 9:49 下午
  */
@@ -35,7 +37,8 @@ public class 全排列2 {
             if (used[i]){
                 continue;
             }
-            if (i > 0 && used[ i -1] && nums[i -1] == nums[i]){
+            ///剪枝
+            if (i > 0 && !used[i -1] && nums[i -1] == nums[i]){
                 continue;
             }
             used[i] = true;

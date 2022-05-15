@@ -124,6 +124,12 @@ public class ConsistentHashWithoutVN {
         node = nv.matchServerNode("8766713232");
         System.out.println("8766713232 :" + nv.getHash("8766713232") + " 匹配节点 ->" + node.toString());
 
+        List<String> list = new ArrayList<>();
+        list.add("1");
+        System.out.println(System.identityHashCode(list));
+        list.add("2");
+        list.add("2");
+        System.out.println(System.identityHashCode(list));
     }
 
 }

@@ -26,7 +26,7 @@ import java.util.function.Supplier;
  * @DATE 2022/5/13 14:19
  */
 @Slf4j
-public class ClusterConsumerThreadsManager<R> implements IClusterConsumerThreadService {
+public class ClusterThreadDispatcherManager<R> implements IClusterConsumerThreadService {
 
     @Setter
     private int threadConcurrentNumber = 1;
@@ -42,7 +42,7 @@ public class ClusterConsumerThreadsManager<R> implements IClusterConsumerThreadS
 
     private AtomicBoolean producerEndFlag = new AtomicBoolean(false);
     @Setter
-    private ClusterAllocationManager clusterAllocationManager;
+    private ClusterDispatchManager clusterAllocationManager;
     @Setter
     ExecutorService executor ;
 
@@ -57,7 +57,7 @@ public class ClusterConsumerThreadsManager<R> implements IClusterConsumerThreadS
     private Map<String,WorkThread> workThreadrouteTableMap = new ConcurrentHashMap<>();
     private List<String> threadRouteInvokers = new ArrayList<>(16);
 
-    public ClusterConsumerThreadsManager(String businessName) {
+    public ClusterThreadDispatcherManager(String businessName) {
         this.businessName = businessName;
         this.producerRateWaitPolicy = new CapacityControlWaitPolicy(DEFAULT_QUEUE_CAPACITY,businessName,DEFAULT_PRODUCE_QUEUE_WAIT_TIME);
     }
@@ -66,7 +66,7 @@ public class ClusterConsumerThreadsManager<R> implements IClusterConsumerThreadS
      * 将待处理数据分配到每个业务线程队列中
      * @param dataEntityList
      */
-    public void selectExecuteThread(List<TradeDataEntity> dataEntityList){
+    public void selectDispatchExecuteThread(List<TradeDataEntity> dataEntityList){
 
         List<String> threadList = threadRouteInvokers;
         dataEntityList.parallelStream().forEach( dataEntity -> {
@@ -93,12 +93,12 @@ public class ClusterConsumerThreadsManager<R> implements IClusterConsumerThreadS
     public void allocationToConsumerThreadQueue (List<TradeDataEntity> list) {
 
         ///本机执行交易数据
-        list = clusterAllocationManager.selectExecuteJVM(list);
+        list = clusterAllocationManager.selectDispatchJVM(list);
         if (CollectionUtils.isEmpty(list)){
             return ;
         }
         ////分配到个线程执行的数据
-        this.selectExecuteThread(list);
+        this.selectDispatchExecuteThread(list);
     }
 
     /**

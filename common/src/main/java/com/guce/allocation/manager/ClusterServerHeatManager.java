@@ -72,7 +72,7 @@ public class ClusterServerHeatManager implements InitializingBean , DisposableBe
         long curr = System.currentTimeMillis();
         try{
             Map<String,Long> routeMap = redissonClient.getMap(SERVER_HEAT_ROUTE_MAP_KEY);
-            List<String> clusterServerList = ClusterAllocationManager.getClusterServerList();
+            List<String> clusterServerList = ClusterDispatchManager.getClusterServerList();
             boolean updateRoute = false;
 
             if (routeMap == null) {
@@ -99,7 +99,7 @@ public class ClusterServerHeatManager implements InitializingBean , DisposableBe
                 }
             }
             if (updateRoute) {
-                ClusterAllocationManager.setClusterServerList(clusterServerList);
+                ClusterDispatchManager.setClusterServerList(clusterServerList);
                 log.warn("refresh server route info : {}" , clusterServerList);
             }
         }catch (Exception e) {

@@ -22,23 +22,22 @@ public class 全排列 {
         return result;
     }
 
-    public void dfs(int[] nums , int len  ,boolean[] used, Deque<Integer> stack ,List<List<Integer>> result){
-        if (stack.size() == len) {
+    public void dfs(int[] nums, int len , boolean[] used ,Deque<Integer> stack , List<List<Integer>> result) {
+        if (stack.size() == len){
             result.add(new ArrayList<>(stack));
             return ;
         }
 
-        for (int i = 0 ; i < len ; i++ ){
+        for (int i = 0 ; i < len ; i++) {
             if (used[i]){
                 continue;
             }
             stack.addLast(nums[i]);
             used[i] = true;
-            dfs(nums,len ,used,stack,result);
+            dfs(nums,len,used,stack,result);
             stack.pollLast();
             used[i] = false;
         }
-
     }
 
     public static void main(String[] args) {

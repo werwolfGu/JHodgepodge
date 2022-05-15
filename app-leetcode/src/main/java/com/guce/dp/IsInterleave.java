@@ -10,6 +10,9 @@ public class IsInterleave {
 
     public  boolean isInterLeave(String s1 ,String s2,String s3){
         int  m = s1.length(), n = s2.length();
+        if (m + n != s3.length()){
+            return false;
+        }
         boolean[][] dp = new boolean[m + 1][n + 1];
 
         dp[0][0] = true;

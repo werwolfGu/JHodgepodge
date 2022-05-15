@@ -1,7 +1,7 @@
 package com.guce.allocation;
 
-import com.guce.allocation.manager.ClusterAllocationManager;
-import com.guce.allocation.manager.ClusterConsumerThreadsManager;
+import com.guce.allocation.manager.ClusterDispatchManager;
+import com.guce.allocation.manager.ClusterThreadDispatcherManager;
 import com.guce.allocation.manager.IClusterConsumerThreadService;
 import com.guce.loadbalance.LoadBalance;
 import com.guce.loadbalance.impl.ConsistentHashLoadBalance;
@@ -46,8 +46,8 @@ public class ClusterAllocationBuilder {
     private boolean allMsgPollMode = false;
 
 
-    private ClusterAllocationManager clusterAllocationManager;
-    private ClusterConsumerThreadsManager threadsManager;
+    private ClusterDispatchManager clusterAllocationManager;
+    private ClusterThreadDispatcherManager threadsManager;
 
     private final static String DEFAULT_THREAD_NAME_PRE = "cluster-allocation-";
     private final static AtomicInteger THREAD_NUMBER = new AtomicInteger(0);
@@ -87,9 +87,9 @@ public class ClusterAllocationBuilder {
         threadConcurrentNumber = Optional.ofNullable(threadConcurrentNumber).orElse(DEFAULT_CONCURRENT_THREAD_NUMBER);
 
         clusterAllocationManager
-                = new ClusterAllocationManager(allMsgPollMode,serverLoadBalance);
+                = new ClusterDispatchManager(allMsgPollMode,serverLoadBalance);
 
-        threadsManager = new ClusterConsumerThreadsManager(businessName);
+        threadsManager = new ClusterThreadDispatcherManager(businessName);
         threadsManager.setClusterAllocationManager(clusterAllocationManager);
         threadsManager.setBatchSize(batchSize);
         threadsManager.setExecutor(executor);
@@ -102,7 +102,7 @@ public class ClusterAllocationBuilder {
     /**
      * 创建集群分配管理类
      */
-    public ClusterAllocationManager buildClusterAllocation(){
+    public ClusterDispatchManager buildClusterAllocation(){
         return clusterAllocationManager;
     }
 

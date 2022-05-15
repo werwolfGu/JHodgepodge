@@ -1,6 +1,10 @@
-#浅谈IO那点事-笔记
- 
- 
+# 浅谈IO那点事-笔记
+
+历史演进图
+
+![](/Users/chengen.gu/workspace/github/springboot-demo/MD/picture/redisIO多路复用原理 (1).png)
+
+
 1. 概念说明 
     - 用户空间和内核空间 
     - 保护模式
@@ -12,10 +16,9 @@
     如图
     用户app1/用户app2 为用户空间 ； linux kernel :为内核空间
     保护模式：用户空间不能直接访问内核空间
-    比如：用户app需要读写文件，其实用户程序是不能直接操作文件，需要通过内核空间才能访问到文件，所以这里设计到一个用户态想内核态的
-    切换；
+    比如：用户app需要读写文件，其实用户程序是不能直接操作文件，需要通过内核空间才能访问到文件，所以这里设计到一个用户态想内核态的切换；
 2. IO发展历程 
- 
+
     BIO：`阻塞IO`  NIO：`非阻塞IO`  AIO：`异步IO`
 
 开始阶段IO为BIO 
@@ -67,7 +70,7 @@ public static void main(String[] args) throws IOException {
 
 对于这个问题，就有另一个解决办法：使用线程池指定同时处理客户端请求的数量；但是在接受客户端请求时还是阻塞的；随着技术发展出现NIO
 
-###NIO
+### NIO
 NIO有叫非阻塞IO也有叫newIO
 
 NIO 非阻塞IO 多路复用 select  poll  epoll
@@ -98,5 +101,4 @@ epoll模式
 此时内核同时监听了fd9。
 4. 如果此时fd9的请求到达，同时又有另一个客户端需要建立连接；此时epoll_wait会知道有2个文件描述符fd5 和fd9传给app
 fd5处理建立连接创建fd10 通过epoll_ctl传给fd8 ，同时app会接受fd9的请求，处理客户端请求，处理完成将数据返回；
-
 

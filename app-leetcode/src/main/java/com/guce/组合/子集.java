@@ -22,8 +22,9 @@ public class 子集 {
     }
 
     public void dfs(Deque<Integer>stack ,int begin,int[] nums, List<List<Integer>> result){
-
-        result.add(new ArrayList<>(stack));
+        if (stack.size() != 0 ){
+            result.add(new ArrayList<>(stack));
+        }
 
         for (int i = begin ; i < nums.length ;i++ ){
 
@@ -36,6 +37,6 @@ public class 子集 {
 
     public static void main(String[] args) {
         子集 instance = new 子集();
-        System.out.println(instance.subsets(new int[]{1,2,3}));
+        System.out.println(instance.subsets(new int[]{1,2,3,4}));
     }
 }

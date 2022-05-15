@@ -52,6 +52,7 @@ public class TestGrvyScriptEngineClient {
         GrvyScriptEngineClient client = this.context.getBean(GrvyScriptEngineClient.class);
         String script = " def list = [\"1101\",\"1411\",\"1121\",\"1131\"]\n" +
                 "    def channels = [\"NET\",\"NCUP\"]\n" +
+                "abc = true\n" +
                 "    if (list.contains(交易码) && channels.contains(渠道))\n" +
                 "        return true ";
         Map<String,Object> map = Maps.newHashMap();

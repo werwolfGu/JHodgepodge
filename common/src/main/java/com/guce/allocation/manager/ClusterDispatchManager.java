@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  * @DATE 2022/5/12 12:53
  */
 @Slf4j
-public class ClusterAllocationManager{
+public class ClusterDispatchManager {
     @Getter
     @Setter
     private static List<String> clusterServerList = new ArrayList<>(128);
@@ -28,10 +28,10 @@ public class ClusterAllocationManager{
 
     private static final String host = NetUtils.getLocalHost();
 
-    public ClusterAllocationManager (LoadBalance loadBalance) {
+    public ClusterDispatchManager(LoadBalance loadBalance) {
         this(false,loadBalance);
     }
-    public ClusterAllocationManager (boolean allMsgPollMode,LoadBalance loadBalance) {
+    public ClusterDispatchManager(boolean allMsgPollMode, LoadBalance loadBalance) {
         this.allMsgPollMode = allMsgPollMode;
         this.loadBalance = loadBalance;
     }
@@ -41,7 +41,7 @@ public class ClusterAllocationManager{
      * @param tradeList
      * @return
      */
-    public List<TradeDataEntity> selectExecuteJVM(List<? extends TradeDataEntity> tradeList){
+    public List<TradeDataEntity> selectDispatchJVM(List<? extends TradeDataEntity> tradeList){
         if (CollectionUtils.isEmpty(tradeList)) {
             return null;
         }
@@ -72,6 +72,6 @@ public class ClusterAllocationManager{
         invokers.add("192.168.1.20");
         invokers.add("192.168.31.196");
         invokers.add("22.9.171.133");
-        ClusterAllocationManager.getClusterServerList().addAll(invokers);
+        ClusterDispatchManager.getClusterServerList().addAll(invokers);
     }
 }

@@ -1,6 +1,6 @@
 package com.guce.allocation;
 
-import com.guce.allocation.manager.ClusterAllocationManager;
+import com.guce.allocation.manager.ClusterDispatchManager;
 import com.guce.loadbalance.impl.ConsistentHashLoadBalance;
 import com.guce.service.IAllocationService;
 import com.guce.service.impl.AllocationServiceImpl;
@@ -52,7 +52,7 @@ public class AllocationExample {
                     return true;
                 }).build();
 
-        ClusterAllocationManager allocationManager = clusterAllocationBuilder.buildClusterAllocation();
+        ClusterDispatchManager allocationManager = clusterAllocationBuilder.buildClusterAllocation();
         allocationManager.simulateClusterServer();
 
         CompletableFuture future = clusterAllocationBuilder

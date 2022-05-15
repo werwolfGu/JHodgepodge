@@ -124,7 +124,6 @@ id(主键)	c（普通索引）	d（无索引）
 
 
 
-
 参考  
 [MVCC无法解决幻读](https://www.jianshu.com/p/cef49aeff36b)  
 [MVCC无法解决幻读1](https://www.zhihu.com/question/372905832)  
