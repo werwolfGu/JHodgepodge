@@ -8,12 +8,16 @@ import com.guce.loadbalance.impl.ConsistentHashLoadBalance;
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -27,7 +31,6 @@ public class ClusterAllocationBuilder {
     private LoadBalance threadLoadBalance;
     private final static LoadBalance DEFAULT_LOADBALANCE = new ConsistentHashLoadBalance();
 
-    private final static ExecutorService DEFAULT_THREAD_POOL_EXECUTOR ;
     private final static int DEFAULT_BATCH_SIZE = 1;
     private final static int DEFAULT_CONCURRENT_THREAD_NUMBER = 4;
     private String businessName;
@@ -37,7 +40,12 @@ public class ClusterAllocationBuilder {
     private int batchSize ;
     private Supplier<Boolean> interruptedBusinessThreadLoopInvoker;
 
-    private ExecutorService executor;
+    private ExecutorService businessHandleExecutor;
+    private ExecutorService msgPollExecutor;
+
+    private BiFunction<Map<String,Object> , IClusterConsumerThreadService, Boolean> msgPollInvoker ;
+    private static final Map<String,ExecutorService> businessThreadMap =
+            new ConcurrentHashMap<>(128);
     /**
      * 是否全量数据拉去模式，
      * true：全量数据拉去的话，会对消息在服务器层面先做负载均衡分配；
@@ -52,17 +60,18 @@ public class ClusterAllocationBuilder {
     private final static String DEFAULT_THREAD_NAME_PRE = "cluster-allocation-";
     private final static AtomicInteger THREAD_NUMBER = new AtomicInteger(0);
 
-    static {
+    public static ExecutorService createDefaultThreadPoolExecutor(String businessName) {
 
-        int CORE_CPU_NUM = Runtime.getRuntime().availableProcessors();
+        int CORE_CPU_NUM = Runtime.getRuntime().availableProcessors() + 1;
         int maxThreadNum = CORE_CPU_NUM * 2;
-        DEFAULT_THREAD_POOL_EXECUTOR =
+        return businessThreadMap.computeIfAbsent( businessName , key ->
                 new ThreadPoolExecutor(CORE_CPU_NUM,maxThreadNum , 180, TimeUnit.SECONDS
-                        , new LinkedBlockingQueue<>(10000), (r) -> {
-                            String threadName = DEFAULT_THREAD_NAME_PRE + THREAD_NUMBER.getAndIncrement();
-                            Thread res = new Thread(r,threadName);
-                            return res;
-                });
+                , new LinkedBlockingQueue<>(10000), (r) -> {
+                    String threadName = DEFAULT_THREAD_NAME_PRE + businessName + "-" + THREAD_NUMBER.getAndIncrement();
+                    Thread res = new Thread(r,threadName);
+                    return res;
+        }));
+
     }
 
 
@@ -82,7 +91,13 @@ public class ClusterAllocationBuilder {
         }
         serverLoadBalance = Optional.ofNullable(serverLoadBalance).orElse(DEFAULT_LOADBALANCE);
         threadLoadBalance = Optional.ofNullable(threadLoadBalance).orElse(DEFAULT_LOADBALANCE);
-        executor = Optional.ofNullable(executor).orElse(DEFAULT_THREAD_POOL_EXECUTOR);
+
+        businessHandleExecutor = Optional.ofNullable(businessHandleExecutor)
+                .orElseGet( () -> createDefaultThreadPoolExecutor(businessName));
+
+        msgPollExecutor = Optional.ofNullable(msgPollExecutor)
+                .orElseGet( () -> createDefaultThreadPoolExecutor(businessName));
+
         batchSize = Optional.ofNullable(batchSize).orElse(DEFAULT_BATCH_SIZE);
         threadConcurrentNumber = Optional.ofNullable(threadConcurrentNumber).orElse(DEFAULT_CONCURRENT_THREAD_NUMBER);
 
@@ -92,7 +107,8 @@ public class ClusterAllocationBuilder {
         threadsManager = new ClusterThreadDispatcherManager(businessName);
         threadsManager.setClusterAllocationManager(clusterAllocationManager);
         threadsManager.setBatchSize(batchSize);
-        threadsManager.setExecutor(executor);
+        threadsManager.setBusinessConsumeExecutor(businessHandleExecutor);
+        threadsManager.setMsgPollExecutor(msgPollExecutor);
         threadsManager.setThreadConcurrentNumber(threadConcurrentNumber);
         threadsManager.setLoadBalance(threadLoadBalance);
         threadsManager.setBusinessInvoker(businessInvoker);
@@ -109,6 +125,10 @@ public class ClusterAllocationBuilder {
     public IClusterConsumerThreadService buildClusterConsumerThreadsManager() {
 
         return threadsManager;
+    }
+
+    public CompletableFuture startupMsgPollService(Map<String,Object> param){
+       return  threadsManager.startupBusinessMsgPoll(param, msgPollInvoker);
     }
 
     /**
@@ -166,6 +186,16 @@ public class ClusterAllocationBuilder {
     }
 
     /**
+     * 业务代码函数
+     * @param msgPollInvoker
+     * @return
+     */
+    public ClusterAllocationBuilder msgPollInvoker(BiFunction<Map<String,Object> ,IClusterConsumerThreadService,Boolean> msgPollInvoker){
+        this.msgPollInvoker = msgPollInvoker;
+        return this;
+    }
+
+    /**
      * 每一批次执行的数量
      * @param batchSize
      * @return
@@ -176,13 +206,24 @@ public class ClusterAllocationBuilder {
     }
 
     /**
-     * 执行线程池
-     * @param executor
+     * 业务执行线程池
+     * @param businessHandleExecutor
      * @return
      */
-    public ClusterAllocationBuilder executor(ExecutorService executor) {
+    public ClusterAllocationBuilder businessHandleExecutor(ExecutorService businessHandleExecutor) {
 
-        this.executor = executor;
+        this.businessHandleExecutor = businessHandleExecutor;
+        return this;
+    }
+
+    /**
+     * 业务执行线程池
+     * @param msgPollExecutor
+     * @return
+     */
+    public ClusterAllocationBuilder msgPollExecutor(ExecutorService msgPollExecutor) {
+
+        this.msgPollExecutor = msgPollExecutor;
         return this;
     }
 }

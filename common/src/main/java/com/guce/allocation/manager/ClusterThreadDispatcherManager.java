@@ -17,6 +17,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.LongAdder;
+import java.util.function.BiFunction;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -44,7 +45,10 @@ public class ClusterThreadDispatcherManager<R> implements IClusterConsumerThread
     @Setter
     private ClusterDispatchManager clusterAllocationManager;
     @Setter
-    ExecutorService executor ;
+    ExecutorService businessConsumeExecutor ;
+
+    @Setter
+    ExecutorService msgPollExecutor ;
 
     @Setter
     private LoadBalance loadBalance;
@@ -74,9 +78,9 @@ public class ClusterThreadDispatcherManager<R> implements IClusterConsumerThread
             String selectedThread = loadBalance.select(threadList,dataEntity.getThreadIdentifierCode());
             WorkThread thread = workThreadrouteTableMap.get(selectedThread);
             AllocationQueueManager.getBusinessQueueLenMap()
-                    .get(dataEntity.getBusinessName()).add(1);
+                    .get(businessName).add(1);
             AllocationQueueManager.getBusinessQueueSizeMap()
-                    .get(dataEntity.getBusinessName()).add(1);
+                    .get(businessName).add(1);
 
             BlockingQueue queue = thread.getThreadWorkQueue();
             queue.add(dataEntity);
@@ -109,7 +113,22 @@ public class ClusterThreadDispatcherManager<R> implements IClusterConsumerThread
 
         return CompletableFuture.runAsync( () -> {
             mapConsumer.accept(null);
-        },executor).whenComplete( (Void,e) -> {
+        },msgPollExecutor).whenComplete( (Void,e) -> {
+            log.info("生成的数据数量：" + AllocationQueueManager.getBusinessQueueLenMap().get(businessName).longValue());
+            finished();
+        } );
+
+    }
+
+    /**
+     * 启动数据拉去
+     */
+    @Override
+    public CompletableFuture startupBusinessMsgPoll(final Map<String,Object> param ,BiFunction<Map<String,Object>,IClusterConsumerThreadService,Boolean> function) {
+
+        return CompletableFuture.runAsync( () -> {
+            function.apply(param,this);
+        },msgPollExecutor).whenComplete( (Void,e) -> {
             log.info("生成的数据数量：" + AllocationQueueManager.getBusinessQueueLenMap().get(businessName).longValue());
             finished();
         } );
@@ -137,7 +156,7 @@ public class ClusterThreadDispatcherManager<R> implements IClusterConsumerThread
             workThreadrouteTableMap.put(threadIdentifierCode,tradeHandleThread);
             threadRouteInvokers.add(threadIdentifierCode);
             CompletableFuture future = CompletableFuture
-                    .runAsync(tradeHandleThread ,executor)
+                    .runAsync(tradeHandleThread ,businessConsumeExecutor)
                     .whenComplete( (Void ,e) -> {
                         log.info(Thread.currentThread().getName() + " end ,clear thread route info");
                         workThreadrouteTableMap.remove(threadIdentifierCode);
@@ -218,6 +237,9 @@ public class ClusterThreadDispatcherManager<R> implements IClusterConsumerThread
                         break;
                     }
                     TradeDataEntity data = queue.poll(1, TimeUnit.SECONDS);
+                    if (data == null) {
+                        Thread.yield();
+                    }
                     if (data != null) {
                         AllocationQueueManager.getBusinessQueueSizeMap()
                                 .get(data.getBusinessName()).decrement();

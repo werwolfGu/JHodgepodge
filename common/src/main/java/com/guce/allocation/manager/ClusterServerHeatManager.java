@@ -7,7 +7,6 @@ import org.redisson.api.RTopic;
 import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,17 +20,22 @@ import java.util.concurrent.TimeUnit;
  * @DATE 2022/5/12 15:56
  */
 @Slf4j
-@Component
 public class ClusterServerHeatManager implements InitializingBean , DisposableBean {
 
     private RedissonClient redissonClient;
+
     private final static String SERVER_HEAT_ROUTE_MAP_KEY = "cluster_server_heat_route_key";
     private final static String CLUSTER_SERVER_ROUTE_INFO_TOPIC = "cluster_server_route_info_topic";
     private ScheduledExecutorService scheduledExecutorService ;
     private static final String host ;
+    private String appid ;
 
     static {
         host = NetUtils.getLocalHost();
+    }
+
+    public ClusterServerHeatManager(RedissonClient redissonClient){
+        this.redissonClient = redissonClient;
     }
 
     /**
@@ -53,7 +57,7 @@ public class ClusterServerHeatManager implements InitializingBean , DisposableBe
      */
     public void sendHeatbeat() {
         Long value = System.currentTimeMillis();
-        RMap<String,Long> rMap = redissonClient.getMap(SERVER_HEAT_ROUTE_MAP_KEY);
+        RMap<String,Long> rMap = redissonClient.getMap(getKey(SERVER_HEAT_ROUTE_MAP_KEY));
         rMap.put(host,value);
     }
 
@@ -71,7 +75,7 @@ public class ClusterServerHeatManager implements InitializingBean , DisposableBe
     public void updateRouteInfo () {
         long curr = System.currentTimeMillis();
         try{
-            Map<String,Long> routeMap = redissonClient.getMap(SERVER_HEAT_ROUTE_MAP_KEY);
+            Map<String,Long> routeMap = redissonClient.getMap(getKey(SERVER_HEAT_ROUTE_MAP_KEY));
             List<String> clusterServerList = ClusterDispatchManager.getClusterServerList();
             boolean updateRoute = false;
 
@@ -108,7 +112,7 @@ public class ClusterServerHeatManager implements InitializingBean , DisposableBe
     }
 
     public void publishRouteInfo() {
-        RTopic routeInfoTopic = redissonClient.getTopic(CLUSTER_SERVER_ROUTE_INFO_TOPIC);
+        RTopic routeInfoTopic = redissonClient.getTopic(getKey(CLUSTER_SERVER_ROUTE_INFO_TOPIC));
         routeInfoTopic.addListener(String.class, (CharSequence channel, String msg) -> {
             /////发送心跳，同时更新路由信息
             sendHeatbeat();
@@ -119,15 +123,18 @@ public class ClusterServerHeatManager implements InitializingBean , DisposableBe
 
     @Override
     public void destroy() throws Exception {
-        RMap<String,Long> routeMap = redissonClient.getMap(SERVER_HEAT_ROUTE_MAP_KEY);
+        RMap<String,Long> routeMap = redissonClient.getMap(getKey(SERVER_HEAT_ROUTE_MAP_KEY));
         routeMap.remove(host);
         log.info("spring destroy，将host {} 从路由列表中剔除 , current route info : {}" , host,routeMap);
     }
 
+    public String getKey (String key) {
+        return new StringBuilder().append(key).append("_").append(appid).toString();
+    }
 
     @Override
     public void afterPropertiesSet() throws Exception {
-
+        appid = System.getProperty("appId");
         int CPU_CORE = Runtime.getRuntime().availableProcessors();
         scheduledExecutorService = new ScheduledThreadPoolExecutor(CPU_CORE);
         publishRouteInfo();
@@ -136,13 +143,14 @@ public class ClusterServerHeatManager implements InitializingBean , DisposableBe
 
         scheduledExecutorService
                 .scheduleAtFixedRate(new ReflushRouteInfo(),3,3, TimeUnit.SECONDS);
-
         Runtime.getRuntime().addShutdownHook( new Thread(() -> {
-            RMap<String,Long> routeMap = redissonClient.getMap(SERVER_HEAT_ROUTE_MAP_KEY);
+            RMap<String,Long> routeMap = redissonClient.getMap(getKey(SERVER_HEAT_ROUTE_MAP_KEY));
             routeMap.remove(host);
             log.info("服务关闭，将host {} 从路由列表中剔除 , current route info : {}" , host,routeMap);
 
         }));
+
+        log.info("cluster server heatbeat start appid: {} ; host:{}" ,appid,host);
     }
 
 }
