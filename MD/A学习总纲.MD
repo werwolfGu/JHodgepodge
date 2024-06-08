@@ -1,12 +1,12 @@
-#学习总纲
+# 学习总纲
+
 ## 目录
 - [Java](#java)
-    - [Java集合](Java集合)
-    - [Java多线程](Java多线程)
-    - [threadlocal](com.guce.ThreadLocalLearn)  
+    - [Java集合](#Java集合)
+    - [Java多线程](#Java多线程)
+    - [threadlocal](./threadLocal.MD)  
     - [jvm](#JVM内存结构GC算法)
     - [lock](Java锁)
-
 - [MySQL](#MySQL)
   - [事务隔离级别](#事务隔离级别)
   - [MVCC](./MySQL/MySQL-MVCC.MD)  
@@ -15,7 +15,6 @@
   - 锁 间隙锁
   - 索引存储结构
   - [索引下推 索引覆盖  回表](#索引下推、索引覆盖、回表)
-
 - redis
     1. [redis数据结构  string  hash  list  set zset](./redis/redis-数据结构.MD) 
     2. redis内部数据结构：实现原理
@@ -25,7 +24,6 @@
     6. [redis渐进式hash](./redis/渐进式rehash.MD)
     7. redis如何实现分布式锁 ; 
     8. redis如何保证高性能；
-
 - RocketMQ
     1. rocketMQ消息有哪几种
     2. rocketMQ如何保证事务
@@ -33,24 +31,22 @@
     4. 为何要使用rocketMQ
     5. rocketMQ消息消费异常如何处理
     6. rocketMQ如何保证幂等
-
-- 网络IO
-    1. poll  epoll 实现原理
+- 网络IO-多路复用
+    1. poll select epoll 实现原理
 - 进阶
     1. 服务器CPU飚高如何排查；
     2. 内存溢出问题如何排查 -mat 什么情况下会出现内存溢出
     3. 系统稳定性
-    4. arthas
+    4. [arthas](https://arthas.aliyun.com/doc/)
     5. spring IOC AOP
     6. Mybatis
     7. 缓存技术  
        - 缓存穿透
        - 缓存击穿 
        - 缓存雪崩
-    
     8. 高可用、高性能、可扩展
-    9. 接口幂等实现
-    10. 唯一性ID如何生成
+    9. [接口幂等实现](#接口幂等实现)
+    10. [唯一性ID如何生成](#唯一性ID如何生成)
         - snowflakes(雪花算法)
         - 数据库实现 (步长)
     11. 负载均衡算法
@@ -62,24 +58,36 @@
         - 滑动窗口
         - 漏桶
         - 令牌桶
+        - 计数法
     13. 团队管理
     14. traceId解决方案
     15. 分库分表
     16. 接口：限流、降级、熔断；   
-        (RateLimiter / 开关降级  / setinel)
-        
+        (RateLimiter / 开关降级  / sentinel)
     17. 分布式锁
         - redis实现分布式锁（lua脚本实现）； watchdog
         - 数据库唯一版本号
         - 数据库乐观锁(版本号)
         - zookeeper实现
+    18. [系统稳定性保障](#系统稳定性保障)
 - 自研框架
   - 流程引擎
+    - [开源LiteFlow](https://gitee.com/dromara/liteFlow)
   - 规则引擎
   - 日志链
   - 工程中jar冲突，类冲突maven插件工具
+  - 去O过程中实现DB双写能力；
 
-## MySQL
+
+
+## Java集合
+
+> 常用java集合类有 `ArrayList` `LinkedList` `HashMap` `ConcurrentHashMap` `HashSet` 等；
+
+
+
+## MySQL 
+
 ### 事务隔离级别
 
 MySQL 有四种事务隔离级别 `读未提交` `读已提交` ` 可重复读` `串性化` MySQL默认事务隔离方式 `可重复读`
@@ -206,7 +214,7 @@ select * from user where name='gce'
 ```sql
 select name,age from user where name='gce'
 ```
-如上SQL直接在索引中就能返回需要的值，就不需要回表了，这据说索引覆盖；(name,age) 联合索引
+如上SQL直接在索引中就能返回需要的值，就不需要回表了，这就是索引覆盖；(name,age) 联合索引
 
 ### 索引下推
 ```sql
@@ -216,9 +224,38 @@ select * from user where name like 'gce%' and age='18';
 
 
 
+#### 接口幂等实现
+
+1. **唯一事务编号**：
+   对于每个操作请求，客户端生成一个唯一的事务ID。服务器在处理前检查该ID是否已经存在，如果存在，则不再执行操作，直接返回之前的结果。比如将数据存在redis或数据库中；
+2. **乐观锁**：
+   在数据库操作中，使用乐观锁可以通过比较数据版本号来实现幂等性。在更新前检查版本号，如果不一致则不进行更新。
+3. **悲观锁**：
+   数据库中通过行锁或表锁来确保同一时间只有一个操作能修改数据。
+4. **状态机**：
+   将数据变更操作建模为一个状态机，每种状态下只有特定的操作可以执行。如果状态不允许，操作将被拒绝。
+5. **请求去重**：
+   服务器存储已经处理的请求的指纹信息，比如请求参数的Hash值。当收到重复请求时，通过比对指纹信息识别并丢弃。
+6. **幂等Token**：
+   类似于唯一事务编号，服务器提供一个Token，客户端在执行操作时带上这个Token，服务器通过Token确保操作只被执行一次（例如：**snowflake 雪花算法**，**美团 Leaf 算法**，**滴滴 TinyID 算法**，**百度 Uidgenerator 算法**，**uuid**，**redis** 等）
+7. **预写日志**：
+   写入一项记录到日志中，表明某项操作即将执行。如果操作失败而需要重试，日志可以用来检查操作是否已经执行过。
+
+#### 唯一性ID如何生成
+
+现在市面上主流的唯一ID生成框架：
+
+1. **snowflake 雪花算法**
+2. [**美团 Leaf 算法**](https://github.com/Meituan-Dianping/Leaf)
+3. [**滴滴 TinyID 算法**](https://github.com/didi/tinyid)
+4. **百度 Uidgenerator 算法**
+
 #### 系统稳定性保障：
+
+[系统稳定性最佳实践](./规划/系统稳定性最佳实践.md)
+
 事前预防预警
-	1. 稳定性架构设计  架构的 高性能、高并发、高可用、可扩展
+	1. 稳定性架构设计  架构的 高性能、高并发、高可用、可扩展，
 	2. 防御式编程  ----外部系统不能相信；确保外部系统出问题时，系统需要有应对方式；
 	3. 业务可降级  sentinel 
 	4. 力保核心链路     ----限流   sentinel
@@ -236,6 +273,7 @@ select * from user where name like 'gce%' and age='18';
 事后复盘总结
 	找出问题根源、5whys分析法、制定相应的优化措施、组织团队进行复盘
 	
+
 	为什么会发生
 	为什么没有发现
 	为什么没有从系统上预防事故
@@ -258,7 +296,7 @@ PM 常见的职责如下：
 
 1. 对于应用程序层面：保证应用一次完成的链路可以通过一个traceId查询出所有的链路；
 2. 通过注解实现开关拿开关； 不会再出现各种各样的拿开关的代码
-3. 使用redis实现延时队列  使用zset实现
+3. 使用redis实现延时队列使用zset实现
 4. 使用redis实现at least once queue
 5. 对于数据库中突然某条SQL跑慢了，应该是执行计划跑偏了 ；绑定执行计划； MySQL指定索引；
 6. 对于大数据量跑数据 源数据使用 ID分段 ；在分布到集群中个节点执行；
@@ -266,4 +304,4 @@ PM 常见的职责如下：
 
    做的业务：信用卡积分主流程；
    积分笔笔抽 ；
-   *****对于恶意薅羊毛的客户实施积分账号冻结；
+   **对于恶意薅羊毛的客户实施积分账号冻结；**

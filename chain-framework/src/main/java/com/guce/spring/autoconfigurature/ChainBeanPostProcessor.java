@@ -7,6 +7,7 @@ import com.guce.chain.model.ChainExecServiceWrapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
+import org.springframework.stereotype.Component;
 
 /**
  * {@link org.springframework.beans.factory.config.BeanPostProcessor BeanPostProcessor}
@@ -20,8 +21,7 @@ import org.springframework.beans.factory.config.BeanPostProcessor;
  * @DATE 2021/7/15 9:42 下午
  */
 @Slf4j
-//@Component("chainBeanPostProcessor")
-@Deprecated
+@Component("chainBeanPostProcessor")
 public class ChainBeanPostProcessor  implements BeanPostProcessor {
 
     /**
@@ -46,10 +46,15 @@ public class ChainBeanPostProcessor  implements BeanPostProcessor {
             ChainExecServiceWrapper serviceWrapper = new ChainExecServiceWrapper();
             serviceWrapper.setChainService(service);
             serviceWrapper.annoParamWrapper(annoService);
-            ChainServiceManager.chainNodeJoinFlow(serviceWrapper);
+            //ChainServiceManager.chainNodeJoinFlow(serviceWrapper);
+            ChainServiceManager.getChainList().add(serviceWrapper);
 
         }
 
         return bean;
+    }
+
+    public ChainBeanPostProcessor(){
+        log.info("ChainBeanPostProcessor init");
     }
 }

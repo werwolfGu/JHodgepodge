@@ -16,9 +16,7 @@ public class LongestCommonPrefix {
         for (int i = 1 ; i < strs.length ; i++ ){
             minLen = Math.min(minLen,strs[i].length());
         }
-
         //二分查找法
-
         int low = 1, high = minLen;
         while (low <= high) {
             int mid = (low + high) / 2;

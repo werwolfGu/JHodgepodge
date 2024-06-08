@@ -1,2 +1,4 @@
 org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
 com.guce.spring.SpringAutoConfiguration
+org.springframework.context.ApplicationContextInitializer=\
+  com.guce.spring.initializer.TTLMDCAdapterInitializer

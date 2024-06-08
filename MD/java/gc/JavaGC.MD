@@ -39,7 +39,7 @@ Eden区的对象复制到survivor中的一个区中，当Survivor区满时，此
             第一次 CMS GC 时，统计数据还没有形成是无效的，这时会跟据 Old Gen 的使用占比来进行判断是否要进行 GC。这个占比为`50%`；
         2. 配置(true)
             根据`CMSInitiatingOccupancyFraction` 默认值是92% 判断old Gen空间使用占比情况；
-    3. 判断年轻代晋升对象晋升是否可能会失败，如何会失败，则进行一次回收；
+    3. 判断年轻代晋升对象晋升是否可能会失败，如果会失败，则进行一次回收；
     4. 如果metaSpace认为需要回收metaSpace区域，也会触发一次cms回收
 3. FULL GC触发条件
     1. Perm Gen(metaSpace)空间不足时；

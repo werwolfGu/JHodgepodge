@@ -7,9 +7,12 @@ import com.guce.example.ExampleDemo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
+import javax.sql.DataSource;
 import java.util.concurrent.ExecutionException;
 
 @Service("demoService")
@@ -32,10 +35,11 @@ public class DemoService {
     @Autowired
     private ExampleDemo demo;
 
+
     @Resource(name = "guavaCacheExample")
     private GuavaCacheExample guavaCacheExample;
-
     @MyAnnTest(name = "ann")
+    @Transactional
     public String helloService(@MyAnnTest(name = "name") String name, @MyAnnTest(name = "age") String age) throws ExecutionException {
         // demoDao.getInfo(new HashMap<>());
         String value = guavaCacheExample.get("key");
@@ -44,6 +48,10 @@ public class DemoService {
         demo.doSomething();
         logger.info("guava cache value:{}", value);
         return "hello world";
+    }
+
+    public DataSourceTransactionManager transactionManager(DataSource dataSource) {
+        return new DataSourceTransactionManager(dataSource);
     }
 
 }

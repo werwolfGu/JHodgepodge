@@ -17,8 +17,8 @@ import java.util.Queue;
  * 示例 1:
  * <p>
  * 输入:       1         1
- * / \       / \
- * 2   3     2   3
+ *           / \       / \
+ *          2   3     2   3
  * <p>
  * [1,2,3],   [1,2,3]
  * <p>
@@ -54,6 +54,8 @@ public class IsSameTree {
                 return false;
             }
             TreeNode left1 = node1.left, right1 = node1.right, left2 = node2.left, right2 = node2.right;
+
+            //使用异或  true = true ^ false 来判断都是有值的 ；
             if (left1 == null ^ left2 == null) {
                 return false;
             }
@@ -80,7 +82,7 @@ public class IsSameTree {
     public boolean isSameTree1(TreeNode p, TreeNode q){
         return recursion(p,q) ;
     }
-
+    /// 使用递归深度遍历来判断值是否相等
     public boolean recursion(TreeNode p,TreeNode q){
         if ( p == null && q == null){
             return true;

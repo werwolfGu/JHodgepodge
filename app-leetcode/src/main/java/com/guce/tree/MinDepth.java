@@ -87,11 +87,21 @@ public class MinDepth {
         return depth;
     }
 
+
+    public static int recursion (TreeNode root , int depth) {
+
+        if (root == null) {
+            return depth;
+        }
+        return Math.min(recursion(root.left , depth + 1) , recursion(root.right , depth + 1));
+    }
+
     public static void main(String[] args) {
-        TreeNode node = TreeNode.createBinaryTree(new Integer[]{1,2,3,4,null,null,5},0);
+        TreeNode node = TreeNode.createBinaryTree(new Integer[]{3,9,20,null,null,15,7},0);
         System.out.println(minDepth(node));
 
         System.out.println(minDepthDfs(node));
+        System.out.println(recursion(node,1));
     }
 
 }

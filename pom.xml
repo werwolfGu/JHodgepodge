@@ -33,6 +33,7 @@
     <module>plugin-framework-example</module>
     <module>sentinel-datasource-redis-ext</module>
       <module>disruptor-dmo</module>
+      <module>freeMarker-demo</module>
   </modules>
   <packaging>pom</packaging>
 

@@ -12,4 +12,6 @@ InheritableThreadLocal只能通过父子线(1->1)程传递变量，线程池里�
 
 参考
 
+[threadlocalDemo](com.guce.ThreadLocalLearn)
+
 [ThreadLocal源码分析](https://juejin.im/post/5e4625df6fb9a07cbc268b84?utm_source=gold_browser_extension)

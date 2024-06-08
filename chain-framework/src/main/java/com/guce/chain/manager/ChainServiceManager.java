@@ -16,6 +16,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.io.filefilter.FileFilterUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.InitializingBean;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -39,7 +40,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * @DATE 2020/2/17 2:26 下午
  */
 @Component("chainServiceManager")
-public class ChainServiceManager {
+public class ChainServiceManager implements InitializingBean {
 
     private static Logger logger = LoggerFactory.getLogger(ChainServiceManager.class);
 
@@ -57,6 +58,10 @@ public class ChainServiceManager {
     private final static String FILE_FILTER_SUFFIX = "Flow.json";
 
     private final static long SPRING_LOADER_UNFINISHED_SLEEP_MILL = 500;
+
+    public ChainServiceManager() {
+        logger.info("==========ChainServiceManager init start==========");
+    }
 
     /**
      * lazy加载
@@ -335,6 +340,7 @@ public class ChainServiceManager {
 
     }
 
+
     private static Map<String, List<ChainExecServiceWrapper>> chainExecutorSpringMap = new ConcurrentHashMap<>(32);
 
     public static void chainNodeJoinFlow(ChainExecServiceWrapper chainExecServiceWrapper) {
@@ -345,5 +351,26 @@ public class ChainServiceManager {
         chainList.add(chainExecServiceWrapper);
         chainList.sort(RANK_CHAIN_SERVICES);
 
+    }
+
+    private static List<ChainExecServiceWrapper> chainList = new ArrayList<>();
+
+    public static List<ChainExecServiceWrapper> getChainList() {
+        return chainList;
+    }
+
+    @Override
+    public void afterPropertiesSet() throws Exception {
+        logger.info("chain list: {}" , chainList.size());
+        chainList.stream().forEach( chain -> {
+            String resourceName = chain.getChainResourceName();
+            List<ChainExecServiceWrapper> innerChainList = chainExecutorSpringMap
+                    .computeIfAbsent(resourceName, key -> new ArrayList<>());
+            innerChainList.add(chain);
+        });
+        chainExecutorSpringMap.entrySet().stream().forEach(entry -> {
+            List<ChainExecServiceWrapper> chainList = entry.getValue();
+            chainList.sort(RANK_CHAIN_SERVICES);
+        });
     }
 }

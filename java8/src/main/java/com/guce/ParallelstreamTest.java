@@ -14,7 +14,6 @@ public class ParallelstreamTest {
 
 
     public static void main(String[] args) {
-
         Map<String, List<String>> map = new HashMap<>();
         map.computeIfAbsent("key", (key) -> new ArrayList<>());
         int nums = 1000, nums2 = 100;

@@ -72,7 +72,7 @@ public class AutoConfiguredAnnDemoScannerRegistrar  implements ImportBeanDefinit
                 + " annotated with " + ClassUtils.getShortName(name) + "?");
         String[] basePackages = attributes.getStringArray("basePackages");
 
-        return StringUtils.arrayToDelimitedString(basePackages,",");
+        return StringUtils.arrayToDelimitedString(basePackages,","); 
     }
 
     @Override

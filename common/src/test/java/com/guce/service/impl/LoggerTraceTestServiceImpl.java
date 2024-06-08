@@ -19,13 +19,14 @@ import java.util.concurrent.ExecutorService;
  */
 @Service
 @Slf4j
+@LoggerTrace("b")
 public class LoggerTraceTestServiceImpl implements LoggerTraceTestService {
 
     @ThreadPoolClient
     private ExecutorService executorService;
 
     @Override
-    @LoggerTrace
+    @LoggerTrace("a")
     @SwitchCache(keys = {"key1", "key2", "key3", "key4", "key7:defaultValue"},
             valueTypes = {String.class, Set.class, List.class})
     public void test() {

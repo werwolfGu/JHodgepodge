@@ -15,7 +15,7 @@
         <module>rocketmq-demo</module>
     </modules>
     <properties>
-        <rocketmq-client.version>4.3.0</rocketmq-client.version>
+        <rocketmq-client.version>4.9.1</rocketmq-client.version>
         <ons-client.version>1.8.4.Final</ons-client.version>
     </properties>
 

@@ -22,8 +22,8 @@
         <maven.compiler.target>1.8</maven.compiler.target>
     </properties>
 
-    <profiles>
-        <!-- 测试环境 -->
+    <!--<profiles>
+        &lt;!&ndash; 测试环境 &ndash;&gt;
         <profile>
             <id>test</id>
             <activation>
@@ -33,7 +33,7 @@
                 <spring.profiles.active>test</spring.profiles.active>
             </properties>
         </profile>
-        <!-- 开发环境 -->
+        &lt;!&ndash; 开发环境 &ndash;&gt;
         <profile>
             <id>dev</id>
             <activation>
@@ -43,7 +43,7 @@
                 <spring.profiles.active>dev</spring.profiles.active>
             </properties>
         </profile>
-        <!-- beta环境 -->
+        &lt;!&ndash; beta环境 &ndash;&gt;
         <profile>
             <id>beta</id>
             <properties>
@@ -51,7 +51,7 @@
             </properties>
 
         </profile>
-        <!-- 生产环境 -->
+        &lt;!&ndash; 生产环境 &ndash;&gt;
         <profile>
             <id>pro</id>
             <activation>
@@ -61,8 +61,14 @@
                 <spring.profiles.active>prod</spring.profiles.active>
             </properties>
         </profile>
-    </profiles>
+    </profiles>-->
     <dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-freemarker</artifactId>
+            <version>2.7.3</version>
+        </dependency>
+
         <!--<dependency>
             <groupId>com.guce</groupId>
             <artifactId>service</artifactId>

@@ -14,6 +14,7 @@ import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 
 /**
  * @Author chengen.gce
@@ -28,9 +29,22 @@ public class AllocationExample {
     private IAllocationService loggerTraceTestService;
     @Test
     public void test () {
-        String businessName = "queueName";
-        int concurrentThreadNumber = 4;
-        int min = 0 , max = 10000;
+        try {
+            CompletableFuture future = CompletableFuture.runAsync(() -> simulateBusiness("business1" , 0,10000,4));
+            CompletableFuture future1 = CompletableFuture.runAsync(() -> simulateBusiness("business2" , 0,10000,8));
+
+            CompletableFuture[] arr = new CompletableFuture[]{future,future1};
+            CompletableFuture.allOf(arr).get();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+    public void simulateBusiness(final String businessName ,final int min  ,final int max,int concurrentThreadNumber) {
 
         ClusterAllocationBuilder clusterAllocationBuilder = ClusterAllocationBuilder.builder()
                 ////业务名称  用于区分执行的是哪个业务
@@ -50,18 +64,8 @@ public class AllocationExample {
                 .businessInvoker(list  -> {
                     loggerTraceTestService.test(list);
                     return true;
-                }).build();
-
-        ClusterDispatchManager allocationManager = clusterAllocationBuilder.buildClusterAllocation();
-        allocationManager.simulateClusterServer();
-
-        CompletableFuture future = clusterAllocationBuilder
-                .buildClusterConsumerThreadsManager().startupBusinessHandleThread();
-
-        clusterAllocationBuilder
-                .buildClusterConsumerThreadsManager().startupBusinessMsgPoll( map -> {
-
-                    int segment = 100, currMin = min;
+                }).msgPollInvoker((param , consumerThreadService) -> {
+                    int segment = 400, currMin = min;
                     while (true) {
                         int start = currMin ;
                         int end = start + segment;
@@ -78,13 +82,21 @@ public class AllocationExample {
                             data.setThreadIdentifierCode(String.valueOf(i));
                             list.add(data);
                         }
-
-                        clusterAllocationBuilder
-                                .buildClusterConsumerThreadsManager().allocationToConsumerThreadQueue(list);
+                        consumerThreadService.allocationToConsumerThreadQueue(list);
                     }
-                });
+                    return true;
+                }).build();
+
+        ClusterDispatchManager allocationManager = clusterAllocationBuilder.buildClusterAllocation();
+        allocationManager.simulateClusterServer();
+
+        CompletableFuture future = clusterAllocationBuilder
+                .buildClusterConsumerThreadsManager().startupBusinessHandleThread();
+
+        CompletableFuture pollMsgFuture = clusterAllocationBuilder.startupMsgPollService(null);
         try {
-            future.get();
+            CompletableFuture[] arr = new CompletableFuture[]{future,pollMsgFuture};
+            CompletableFuture.allOf(arr).get();
         } catch (Exception e) {
             e.printStackTrace();
         }

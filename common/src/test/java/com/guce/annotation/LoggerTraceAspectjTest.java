@@ -1,5 +1,6 @@
 package com.guce.annotation;
 
+import com.guce.service.DemoManager;
 import com.guce.service.LoggerTraceTestService;
 import com.guce.service.impl.LoggerTraceTestServiceImpl;
 import com.guce.spring.SpringAutoConfiguration;
@@ -20,11 +21,14 @@ public class LoggerTraceAspectjTest {
     @Autowired
     LoggerTraceTestService loggerTraceTestService ;
 
+    @Autowired
+    private DemoManager demoManager ;
 
 
     @Test
     public void aroundTest(){
         loggerTraceTestService.test();
+        demoManager.test();
     }
 
 }

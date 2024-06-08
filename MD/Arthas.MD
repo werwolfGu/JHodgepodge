@@ -6,3 +6,5 @@
  [操作文档](https://alibaba.github.io/arthas/arthas-tutorials?language=cn)  
  [arthas-plugin](https://github.com/WangJi92/arthas-idea-plugin)
 
+[Arthas原理](https://yeas.fun/archives/arthas-isolation)
+
