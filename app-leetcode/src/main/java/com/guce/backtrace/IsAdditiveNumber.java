@@ -3,6 +3,7 @@ package com.guce.backtrace;
 /**
  *
  * https://leetcode-cn.com/problems/additive-number/
+ * 判断是否是累加数
  * @Author chengen.gce
  * @DATE 2021/4/18 2:57 下午
  */

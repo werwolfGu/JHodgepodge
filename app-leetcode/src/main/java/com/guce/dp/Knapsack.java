@@ -37,7 +37,14 @@ public class Knapsack {
 
                 dp[i][j] = dp[i - 1][j];
                 if (w[i] <= j) {
+                    /// todo 0 / 1 背包问题 只能选前一个物品 v[i] + dp[i - 1][j - w[i]]
                     dp[i][j] = Math.max(dp[i][j], v[i] + dp[i - 1][j - w[i]]);
+                    /**
+                     * todo 完全背包问题 当前物品可以选多次 v[i] + dp[i][j - w[i]]
+                     * dp[i][j] = Math.max(dp[i][j], v[i] + dp[i][j - w[i]] );
+                     */
+
+
                 }
             }
         }

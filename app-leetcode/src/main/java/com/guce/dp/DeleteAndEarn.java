@@ -31,17 +31,21 @@ public class DeleteAndEarn {
 
     public int deleteAndEarn(int[] nums) {
 
-        int[] count = new int[10001];
+        int maxVal = 0;
         for (int i = 0 ; i < nums.length ;i++ ){
-            count[nums[i]]++;
+            maxVal = Math.max(maxVal , nums[i]);
         }
-        int[] dp = new int[10001];
+        int[] count = new int[maxVal];
+        for (int i = 0 ; i < nums.length ; i++) {
+            count[nums[i]] += nums[i];
+        }
+        int[] dp = new int[maxVal + 1];
         dp[0] = count[0];
-        dp[1] = Math.max(count[0],count[1]);
-        for (int i = 2 ; i <= 10000 ; i++){
-            dp[i] = Math.max(dp[i -1] , dp[i -2] + (count[i] * i));
+        dp[1] = Math.max(count[1],count[0]);
+        for (int i = 2;  i<= maxVal ; i++){
+            dp[i] = Math.max(dp[i - 1],dp[i - 2] + count[i]);
         }
-        return dp[10000];
+        return dp[maxVal];
     }
     public int deleteAndEarnPlus(int[] nums) {
 

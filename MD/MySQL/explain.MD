@@ -7,40 +7,101 @@
 expain出来的信息有10列，
 分别是`id`、`select_type`、`table`、`type`、`possible_keys`、`key`、`key_len`、`ref`、`rows`、`Extra`，下面对这些字段进行解释：
 
-- id  
-  执行编号，标识select所属的行。如果在语句中没子查询或关联查询，
-  只有唯一的select，每行都将显示1。
-  否则，内层的select语句一般会顺序编号，对应于其在原始语句中的位置
-  
-- select_type  
-  显示本行是简单或复杂select。
-  如果查询有任何复杂的子查询，则最外层标记为PRIMARY（DERIVED、UNION、UNION RESUlT）;
-  
-- table   
-  访问引用哪个表（引用某个查询，如“derived3”）
+**id**：查询的序列号。用于标识查询中各个部分的顺序，复杂查询（如子查询、联合查询）会有多个id。
 
-- type  
-  数据访问/读取操作类型（ALL、index、range、ref、eq_ref、const/system、NULL）
+**select_type**：查询的类型，表示查询的复杂程度，如 `SIMPLE`（简单查询）、`PRIMARY`（最外层查询）、`SUBQUERY`（子查询）、`DERIVED`（派生表，子查询的结果）。
+
+**table**：被访问的表名或派生表的名称。
+
+**partitions**：使用的分区信息。如果表使用了分区，这里显示使用了哪些分区。
+
+**type**：访问类型，表示MySQL如何找到数据行。常见类型有：
+
+- `ALL`：全表扫描，性能最差。
+
+- `index`：索引全扫描，比全表扫描快。
+
+  ```SQL 
+  CREATE INDEX idx_last_name ON users (last_name);
+  -- 查询只访问索引列；
+  EXPLAIN SELECT last_name FROM users;
+  EXPLAIN SELECT last_name FROM users ORDER BY last_name;
   
-- possible_keys  
-  揭示哪一些索引可能有利于高效的查找
+  CREATE INDEX idx_name_age ON users (last_name, age);
+  -- 联合索引，索引覆盖
+  EXPLAIN SELECT last_name, age FROM users WHERE last_name = 'Doe';
+  ```
 
-- key  
-  显示mysql决定采用哪个索引来优化查询
+- `range`：索引范围扫描，只扫描满足条件的索引范围。
 
-- key_len  
-  显示mysql在索引里使用的字节数
+  - 一般出现在`between` `in` `>` `>=` `<` `<=` `like`等情况会出现
 
-- ref  
-  显示了之前的表在key列记录的索引中查找值所用的列或常量
+  ```SQL
+  -- age 是索引
+  EXPLAIN SELECT * FROM users WHERE age > 25;
+  EXPLAIN SELECT * FROM users WHERE age IN (20, 25, 30);
+  EXPLAIN SELECT * FROM users WHERE age BETWEEN 20 AND 30;
+  -- last_name是索引
+  EXPLAIN SELECT * FROM users WHERE last_name LIKE 'D%';
+  -- 联合索引：last_name first_name 
+  EXPLAIN SELECT * FROM users WHERE last_name = 'Doe' AND first_name BETWEEN 'A' AND 'M';
+  ```
+
   
-- rows  
-  为了找到所需的行而需要读取的行数，估算值，不精确。
-  通过把所有rows列值相乘，可粗略估算整个查询会检查的行数
 
-- Extra  
-  额外信息，如using index、filesort等
+- `ref`：使用非唯一索引扫描，返回匹配某个单独值的所有行。
+
+  - 使用等值查询 `=` 
+
+  ```SQL 
+  -- 索引：age
+  EXPLAIN SELECT * FROM users WHERE age = 30;
+  -- 联合索引：last_name, age
+  EXPLAIN SELECT * FROM users WHERE last_name = 'Doe' AND age = 30;
+  ```
+
   
+
+- `eq_ref`：当查询中的某个表通过唯一索引或主键与另一个表进行连接时，MySQL 可能会选择 `eq_ref` 访问类型。
+
+  ```SQL 
+  -- id 为主键 ； user_id为外键
+  EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id;
+  ```
+
+  
+
+- `const`、`system`：常量表，最多只返回一条记录，性能最好。
+
+```SQL 
+-- const 
+-- id 是主键
+EXPLAIN SELECT * FROM users WHERE id = 1;
+EXPLAIN SELECT * FROM users u JOIN orders o ON u.id = o.user_id WHERE u.id = 1;
+
+-- system 通常表中只有一条数据
+```
+
+
+
+**possible_keys**：查询可能使用的索引。
+
+**key**：实际使用的索引。如果为空，表示没有使用索引。
+
+**key_len**：使用的索引键的长度，表示MySQL在索引中使用的字节数。
+
+**ref**：显示索引的哪一列被用来查找索引记录，通常是常数。
+
+**rows**：MySQL 估计为找到所需数据需要读取的行数，越少越好。
+
+**filtered**：返回结果行的百分比，表示查询条件过滤掉的数据行比例。
+
+**Extra**：额外的信息，描述MySQL在查询过程中采取的操作。常见的有：
+
+- `Using index`：表示查询只使用索引，不需要访问表数据。
+- `Using where`：表示使用了WHERE子句进行过滤。
+- `Using temporary`：表示使用了临时表，通常用于排序或分组。
+- `Using filesort`：表示MySQL使用了文件排序，而不是索引排序。
 
 ### id
 

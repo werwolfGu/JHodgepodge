@@ -43,6 +43,27 @@ public class CoinChange {
         }
     }
 
+    public void backTrace(int[] coins ,int size , int currAmount , int amount ){
+
+        if (currAmount == amount) {
+            res = Math.min(res,size);
+            return ;
+        }
+        if (currAmount > amount) {
+            return ;
+        }
+
+        for (int i = 0 ; i < coins.length; i++) {
+            if(currAmount + coins[i] > amount) {
+                break;
+            }
+            currAmount = currAmount + coins[i];
+            size++;
+            backTrace(coins,size,currAmount,amount);
+            size--;
+            currAmount = currAmount - coins[i];
+        }
+    }
     ////dp
     public  int coinChangeDp(int[] coins, int amount) {
 
@@ -62,9 +83,9 @@ public class CoinChange {
 
     public static void main(String[] args) {
         CoinChange coinChange = new CoinChange();
-        int[] coins = new int[]{1,2,5} ;
-        //System.out.println(coinChange.coinChange(coins,50));
+        int[] coins = new int[]{1,2147483647} ;
+        System.out.println(coinChange.coinChange(coins,2));
 
-        System.out.println(coinChange.coinChangeDp(coins,50));
+        //System.out.println(coinChange.coinChangeDp(coins,50));
     }
 }

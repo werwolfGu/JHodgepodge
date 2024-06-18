@@ -32,8 +32,11 @@ public class WordSearch {
 
     public static boolean dfs(int i ,int j ,int start , String word,char[][] board){
 
+        if (word.charAt(start) != board[i][j]) {
+            return false;
+        }
         if (start == word.length() -1 ){
-            return word.charAt(start) == board[i][j];
+            return true;
         }
 
         if (board[i][j] == word.charAt(start)) {

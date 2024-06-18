@@ -12,8 +12,8 @@
   - [MVCC](./MySQL/MySQL-MVCC.MD)  
   - [MySQL日志文件](./MySQL/MySQL日志文件.MD)
   - [执行计划分析](./MySQL/explain.MD)
-  - 锁 间隙锁
-  - 索引存储结构
+  - [MySQL锁](./MySQL/MySQL锁.MD)
+  - [MySQL索引](./MySQL/MySQL索引.MD)
   - [索引下推 索引覆盖  回表](#索引下推、索引覆盖、回表)
 - redis
     1. [redis数据结构  string  hash  list  set zset](./redis/redis-数据结构.MD) 

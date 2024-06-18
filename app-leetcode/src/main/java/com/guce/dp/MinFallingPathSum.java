@@ -16,16 +16,15 @@ public class MinFallingPathSum {
         }
         for (int i = 1 ; i < row ; i++){
             for (int j = 0 ; j < col ;j++ ){
-                int left = 0,mid = 0,right = 0 ;
-                mid = dp[i -1][j];
+                int mid = dp[i -1][j];
                 if (j > 0){
-                    left = dp[i -1][j -1];
+                    mid = Math.min(mid,dp[i -1][j -1]);
                 }
                 if (j < col - 1){
-                    right = dp[i - 1][j+1];
+                    mid = Math.min(mid,dp[i -1][j +1]);
                 }
 
-                dp[i][j] = Math.min(Math.min(left,mid),right) + matrix[i][j];
+                dp[i][j] = mid + matrix[i][j];
             }
         }
         int min = dp[row -1][0];

@@ -32,7 +32,6 @@ public class Partition {
         int len = charArr.length;
         List<List<String>> res = new ArrayList<>();
         Deque<String> stack = new ArrayDeque<>();
-
         dfs(charArr,0,len,stack,res);
         return res;
 
@@ -71,5 +70,8 @@ public class Partition {
     public static void main(String[] args) {
         Partition partition = new  Partition();
         System.out.println(partition.partition("aab"));
+
+        String s = "abcd";
+        System.out.println(s.substring(0,3));
     }
 }
