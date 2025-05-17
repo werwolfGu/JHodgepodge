@@ -18,5 +18,32 @@ boolean startTransaction = org.springframework.transaction.support.TransactionSy
 
 
 
+## 通过spring管理事务能力
+
+```java
+public void updateUser(User user) {
+    DefaultTransactionDefinition def = new DefaultTransactionDefinition();
+    def.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRED);
+    def.setIsolationLevel(TransactionDefinition.ISOLATION_DEFAULT);
+    def.setTimeout(30);
+    def.setReadOnly(false);
+
+    TransactionStatus status = transactionManager.getTransaction(def);
+
+    try {
+        // 反射调用 userRepository.save(user)
+        Method saveMethod = UserRepository.class.getMethod("save", User.class);
+        saveMethod.invoke(userRepository, user);
+        transactionManager.commit(status);
+    } catch (Exception e) {
+        transactionManager.rollback(status);
+        throw e;
+    }
+}
+
+```
+
+
+
 
 

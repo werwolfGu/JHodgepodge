@@ -10,7 +10,11 @@ import java.util.Deque;
  * 柱状图中最大的矩形 单调栈
  */
 public class LargestRectangleArea {
-
+    /**
+     * 从中心点向2边扩张；
+     * @param heights
+     * @return
+     */
     public static int solution (int[] heights){
         int max = 0;
 

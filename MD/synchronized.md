@@ -43,7 +43,9 @@ JDK 6之前synchronized效率低的原因。这种依赖于操作系统Mutex Loc
 
 - 偏向锁
 
-> 多数时间只有一个线程使用了synchronized ; 如 StringBuffer  
+> 多数时间只有一个线程使用了
+>
+>  ; 如 StringBuffer  
 
 偏向锁是指一段同步代码一直被一个线程所访问，那么该线程会自动获取锁，降低获取锁的代价。
 

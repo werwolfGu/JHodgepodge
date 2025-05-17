@@ -46,4 +46,12 @@ public class 跳跃游戏 {
         }
         return step;
     }
+
+    public static void main(String[] args) {
+        int x = -11;
+        int mod = x / 10 ;
+        System.out.println(mod);
+        System.out.println(Integer.MAX_VALUE);
+        
+    }
 }
